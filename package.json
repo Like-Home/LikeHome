@@ -1,0 +1,18 @@
+{
+  "name": "likehome",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Like-Home/LikeHome.git"
+  },
+  "author": "",
+  "bugs": {
+    "url": "https://github.com/Like-Home/LikeHome/issues"
+  },
+  "homepage": "https://github.com/Like-Home/LikeHome#readme"
+}
