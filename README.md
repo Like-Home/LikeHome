@@ -1,16 +1,16 @@
 # LikeHome
 
 ## Folders
-- `/backend`    - The API server that servers files and handles interactions from the web application frontend.
-- `/frontend`
-  - `./src/`    - The API server that servers files and handles interactions from the web application frontend.
-  - `./public/` - The web React app frontend.
+- `/backend`    - The Django backend API server.
+- `/frontend`   - The React web app frontend.
 
 ## Resources
 
 - [React](https://reactjs.org/)
 - [Django](https://www.djangoproject.com/)
 - [Building a React.js Application using Django REST Framework](https://www.section.io/engineering-education/react-and-django-rest-framework/)
+- [dbdiagram.io - Visualize dbml Files](https://dbdiagram.io/)
+- [Caddy](https://caddyserver.com/docs/caddyfile)
 
 ## Setup
 
@@ -32,7 +32,18 @@ python manage.py createsuperuser
 
 ### Frontend
 
-Coming soon...
+Make sure you have npm installed. Then run these commands:
+```
+cd frontend
+npm install
+```
+
+Install Caddy:
+- For Windows, a copy of `caddy.exe` is already included for easy development.
+- On Linux and macOS, [install Caddy](https://caddyserver.com/docs/install) through your package manager.
+  - You can also download it manually from Caddy's website if you prefer.
+
+That's it for now!
 
 ## Running the application
 
@@ -46,4 +57,9 @@ python manage.py runserver
 
 ### Frontend
 
-Coming soon...
+In the root folder (the one with the Caddyfile), run:
+```
+caddy run
+```
+
+
