@@ -43,30 +43,20 @@ Install Caddy:
 - On Linux and macOS, [install Caddy](https://caddyserver.com/docs/install) through your package manager.
   - You can also download it manually from Caddy's website if you prefer.
 
-That's it for now!
+For a production build do:
+```
+cd frotend
+npm run build
+```
 
 ## Running the application
 
-### Backend
-
+To get a complete development setup instantly, simply run: (in the root folder)
 ```
-cd backend
-python manage.py runserver
+node run.js
 ```
 
-
-### Frontend
-
-First:
+To emulate production mode without Docker you can do:
 ```
-cd frontend
-npm start
+node run.js production
 ```
-
-In the root folder (the one with the Caddyfile), run:
-```
-caddy run
-```
-
-
-
