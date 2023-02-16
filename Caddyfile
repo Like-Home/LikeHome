@@ -1,11 +1,7 @@
 :80
 
-# Serve static files from frontend/public
-file_server
-root frontend/public
-
-# Serve node_modules
-root /node_modules/* frontend
+# Serve most files from Vite
+reverse_proxy localhost:5173
 
 # Forward certain paths to Django
 @django path /api/* /admin/* /static/*

@@ -57,9 +57,16 @@ python manage.py runserver
 
 ### Frontend
 
+First:
+```
+cd frontend
+npm start
+```
+
 In the root folder (the one with the Caddyfile), run:
 ```
 caddy run
 ```
+
 
 
