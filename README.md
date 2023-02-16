@@ -32,7 +32,7 @@ python manage.py createsuperuser
 
 ### Frontend
 
-Make sure you have npm installed. Then run these commands:
+Make sure you have Node and npm installed. Then run these commands:
 ```
 cd frontend
 npm install
@@ -45,7 +45,7 @@ Install Caddy:
 
 For a production build do:
 ```
-cd frotend
+cd frontend
 npm run build
 ```
 
@@ -56,7 +56,10 @@ To get a complete development setup instantly, simply run: (in the root folder)
 node run.js
 ```
 
-To emulate production mode without Docker you can do:
+To emulate production mode without Docker:
 ```
+cd frontend
+npm run build
+cd ..
 node run.js production
 ```

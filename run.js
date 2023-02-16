@@ -1,6 +1,9 @@
 const BLACK = 0, RED = 1, GREEN = 2, YELLOW = 3, BLUE = 4, MAGENTA = 5, CYAN = 6, WHITE = 7
 const PRODUCTION = (process.argv[2] ?? process.env['ENV'] ?? '').startsWith('prod')
 
+// Go into the dir of run.js
+process.chdir(__dirname)
+
 if (!PRODUCTION) {
     log('Running development server...')
     spawn(prefix('Django', RED), 'python -m poetry run python manage.py runserver', {callback: djangoLog, cwd: 'backend'})
