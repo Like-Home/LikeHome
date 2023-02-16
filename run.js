@@ -47,7 +47,7 @@ function djangoLog(line) {
         let pfx = prefix('General', BLUE)
         return (line + '\n'
             + `${pfx} | \n`
-            + `${pfx} |   Running at ${color('http://localhost:80/', YELLOW)}\n`
+            + `${pfx} | Running at ${color('http://localhost:80/', YELLOW)}\n`
             + `${pfx} | `)
         ready = true
     }
