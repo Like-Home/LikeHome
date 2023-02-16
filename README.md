@@ -14,40 +14,16 @@
 
 ## Setup
 
-### Backend
+### [Backend](backend/README.md)
 
-Make sure you have Python 3.11 installed with Potry. To install Poetry, run `python -m pip install poetry` in your terminal.
+### [Frontend](frontend/README.md)
 
-**NOTE**: On Windows you might need to replace python with  `py -3.11` instead.
-
-```
-cd backend
-python -m poetry install
-python -m poetry shell
-python manage.py migrate
-python manage.py makemigrations
-python manage.py migrate --run-syncdb
-python manage.py createsuperuser
-```
-
-### Frontend
-
-Make sure you have Node and npm installed. Then run these commands:
-```
-cd frontend
-npm install
-```
+### Caddy
 
 Install Caddy:
 - For Windows, a copy of `caddy.exe` is already included for easy development.
 - On Linux and macOS, [install Caddy](https://caddyserver.com/docs/install) through your package manager.
   - You can also download it manually from Caddy's website if you prefer.
-
-For a production build do:
-```
-cd frontend
-npm run build
-```
 
 ## Running the application
 
