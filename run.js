@@ -4,15 +4,19 @@ const PRODUCTION = (process.argv[2] ?? process.env['ENV'] ?? '').startsWith('pro
 // Go into the dir of run.js
 process.chdir(__dirname)
 
+// Detect if already in Poetry virtual environment
+// TODO: some windows users might need a py -3.11 prefix
+const PYTHON_PATH = process.env.POETRY_ACTIVE === '1' ? 'python' : 'python -m poetry run python'
+
 if (!PRODUCTION) {
     log('Running development server...')
-    spawn(prefix('Django', RED), 'python -m poetry run python manage.py runserver', {callback: djangoLog, cwd: 'backend'})
+    spawn(prefix('Django', RED), `${PYTHON_PATH} manage.py runserver`, {callback: djangoLog, cwd: 'backend'})
     spawn(prefix('Vite', GREEN), 'npm start --silent', {cwd: 'frontend'})
     spawn(prefix('Caddy', YELLOW), 'caddy run', {callback: caddyLog})
 
 } else {
     log('Running production test server...')
-    spawn(prefix('Django', RED), 'python -m poetry run python manage.py runserver', {callback: djangoLog, cwd: 'backend'})
+    spawn(prefix('Django', RED), `${PYTHON_PATH} manage.py runserver`, {callback: djangoLog, cwd: 'backend'})
     spawn(prefix('Caddy', YELLOW), 'caddy run --config Caddyfile.prod', {callback: caddyLog})
 }
 
@@ -45,11 +49,11 @@ let ready = false
 function djangoLog(line) {
     if (!ready) {
         let pfx = prefix('General', BLUE)
+        ready = true // TODO: maybe check vite too, larger projects might take longer to build
         return (line + '\n'
             + `${pfx} | \n`
             + `${pfx} | Running at ${color('http://localhost:80/', YELLOW)}\n`
             + `${pfx} | `)
-        ready = true
     }
 }
 
@@ -70,7 +74,7 @@ function spawn(name, cmd, options={}) {
     cmd = cmd.split(' ')
     const proc = subprocess.spawn(cmd[0], cmd.slice(1), { shell: true, stdio: 'pipe', ...options })
     let data = ''
-    for (let stream of [proc.stdout, proc.stderr]) {
+    [proc.stdout, proc.stderr].forEach(stream => {
         stream.on('data', chunk => {
             data += chunk
             const lines = data.split('\n')
@@ -81,5 +85,5 @@ function spawn(name, cmd, options={}) {
                 console.log(`${name} | ${line}`)
             }
         })
-    }
+    })
 }
