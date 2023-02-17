@@ -3,6 +3,7 @@
 ## Resources
 
 - [Django](https://www.djangoproject.com/)
+- [Django Quick Tutorial Example](https://docs.djangoproject.com/en/4.1/intro/tutorial01/)
 
 ## Setup
 
@@ -17,4 +18,13 @@ python manage.py migrate
 python manage.py makemigrations
 python manage.py migrate --run-syncdb
 python manage.py createsuperuser
+```
+
+## Getting Started
+
+To start the Django server, run the following commands:
+
+```bash
+python -m poetry shell
+python manage.py runserver 8000
 ```
