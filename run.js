@@ -73,8 +73,8 @@ function spawn(name, cmd, options={}) {
     const subprocess = require('child_process')
     cmd = cmd.split(' ')
     const proc = subprocess.spawn(cmd[0], cmd.slice(1), { shell: true, stdio: 'pipe', ...options })
-    let data = ''
-    [proc.stdout, proc.stderr].forEach(stream => {
+    let data = '';
+    for (let stream of [proc.stdout, proc.stderr]) {
         stream.on('data', chunk => {
             data += chunk
             const lines = data.split('\n')
@@ -85,5 +85,5 @@ function spawn(name, cmd, options={}) {
                 console.log(`${name} | ${line}`)
             }
         })
-    })
+    }
 }
