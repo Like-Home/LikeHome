@@ -2,7 +2,7 @@ const fs = require('fs')
 const subprocess = require('child_process')
 const path = require('path')
     
-const BLACK = 0, RED = 1, GREEN = 2, YELLOW = 3, BLUE = 4, MAGENTA = 5, CYAN = 6, WHITE = 7
+const BLACK = 0, RED = 1, GREEN = 2, YELLOW = 3, BLUE = 4, MAGENTA = 5, CYAN = 6, WHITE = 7, GRAY = 60
 const PRODUCTION = (process.argv[2] ?? process.env['ENV'] ?? '').startsWith('prod')
 
 // Go into the dir of run.js
@@ -105,7 +105,7 @@ function caddyLog(line) {
         let {level, ts, logger, msg, ...rest} = data
 
         if (Object.keys(rest).length > 0)
-            rest = color(JSON.stringify(rest), BLACK) //util.inspect(rest, {colors: true, depth: 10, breakLength: Infinity})
+            rest = color(JSON.stringify(rest), GRAY) //util.inspect(rest, {colors: true, depth: 10, breakLength: Infinity})
         else
             rest = ''
 
