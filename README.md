@@ -14,9 +14,35 @@
 
 ## Setup
 
-### [Backend](backend/README.md)
 
-### [Frontend](frontend/README.md)
+### Downloads
+#### Required Software
+- [Javascript 18](https://nodejs.org/en/download/)
+- [Python 3.11](https://www.python.org/downloads/)
+- [Caddy](https://caddyserver.com/docs/install)
+- [Poetry](https://github.com/python-poetry/poetry) 
+
+#### Recommended Software
+- [Postman](https://www.postman.com/downloads/) Testing requests to backend & other external API's
+- [SQLite](https://sqlitebrowser.org/) Browsing data in database
+- [Signal](https://signal.org/en/download/) E2e private messenger for sending/receiving secret tokens
+
+### Backend
+Follow the steps outlined in the
+[Backend setup guide](backend/README.md) 
+
+### Frontend
+Follow the steps outlined in the [Frontend setup guide](frontend/README.md)
+
+### Environment
+Our project will use a .env file that contains different variables and secrets that will be used for both development and production.
+Contact @ncardoza for more info regarding the Google client_id and secrets, which will be sent via [Signal Messenger](https://signal.org/en/download/).
+
+#### Development
+To get started, copy the sample .env file to the project root directory with the filename: `.env`.
+
+#### Production
+Same as above, but save file as: `prod.env`.
 
 ### Caddy
 
@@ -26,8 +52,9 @@ Install Caddy:
   - You can also download it manually from Caddy's website if you prefer.
 
 ## Running the application
-
-To get a complete development setup instantly, simply run: (in the root folder)
+After following the setup directions in both backend & frontend README file,
+to get a complete development setup instantly, enter the poetry virtual envaironment shell and run this command in the project's root folder.
+This will start the Django, Caddy and Vite instances. You can access the development app on http://localhost:80
 ```
 node run.js
 ```
