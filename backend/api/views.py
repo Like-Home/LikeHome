@@ -18,7 +18,7 @@ class TodoView(viewsets.ModelViewSet):
 class CSRFGeneratorView(views.APIView):
     permissions_classes = [permissions.AllowAny]
 
-    def get(self, request, format=None):
+    def get(self, request: Request, format=None):
         return Response({'success': True})
 
 
@@ -26,7 +26,7 @@ class UserView(views.APIView):
     # TODO: figure out why this doesn't work
     permissions_classes = [permissions.IsAuthenticated]
 
-    def get(self, request, format=None):
+    def get(self, request: Request, format=None):
         user = request.user
 
         if not user.is_authenticated:

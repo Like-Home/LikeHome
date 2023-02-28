@@ -32,6 +32,7 @@ local_settings.py
 db.sqlite3
 db.sqlite3-journal
 __pycache__
+.mypy_cache
 
 # Frontend-specific ignored files
 node_modules/
