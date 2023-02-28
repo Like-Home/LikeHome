@@ -3,6 +3,7 @@
 ## Setup
 
 Make sure you have Node and npm installed. Then run these commands:
+
 ```bash
 npm install
 ```
@@ -24,6 +25,14 @@ Just run `npm install @swc/core` and try again. You can find more information ab
 ## Building
 
 For a production build run the following:
+
 ```
 npm run build
 ```
+
+## Frameworks
+
+- [React](https://reactjs.org/)
+- [Vite](https://vitejs.dev/)
+- [react-router](https://reactrouter.com/)
+- [recoil](https://recoiljs.org/)
