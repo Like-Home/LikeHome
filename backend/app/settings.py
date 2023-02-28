@@ -12,6 +12,8 @@ https://docs.djangoproject.com/en/4.1/ref/settings/
 
 from pathlib import Path
 
+from . import config
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -136,6 +138,11 @@ ACCOUNT_EMAIL_REQUIRED = True
 
 SOCIALACCOUNT_PROVIDERS = {
     'google': {
+        'APP': {
+            'client_id': config.GOOGLE_CLIENT_ID,
+            'secret': config.GOOGLE_CLIENT_SECRET,
+            'key': ''
+        },
         'SCOPE': [
             'profile',
             'email',
