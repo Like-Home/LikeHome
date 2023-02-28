@@ -23,15 +23,17 @@ const createSubLogger = log => (level, msg) => log(prefix(level, {
 /**
  * Load environment variables from .env files
  */
-function loadDotEnv() {
+function loadDotEnv(postfix = '') {
     const logger = createSubLogger((...args) => {
         console.log(`${prefix('Environ', GREEN)} |`, ...args)
     })
     
+    const filename = `.env${postfix}`
+
     const locations = [
-        path.join(__dirname, 'backend', '.env'),
-        path.join(__dirname, 'frontend', '.env'),
-        path.join(__dirname, '.env'),
+        path.join(__dirname, 'backend', filename),
+        path.join(__dirname, 'frontend', filename),
+        path.join(__dirname, filename),
     ]
 
     const existingLocations = locations.filter(fs.existsSync)
@@ -42,15 +44,17 @@ function loadDotEnv() {
         existingLocations.forEach(location => {
             logger('info', `| Loading environment variables from ${location}`)
             fs.readFileSync(location, 'utf8').split('\n').forEach(line => {
-                const [key, value] = line.split('=', 1)
-                process.env[key] = value
+                if (line.startsWith('#') || line.trim() === '') return
+                const [key, ...value] = line.split('=')
+                process.env[key] = value.join('=')
             })
         })
     }
 }
 
-function checkVersion(path, option, version) {
-    const child = subprocess.spawnSync(path, [option], { encoding: 'utf8' });
+function checkVersion(cmd, version, options = {}) {
+    cmd = cmd.split(' ')
+    const child = subprocess.spawnSync(cmd[0], cmd.slice(1), { encoding: 'utf8', ...options });
     if (child.status !== 0) {
         console.log(`Error: The program "${path}" failed with status code "${child.status}"`)
         process.exit(1)
@@ -64,23 +68,33 @@ if (!process.version.startsWith('v18.')) {
     process.exit(1)
 }
 
-if (!checkVersion(PYTHON_PATH, '-V', '3.11.')) {
+if (!checkVersion(`${PYTHON_PATH} -V`, '3.11.', { cwd: 'backend' })) {
     console.log("Error: Incorrect version of Python. Please use Python 3.11")
     process.exit(1)
 }
 
-
-loadDotEnv()
 if (!PRODUCTION) {
+    loadDotEnv()
     log('Running development server...')
-    spawn(prefix('Django', RED), `${PYTHON_PATH} manage.py runserver`, {callback: djangoLog, cwd: 'backend'})
-    spawn(prefix('Vite', GREEN), 'npm start --silent', {cwd: 'frontend'})
+    spawn(prefix('Django', RED), `${PYTHON_PATH} manage.py runserver`, {
+        callback: djangoLog,
+        cwd: 'backend',
+    })
+    spawn(prefix('Vite', GREEN), 'npm start --silent', {
+        cwd: 'frontend',
+    })
     spawn(prefix('Caddy', YELLOW), `${CADDY_PATH} run`, {callback: caddyLog})
 
 } else {
+    loadDotEnv('.prod')
     log('Running production test server...')
-    spawn(prefix('Django', RED), `${PYTHON_PATH} manage.py runserver`, {callback: djangoLog, cwd: 'backend'})
-    spawn(prefix('Caddy', YELLOW), `${CADDY_PATH} run --config Caddyfile.prod`, {callback: caddyLog})
+    spawn(prefix('Django', RED), `${PYTHON_PATH} manage.py runserver`, {
+        callback: djangoLog,
+        cwd: 'backend',
+    })
+    spawn(prefix('Caddy', YELLOW), `${CADDY_PATH} run --config Caddyfile.prod`, {
+        callback: caddyLog,
+    })
 }
 
 // Special logger for Caddy
