@@ -1,11 +1,9 @@
-import { useState } from 'react'
+import React, { useState } from 'react'
 import reactLogo from '../assets/react.svg'
 import '../App.scss'
 
 import userAtom from '../recoil/user';
 import { useRecoilValue } from 'recoil';
-
-  
 
 function IndexPage() {
   const [count, setCount] = useState(0)

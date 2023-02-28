@@ -1,3 +1,4 @@
+import React from "react";
 import { Outlet } from "react-router-dom";
 import userAtom from '../recoil/user';
 import { useRecoilValue } from 'recoil';

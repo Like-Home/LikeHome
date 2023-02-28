@@ -1,3 +1,4 @@
+import React from 'react';
 import CSRFToken from "../components/useCSRFToken";
 import userAtom from '../recoil/user';
 import { useRecoilValue } from 'recoil';
@@ -19,7 +20,6 @@ export function AuthPage() {
         <h2>Authentication Page</h2>
         <p>To make reservations or check on the status of existing reservations</p>
         <form action="/accounts/google/login/?process=login" method="post">
-          <a href="/accounts/google/login"></a>
           <CSRFToken />
           <input type="submit" value="Login or Sign Up with Google" />
         </form>
