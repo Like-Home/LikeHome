@@ -63,8 +63,9 @@ function checkVersion(cmd, version, options = {}) {
     return child.stdout.includes(version)
 }
 
-if (!process.version.startsWith('v18.')) { 
-    console.log("Error: Incorrect version of NodeJS. Please use NodeJS v16")
+const nodeVersion = process.versions.node.split('.').map(parseInt)
+if (nodeVersion[0] < 18) {
+    console.log(`Error: Invalid version (${process.version}) of NodeJS. Please use NodeJS v18 or newer.`)
     process.exit(1)
 }
 
