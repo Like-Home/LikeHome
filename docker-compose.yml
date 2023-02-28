@@ -1,0 +1,38 @@
+services:
+  frontend:
+    build: frontend
+    volumes:
+      - ./frontend/dist:/app/dist
+  backend:
+    # restart: always
+    build: backend
+    command: poetry run python manage.py runserver 0.0.0.0:8000
+    volumes:
+      - ./backend:/app
+    environment:
+      - GOOGLE_CLIENT_ID=${GOOGLE_CLIENT_ID}
+      - GOOGLE_CLIENT_SECRET=${GOOGLE_CLIENT_SECRET}
+    env_file: .env
+  # postgres:
+  #   image: postgres
+  #   restart: always
+  #   ports:
+  #     - 5432:5432
+  #   volumes:
+  #     - ./postgres/database:/var/lib/postgresql/data
+  #   environment:
+  #     - POSTGRES_USER=producegoose
+  #     - POSTGRES_DB=website
+  #     - POSTGRES_PASSWORD=drowssap
+  caddy:
+    image: caddy
+    volumes:
+      - ./Caddyfile.docker:/etc/caddy/Caddyfile
+      - ./frontend/dist:/usr/share/caddy
+      - ./caddy_data:/data
+    ports:
+      - "80:80"
+  # stripe-cli:
+  #   image: stripe/stripe-cli
+  #   container_name: stripe-cli
+  #   command: "listen --api-key=${STRIPE_PRIVATE_KEY} --events=checkout.session.completed --forward-to http://backend:8000/webhook/stripe/"

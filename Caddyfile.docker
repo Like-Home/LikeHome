@@ -1,15 +1,15 @@
 # Change to :443 or domain name to enable automatic HTTPS
 :80 {
-
+  
   # Forward certain paths to Django
   @django path /api/* /admin /admin/* /static/*
   handle @django {
-    reverse_proxy localhost:8000
+    reverse_proxy backend:8000
   }
 
   # Serve static files from Vite build
   handle {
-    root * ./frontend/dist
+    root * /usr/share/caddy
     try_files {path} index.html
     file_server
   }
