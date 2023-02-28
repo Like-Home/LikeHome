@@ -4,8 +4,6 @@
 # Google
 client_secret.json
 
-
-
 # Node
 *.log
 logs/
@@ -44,7 +42,7 @@ __pycache__
 .mypy_cache
 
 # Frontend-specific ignored files
-node_modules/
+node_modules
 
 # Runtime data
 pids
@@ -141,3 +139,14 @@ dist
 .yarn/build-state.yml
 .yarn/install-state.gz
 .pnp.*
+
+dist-ssr
+*.local
+
+# Editor directories and files
+.idea
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
