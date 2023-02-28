@@ -1,14 +1,21 @@
 .DEFAULT_GOAL := all
 sources = app api # tests
 
-.PHONY: install
-install:
-	poetry install
+.PHONY: run
+run:
+	poetry run python manage.py runserver
 
 .PHONY: format
 format:
 	poetry run isort $(sources)
 	poetry run autopep8 --in-place --recursive $(sources)
+
+.PHONY: setup
+setup:
+	poetry install
+	poetry run python manage.py makemigrations
+	poetry run python manage.py migrate --run-syncdb
+	poetry run python manage.py createsuperuser
 
 .PHONY: mypy
 typecheck:
