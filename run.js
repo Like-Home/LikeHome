@@ -5,6 +5,11 @@ const path = require('path')
 const BLACK = 0, RED = 1, GREEN = 2, YELLOW = 3, BLUE = 4, MAGENTA = 5, CYAN = 6, WHITE = 7, GRAY = 60
 const PRODUCTION = (process.argv[2] ?? process.env['ENV'] ?? '').startsWith('prod')
 
+if (PRODUCTION) {
+    process.env['ENV'] = 'production'
+    process.env['NODE_ENV'] = 'production'
+}
+
 // Go into the dir of run.js
 process.chdir(__dirname)
 
@@ -66,7 +71,6 @@ function checkVersion(cmd, version, options = {}) {
 const nodeVersion = process.versions.node.split('.').map(parseInt)
 if (nodeVersion[0] < 18) {
     console.log(`Error: Invalid version (${process.version}) of NodeJS. Please use NodeJS v18 or newer.`)
-    process.exit(1)
 }
 
 if (!checkVersion(`${PYTHON_PATH} -V`, '3.11.', { cwd: 'backend' })) {

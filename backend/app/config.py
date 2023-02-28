@@ -19,7 +19,7 @@ class Sentinel:
 NotSet = Sentinel('NOT_SET')
 
 
-def getenv(key: str, default: Any = NotSet) -> Any:
+def getenv(key: str, default: Any = NotSet, required=False) -> Any:
     """Retrieves a value from the environment.
 
     Args:
@@ -36,10 +36,11 @@ def getenv(key: str, default: Any = NotSet) -> Any:
     if key in os.environ:
         return os.environ[key]
 
-    if default is NotSet:
+    if required and default is NotSet:
         raise EnvironmentError(
             f'The environment variable "{key}" was not found and no default was set.')
 
 
-GOOGLE_CLIENT_ID = getenv('GOOGLE_CLIENT_ID')
-GOOGLE_CLIENT_SECRET = getenv('GOOGLE_CLIENT_SECRET')
+PRODUCTION = getenv('ENV', 'development') == 'production'
+GOOGLE_CLIENT_ID = getenv('GOOGLE_CLIENT_ID', required=PRODUCTION)
+GOOGLE_CLIENT_SECRET = getenv('GOOGLE_CLIENT_SECRET', required=PRODUCTION)
