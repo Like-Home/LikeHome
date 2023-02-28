@@ -84,3 +84,32 @@ node run.js production
 If you are using VSCode, you can simply copy `.vscode/settings.example.json` to `.vscode/settings.json`
 and install the [recommended extensions](https://code.visualstudio.com/docs/editor/extension-marketplace#_recommended-extensions)
 inside `.vscode/extensions.json`.
+
+## Docker
+
+Use the following command to spin up all the containers:
+
+```
+docker-compose up
+```
+
+**NOTE**: You can run these following commands in parallel in another terminal.
+
+If it's your first time, you'll need to apply the migrations:
+
+```
+docker compose run backend python manage.py migrate --run-syncdb
+docker compose run backend python manage.py createsuperuser
+```
+
+If you install any dependencies in the backend, you'll need to rebuild the image:
+
+```
+docker compose build backend
+```
+
+If you make any changes to the frontend, you'll need to run it again:
+
+```
+docker compose up frontend
+```

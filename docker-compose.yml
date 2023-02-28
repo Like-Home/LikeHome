@@ -4,26 +4,33 @@ services:
     volumes:
       - ./frontend/dist:/app/dist
   backend:
-    # restart: always
+    restart: always
     build: backend
     command: poetry run python manage.py runserver 0.0.0.0:8000
     volumes:
       - ./backend:/app
+    env_file: .env
     environment:
+      - ENV=production
       - GOOGLE_CLIENT_ID=${GOOGLE_CLIENT_ID}
       - GOOGLE_CLIENT_SECRET=${GOOGLE_CLIENT_SECRET}
-    env_file: .env
-  # postgres:
-  #   image: postgres
-  #   restart: always
-  #   ports:
-  #     - 5432:5432
-  #   volumes:
-  #     - ./postgres/database:/var/lib/postgresql/data
-  #   environment:
-  #     - POSTGRES_USER=producegoose
-  #     - POSTGRES_DB=website
-  #     - POSTGRES_PASSWORD=drowssap
+      - POSTGRES_USER=postgres
+      - POSTGRES_HOST=postgres
+      - POSTGRES_DB=postgres
+      - POSTGRES_PASSWORD=postgres
+    depends_on:
+      - postgres
+  postgres:
+    image: postgres
+    restart: always
+    ports:
+      - 5432:5432
+    volumes:
+      - ./postgres/database:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_DB=postgres
+      - POSTGRES_PASSWORD=postgres
   caddy:
     image: caddy
     volumes:
@@ -32,6 +39,7 @@ services:
       - ./caddy_data:/data
     ports:
       - "80:80"
+  # TODO: setup for stripe webhooks
   # stripe-cli:
   #   image: stripe/stripe-cli
   #   container_name: stripe-cli
