@@ -36,7 +36,7 @@ Follow the steps outlined in the [Frontend setup guide](frontend/README.md)
 
 ### Environment
 Our project will use a .env file that contains different variables and secrets that will be used for both development and production.
-Contact @ncardoza for more info regarding the Google client_id and secrets, which will be sent via [Signal Messenger](https://signal.org/en/download/).
+Contact @NoahCardoza#3669 for more info regarding the Google client_id and secrets, which will be sent via Signal Messenger.
 
 #### Development
 To get started, copy the sample .env file to the project root directory with the filename: `.env`.
