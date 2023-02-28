@@ -1,3 +1,6 @@
+const fs = require('fs')
+const path = require('path')
+    
 const BLACK = 0, RED = 1, GREEN = 2, YELLOW = 3, BLUE = 4, MAGENTA = 5, CYAN = 6, WHITE = 7
 const PRODUCTION = (process.argv[2] ?? process.env['ENV'] ?? '').startsWith('prod')
 
@@ -8,6 +11,43 @@ process.chdir(__dirname)
 // TODO: some windows users might need a py -3.11 prefix
 const PYTHON_PATH = process.env.POETRY_ACTIVE === '1' ? 'python' : 'python -m poetry run python'
 
+const createSubLogger = log => (level, msg) => log(prefix(level, {
+        error: RED,
+        warn: YELLOW,
+        info: MAGENTA,
+        debug: CYAN,
+    }[level], 5), '| ', msg)
+
+/**
+ * Load environment variables from .env files
+ */
+function loadDotEnv() {
+    const logger = createSubLogger((...args) => {
+        console.log(`${prefix('Environ', GREEN)} |`, ...args)
+    })
+    
+    const locations = [
+        path.join(__dirname, 'backend', '.env'),
+        path.join(__dirname, 'frontend', '.env'),
+        path.join(__dirname, '.env'),
+    ]
+
+    const existingLocations = locations.filter(fs.existsSync)
+
+    if (existingLocations.length === 0) {
+        logger('warn', 'No .env file found.')
+    } else {
+        existingLocations.forEach(location => {
+            logger('info', `| Loading environment variables from ${location}`)
+            fs.readFileSync(location, 'utf8').split('\n').forEach(line => {
+                const [key, value] = line.split('=', 1)
+                process.env[key] = value
+            })
+        })
+    }
+}
+
+loadDotEnv()
 if (!PRODUCTION) {
     log('Running development server...')
     spawn(prefix('Django', RED), `${PYTHON_PATH} manage.py runserver`, {callback: djangoLog, cwd: 'backend'})
