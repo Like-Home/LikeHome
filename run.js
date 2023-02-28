@@ -1,4 +1,5 @@
 const fs = require('fs')
+const subprocess = require('child_process')
 const path = require('path')
     
 const BLACK = 0, RED = 1, GREEN = 2, YELLOW = 3, BLUE = 4, MAGENTA = 5, CYAN = 6, WHITE = 7
@@ -9,7 +10,8 @@ process.chdir(__dirname)
 
 // Detect if already in Poetry virtual environment
 // TODO: some windows users might need a py -3.11 prefix
-const PYTHON_PATH = process.env.POETRY_ACTIVE === '1' ? 'python' : 'python -m poetry run python'
+const PYTHON_PATH = process.env.PYTHON || process.env.POETRY_ACTIVE === '1' ? 'python' : 'python -m poetry run python'
+const CADDY_PATH = process.env.CADDY || 'caddy'
 
 const createSubLogger = log => (level, msg) => log(prefix(level, {
         error: RED,
@@ -47,17 +49,38 @@ function loadDotEnv() {
     }
 }
 
+function checkVersion(path, option, version) {
+    const child = subprocess.spawnSync(path, [option], { encoding: 'utf8' });
+    if (child.status !== 0) {
+        console.log(`Error: The program "${path}" failed with status code "${child.status}"`)
+        process.exit(1)
+    }
+
+    return child.stdout.includes(version)
+}
+
+if (!process.version.startsWith('v18.')) { 
+    console.log("Error: Incorrect version of NodeJS. Please use NodeJS v16")
+    process.exit(1)
+}
+
+if (!checkVersion(PYTHON_PATH, '-V', '3.11.')) {
+    console.log("Error: Incorrect version of Python. Please use Python 3.11")
+    process.exit(1)
+}
+
+
 loadDotEnv()
 if (!PRODUCTION) {
     log('Running development server...')
     spawn(prefix('Django', RED), `${PYTHON_PATH} manage.py runserver`, {callback: djangoLog, cwd: 'backend'})
     spawn(prefix('Vite', GREEN), 'npm start --silent', {cwd: 'frontend'})
-    spawn(prefix('Caddy', YELLOW), 'caddy run', {callback: caddyLog})
+    spawn(prefix('Caddy', YELLOW), `${CADDY_PATH} run`, {callback: caddyLog})
 
 } else {
     log('Running production test server...')
     spawn(prefix('Django', RED), `${PYTHON_PATH} manage.py runserver`, {callback: djangoLog, cwd: 'backend'})
-    spawn(prefix('Caddy', YELLOW), 'caddy run --config Caddyfile.prod', {callback: caddyLog})
+    spawn(prefix('Caddy', YELLOW), `${CADDY_PATH} run --config Caddyfile.prod`, {callback: caddyLog})
 }
 
 // Special logger for Caddy
@@ -110,7 +133,6 @@ function log(...args) {
 }
 
 function spawn(name, cmd, options={}) {
-    const subprocess = require('child_process')
     cmd = cmd.split(' ')
     const proc = subprocess.spawn(cmd[0], cmd.slice(1), { shell: true, stdio: 'pipe', ...options })
     let data = '';
