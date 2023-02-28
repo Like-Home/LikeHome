@@ -1,9 +1,29 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import reactLogo from './assets/react.svg'
 import './App.scss'
 
+import { Auth as AuthPage, User } from './pages/auth'
+
+
+// ensures a CSRF token is set in the cookies
+fetch('/api/csrf')
+
 function App() {
   const [count, setCount] = useState(0)
+  const [user, setUser] = useState<User | null>(null)
+
+  useEffect(() => {
+    // TODO: move this to state management
+    fetch('/api/user/me')
+      .then((response) => {
+        if (response.status === 200) {
+          return response.json()
+        } else {
+          return null
+        }
+      })
+      .then(setUser)
+  }, [])
 
   return (
     <div className="App">
@@ -24,6 +44,7 @@ function App() {
           Edit <code>src/App.tsx</code> and save to test HMR
         </p>
       </div>
+      <AuthPage user={user} />
       <p className="read-the-docs">
         Click on the Vite and React logos to learn more
       </p>

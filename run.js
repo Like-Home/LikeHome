@@ -1,23 +1,105 @@
-const BLACK = 0, RED = 1, GREEN = 2, YELLOW = 3, BLUE = 4, MAGENTA = 5, CYAN = 6, WHITE = 7
+const fs = require('fs')
+const subprocess = require('child_process')
+const path = require('path')
+    
+const BLACK = 0, RED = 1, GREEN = 2, YELLOW = 3, BLUE = 4, MAGENTA = 5, CYAN = 6, WHITE = 7, GRAY = 60
 const PRODUCTION = (process.argv[2] ?? process.env['ENV'] ?? '').startsWith('prod')
+
+if (PRODUCTION) {
+    process.env['ENV'] = 'production'
+    process.env['NODE_ENV'] = 'production'
+}
 
 // Go into the dir of run.js
 process.chdir(__dirname)
 
 // Detect if already in Poetry virtual environment
 // TODO: some windows users might need a py -3.11 prefix
-const PYTHON_PATH = process.env.POETRY_ACTIVE === '1' ? 'python' : 'python -m poetry run python'
+const PYTHON_PATH = process.env.PYTHON || process.env.POETRY_ACTIVE === '1' ? 'python' : 'python -m poetry run python'
+const CADDY_PATH = process.env.CADDY || 'caddy'
+
+const createSubLogger = log => (level, msg) => log(prefix(level, {
+        error: RED,
+        warn: YELLOW,
+        info: MAGENTA,
+        debug: CYAN,
+    }[level], 5), '| ', msg)
+
+/**
+ * Load environment variables from .env files
+ */
+function loadDotEnv(postfix = '') {
+    const logger = createSubLogger((...args) => {
+        console.log(`${prefix('Environ', GREEN)} |`, ...args)
+    })
+    
+    const filename = `.env${postfix}`
+
+    const locations = [
+        path.join(__dirname, 'backend', filename),
+        path.join(__dirname, 'frontend', filename),
+        path.join(__dirname, filename),
+    ]
+
+    const existingLocations = locations.filter(fs.existsSync)
+
+    if (existingLocations.length === 0) {
+        logger('warn', 'No .env file found.')
+    } else {
+        existingLocations.forEach(location => {
+            logger('info', `| Loading environment variables from ${location}`)
+            fs.readFileSync(location, 'utf8').split('\n').forEach(line => {
+                if (line.startsWith('#') || line.trim() === '') return
+                const [key, ...value] = line.split('=')
+                process.env[key] = value.join('=')
+            })
+        })
+    }
+}
+
+function checkVersion(cmd, version, options = {}) {
+    cmd = cmd.split(' ')
+    const child = subprocess.spawnSync(cmd[0], cmd.slice(1), { encoding: 'utf8', ...options });
+    if (child.status !== 0) {
+        console.log(`Error: The program "${path}" failed with status code "${child.status}"`)
+        process.exit(1)
+    }
+
+    return child.stdout.includes(version)
+}
+
+const nodeVersion = process.versions.node.split('.').map(parseInt)
+if (nodeVersion[0] < 18) {
+    console.log(`Error: Invalid version (${process.version}) of NodeJS. Please use NodeJS v18 or newer.`)
+}
+
+if (!checkVersion(`${PYTHON_PATH} -V`, '3.11.', { cwd: 'backend' })) {
+    console.log("Error: Incorrect version of Python. Please use Python 3.11")
+    process.exit(1)
+}
 
 if (!PRODUCTION) {
+    loadDotEnv()
     log('Running development server...')
-    spawn(prefix('Django', RED), `${PYTHON_PATH} manage.py runserver`, {callback: djangoLog, cwd: 'backend'})
-    spawn(prefix('Vite', GREEN), 'npm start --silent', {cwd: 'frontend'})
-    spawn(prefix('Caddy', YELLOW), 'caddy run', {callback: caddyLog})
+    spawn(prefix('Django', RED), `${PYTHON_PATH} manage.py runserver`, {
+        callback: djangoLog,
+        cwd: 'backend',
+    })
+    spawn(prefix('Vite', GREEN), 'npm start --silent', {
+        cwd: 'frontend',
+    })
+    spawn(prefix('Caddy', YELLOW), `${CADDY_PATH} run`, {callback: caddyLog})
 
 } else {
+    loadDotEnv('.prod')
     log('Running production test server...')
-    spawn(prefix('Django', RED), `${PYTHON_PATH} manage.py runserver`, {callback: djangoLog, cwd: 'backend'})
-    spawn(prefix('Caddy', YELLOW), 'caddy run --config Caddyfile.prod', {callback: caddyLog})
+    spawn(prefix('Django', RED), `${PYTHON_PATH} manage.py runserver`, {
+        callback: djangoLog,
+        cwd: 'backend',
+    })
+    spawn(prefix('Caddy', YELLOW), `${CADDY_PATH} run --config Caddyfile.prod`, {
+        callback: caddyLog,
+    })
 }
 
 // Special logger for Caddy
@@ -27,7 +109,7 @@ function caddyLog(line) {
         let {level, ts, logger, msg, ...rest} = data
 
         if (Object.keys(rest).length > 0)
-            rest = color(JSON.stringify(rest), BLACK) //util.inspect(rest, {colors: true, depth: 10, breakLength: Infinity})
+            rest = color(JSON.stringify(rest), GRAY) //util.inspect(rest, {colors: true, depth: 10, breakLength: Infinity})
         else
             rest = ''
 
@@ -70,7 +152,6 @@ function log(...args) {
 }
 
 function spawn(name, cmd, options={}) {
-    const subprocess = require('child_process')
     cmd = cmd.split(' ')
     const proc = subprocess.spawn(cmd[0], cmd.slice(1), { shell: true, stdio: 'pipe', ...options })
     let data = '';
