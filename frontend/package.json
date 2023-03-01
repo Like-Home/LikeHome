@@ -9,6 +9,7 @@
     "build": "tsc && vite build",
     "preview": "vite preview",
     "lint": "eslint . --ext .ts,.tsx,.js,.jsx --fix",
+    "check-lint": "eslint . --ext .ts,.tsx,.js,.jsx",
     "format": "prettier . --write ",
     "lint-precommit": "tsc && lint-staged",
     "prepare": "cd .. && husky install frontend/.husky"
