@@ -42,5 +42,11 @@ def getenv(key: str, default: Any = NotSet, required=False) -> Any:
 
 
 PRODUCTION = getenv('ENV', 'development') == 'production'
+
 GOOGLE_CLIENT_ID = getenv('GOOGLE_CLIENT_ID', required=PRODUCTION)
 GOOGLE_CLIENT_SECRET = getenv('GOOGLE_CLIENT_SECRET', required=PRODUCTION)
+
+POSTGRES_USER = getenv('POSTGRES_USER', required=PRODUCTION)
+POSTGRES_HOST = getenv('POSTGRES_HOST', required=PRODUCTION)
+POSTGRES_DB = getenv('POSTGRES_DB', required=PRODUCTION)
+POSTGRES_PASSWORD = getenv('POSTGRES_PASSWORD', required=PRODUCTION)
