@@ -1,29 +1,15 @@
-import { useState, useEffect } from 'react'
-import reactLogo from './assets/react.svg'
-import './App.scss'
+import { useState } from 'react'
+import reactLogo from '../assets/react.svg'
+import '../App.scss'
 
-import { Auth as AuthPage, User } from './pages/auth'
+import userAtom from '../recoil/user';
+import { useRecoilValue } from 'recoil';
 
+  
 
-// ensures a CSRF token is set in the cookies
-fetch('/api/csrf')
-
-function App() {
+function IndexPage() {
   const [count, setCount] = useState(0)
-  const [user, setUser] = useState<User | null>(null)
-
-  useEffect(() => {
-    // TODO: move this to state management
-    fetch('/api/user/me')
-      .then((response) => {
-        if (response.status === 200) {
-          return response.json()
-        } else {
-          return null
-        }
-      })
-      .then(setUser)
-  }, [])
+  const user = useRecoilValue(userAtom)
 
   return (
     <div className="App">
@@ -44,7 +30,11 @@ function App() {
           Edit <code>src/App.tsx</code> and save to test HMR
         </p>
       </div>
-      <AuthPage user={user} />
+      { user && (
+        <div className="card">
+          <h2>Logged in as {user.email}</h2>
+        </div>
+      )}
       <p className="read-the-docs">
         Click on the Vite and React logos to learn more
       </p>
@@ -52,4 +42,4 @@ function App() {
   )
 }
 
-export default App
+export default IndexPage

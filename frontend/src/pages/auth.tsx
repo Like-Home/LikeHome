@@ -1,15 +1,10 @@
 import CSRFToken from "../components/useCSRFToken";
+import userAtom from '../recoil/user';
+import { useRecoilValue } from 'recoil';
 
-export interface User {
-  username: string;
-  email: string;
-}
+export function AuthPage() {
+  const user = useRecoilValue(userAtom)
 
-type AuthProps = {
-  user: User | null;
-}
-
-export function Auth({ user }: AuthProps) {
   return (
     user ? (
       <div className="card">
@@ -33,4 +28,4 @@ export function Auth({ user }: AuthProps) {
   )
 }
 
-export default Auth
+export default AuthPage
