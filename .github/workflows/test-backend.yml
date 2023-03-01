@@ -37,7 +37,7 @@ jobs:
         run: poetry install
       #        if: steps.cached-poetry-dependencies.outputs.cache-hit != 'true'
 
-      - name: Run flask migrations
+      - name: Run Django migrations
         working-directory: ./backend
         run: |
           source .venv/bin/activate
