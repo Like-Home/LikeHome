@@ -5,7 +5,6 @@
 client_secret.json
 
 # Node
-.vscode
 *.log
 logs/
 npm-debug.log*
@@ -13,6 +12,14 @@ yarn-debug.log*
 yarn-error.log*
 lerna-debug.log*
 .pnpm-debug.log*
+
+# VSCode
+.vscode/*
+!.vscode/settings.example.json
+!.vscode/extensions.json
+
+# Stores VSCode versions used for testing VSCode extensions
+.vscode-test
 
 # Environments
 .env
@@ -32,9 +39,10 @@ local_settings.py
 db.sqlite3
 db.sqlite3-journal
 __pycache__
+.mypy_cache
 
 # Frontend-specific ignored files
-node_modules/
+node_modules
 
 # Runtime data
 pids
@@ -125,12 +133,20 @@ dist
 # TernJS port file
 .tern-port
 
-# Stores VSCode versions used for testing VSCode extensions
-.vscode-test
-
 # yarn v2
 .yarn/cache
 .yarn/unplugged
 .yarn/build-state.yml
 .yarn/install-state.gz
 .pnp.*
+
+dist-ssr
+*.local
+
+# Editor directories and files
+.idea
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?

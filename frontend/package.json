@@ -7,7 +7,11 @@
     "start": "vite",
     "dev": "tsc && vite",
     "build": "tsc && vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "lint": "eslint . --ext .ts,.tsx,.js,.jsx --fix",
+    "format": "prettier . --write ",
+    "lint-precommit": "tsc && lint-staged",
+    "prepare": "cd .. && husky install frontend/.husky"
   },
   "repository": {
     "type": "git",
@@ -24,13 +28,61 @@
     "react-router-dom": "^6.8.2",
     "recoil": "^0.7.6"
   },
+  "prettier": {
+    "trailingComma": "all",
+    "tabWidth": 2,
+    "semi": true,
+    "singleQuote": true,
+    "printWidth": 120,
+    "bracketSpacing": true
+  },
+  "eslintConfig": {
+    "extends": [
+      "eslint:recommended",
+      "plugin:react/recommended",
+      "plugin:import/recommended",
+      "plugin:jsx-a11y/recommended",
+      "plugin:@typescript-eslint/recommended",
+      "eslint-config-prettier"
+    ],
+    "settings": {
+      "react": {
+        "version": "detect"
+      },
+      "import/resolver": {
+        "node": {
+          "paths": [
+            "src"
+          ],
+          "extensions": [
+            ".js",
+            ".jsx",
+            ".ts",
+            ".tsx"
+          ]
+        }
+      }
+    },
+    "rules": {}
+  },
   "devDependencies": {
     "@swc/core": "^1.3.35",
     "@types/react": "^18.0.27",
     "@types/react-dom": "^18.0.10",
+    "@typescript-eslint/eslint-plugin": "^5.54.0",
+    "@typescript-eslint/parser": "^5.54.0",
     "@vitejs/plugin-react-swc": "^3.0.0",
+    "eslint": "^8.35.0",
+    "eslint-config-prettier": "^8.6.0",
+    "eslint-plugin-import": "^2.27.5",
+    "eslint-plugin-jsx-a11y": "^6.7.1",
+    "eslint-plugin-react": "^7.32.2",
+    "husky": "^8.0.0",
+    "lint-staged": "^13.1.2",
+    "prettier": "^2.8.4",
     "sass": "^1.58.1",
     "typescript": "^4.9.3",
-    "vite": "^4.1.0"
+    "vite": "^4.1.0",
+    "vite-plugin-eslint": "^1.8.1"
   }
 }
