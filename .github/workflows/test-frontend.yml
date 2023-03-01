@@ -1,4 +1,4 @@
-name: LikeHome Frontend CI
+name: Frontend build test
 
 on:
   push:
@@ -34,7 +34,3 @@ jobs:
       - name: Generate frontend build files
         working-directory: ./frontend
         run: npm run build --if-present
-
-#      - name: Run Jest unit tests
-#        working-directory: ./frontend
-#        run: npm test
