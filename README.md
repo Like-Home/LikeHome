@@ -9,20 +9,10 @@
 
 - [React](https://reactjs.org/)
 - [Django](https://www.djangoproject.com/)
+- [Django Quick Tutorial Example](https://docs.djangoproject.com/en/4.1/intro/tutorial01/)
 - [Building a React.js Application using Django REST Framework](https://www.section.io/engineering-education/react-and-django-rest-framework/)
 - [dbdiagram.io - Visualize dbml Files](https://dbdiagram.io/)
 - [Caddy](https://caddyserver.com/docs/caddyfile)
-
-## Setup
-
-### Downloads
-
-#### Required Software
-
-- [Node.js 18](https://nodejs.org/en/download/)
-- [Python 3.11](https://www.python.org/downloads/)
-- [Caddy](https://caddyserver.com/docs/install)
-- [Poetry](https://github.com/python-poetry/poetry)
 
 #### Recommended Software
 
@@ -30,47 +20,47 @@
 - [SQLite](https://sqlitebrowser.org/) Browsing data in database
 - [Signal](https://signal.org/en/download/) E2e private messenger for sending/receiving secret tokens
 
-### Backend
+## Setup
 
-Follow the steps outlined in the
-[Backend setup guide](backend/README.md)
+### Requirements
 
-### Frontend
+- [Node.js 18](https://nodejs.org/en/download/)
+- [Python 3.11](https://www.python.org/downloads/)
+- [Caddy](https://caddyserver.com/docs/install)
+- [Poetry](https://github.com/python-poetry/poetry) (will be installed automatically)
 
-Follow the steps outlined in the [Frontend setup guide](frontend/README.md)
-
-### Environment
-
-Our project will use a .env file that contains different variables and secrets that will be used for both development and production.
-Contact @NoahCardoza#3669 for more info regarding the Google client_id and secrets, which will be sent via Signal Messenger.
-
-#### Development
-
-To get started, copy the sample .env file to the project root directory with the filename: `.env`.
-
-#### Production
-
-Same as above, but save file as: `prod.env`.
-
-### Caddy
-
-Install Caddy:
-
+To install Caddy:
 - For Windows, a copy of `caddy.exe` is already included for easy development.
 - On Linux and macOS, [install Caddy](https://caddyserver.com/docs/install) through your package manager.
   - You can also download it manually from Caddy's website if you prefer.
 
-## Running the application
+### Running
 
-After following the setup directions in both backend and frontend README file,
-to get a complete development setup instantly, enter the poetry virtual environment shell and run this command in the project's root folder.
-This will start the Django, Caddy and Vite instances. You can access the development app on http://localhost:80
+Now run the following: (replace `python` with whatever command you use for Python 3)
+```
+python setup.py
+```
 
+You only need to run `setup.py` once **after first cloning** the repo or **after pulling** the latest changes (when dependencies or the DB model have changed).
+
+If everything succeeded, you can now start the app any time with:
 ```
 node run.js
 ```
 
-To emulate production mode without Docker:
+By default the app will run on http://localhost:8080
+
+To create an account for the Django admin console, run `py setup.py admin` and enter a username and password.
+
+## Environment
+
+Our project will use a `.env` file that contains different variables and secrets that will be used for both development and production.
+Contact @NoahCardoza#3669 for more info regarding the Google client_id and secrets, which will be sent via Signal Messenger.
+
+- Development: To get started, copy the sample .env file to the project root directory with the filename: `.env`.
+- Production: Same as above, but save file as: `prod.env`.
+
+To emulate production mode (will run on port 80) without Docker:
 
 ```
 cd frontend

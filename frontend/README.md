@@ -1,14 +1,6 @@
 # LikeHome - Frontend
 
-## Setup
-
-Make sure you have Node and npm installed. Then run these commands:
-
-```bash
-npm install
-```
-
-### Trouble Shooting
+### Troubleshooting
 
 #### `vite:react-swc` Plugin Error
 
