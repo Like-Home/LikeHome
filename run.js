@@ -20,7 +20,8 @@ function findPython() {
     if (process.env.POETRY_ACTIVE === '1') return 'python'
     const exes = ["py -3.11", "python3.11", "python", "python3"]
     for (const exe of exes) {
-        const child = subprocess.spawnSync(exe, ['-V'], { encoding: 'utf8' });
+        const cmd = exe.split(' ');
+        const child = subprocess.spawnSync(cmd[0], [...cmd.slice(1), '-V'], { encoding: 'utf8' });
         if (child.status === 0 && child.stdout.includes('3.11.')) {
             return `${exe} -m poetry run python`
         }
