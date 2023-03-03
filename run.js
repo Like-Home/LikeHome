@@ -14,8 +14,22 @@ if (PRODUCTION) {
 process.chdir(__dirname)
 
 // Detect if already in Poetry virtual environment
+
+function findPython() {
+    if (process.env.PYTHON) return process.env.PYTHON
+    if (process.env.POETRY_ACTIVE === '1') return 'python'
+    const exes = ["py -3.11", "python3.11", "python", "python3"]
+    for (const exe of exes) {
+        const child = subprocess.spawnSync(exe, ['-V'], { encoding: 'utf8' });
+        if (child.status === 0 && child.stdout.includes('3.11.')) {
+            return `${exe} -m poetry run python`
+        }
+    }
+    fatal("Could not find Python 3.11, pleases install it.")
+}
+
 // TODO: some windows users might need a py -3.11 prefix
-const PYTHON_PATH = process.env.PYTHON || process.env.POETRY_ACTIVE === '1' ? 'python' : 'python -m poetry run python'
+const PYTHON_PATH = findPython()
 const CADDY_PATH = process.env.CADDY || 'caddy'
 
 const createSubLogger = log => (level, msg) => log(prefix(level, {
@@ -61,8 +75,7 @@ function checkVersion(cmd, version, options = {}) {
     const cmdParts = cmd.split(' ')
     const child = subprocess.spawnSync(cmdParts[0], cmdParts.slice(1), { encoding: 'utf8', ...options });
     if (child.status !== 0) {
-        console.log(`Error: The program "${cmd}" failed with status code "${child.status}"`)
-        process.exit(1)
+        fatal(`The program "${cmd}" failed with status code "${child.status}"`)
     }
 
     return child.stdout.includes(version)
@@ -70,12 +83,11 @@ function checkVersion(cmd, version, options = {}) {
 
 const nodeVersion = process.versions.node.split('.').map(parseInt)
 if (nodeVersion[0] < 18) {
-    console.log(`Error: Invalid version (${process.version}) of NodeJS. Please use NodeJS v18 or newer.`)
+    fatal(`Invalid version (${process.version}) of NodeJS. Please use NodeJS v18 or newer.`)
 }
 
 if (!checkVersion(`${PYTHON_PATH} -V`, '3.11.', { cwd: 'backend' })) {
-    console.log("Error: Incorrect version of Python. Please use Python 3.11")
-    process.exit(1)
+    fatal("Incorrect version of Python. Please use Python 3.11")
 }
 
 if (!PRODUCTION) {
@@ -149,6 +161,11 @@ function color(str, color) {
 
 function log(...args) {
     console.log(`${prefix('General', BLUE)} |`, ...args)
+}
+
+function fatal(...args) {
+    console.log(`${prefix('Error', RED)} |`, ...args)
+    process.exit(1)
 }
 
 function spawn(name, cmd, options={}) {

@@ -19,7 +19,7 @@
 
 #### Required Software
 
-- [Javascript 18](https://nodejs.org/en/download/)
+- [Node.js 18](https://nodejs.org/en/download/)
 - [Python 3.11](https://www.python.org/downloads/)
 - [Caddy](https://caddyserver.com/docs/install)
 - [Poetry](https://github.com/python-poetry/poetry)
