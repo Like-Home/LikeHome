@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-import os
+import sys, os
 
 def run(cmd, echo=False):
     import subprocess
@@ -14,7 +14,6 @@ def run(cmd, echo=False):
     return out
 
 def find_python():
-    import sys
     if False and sys.version_info.major >= 3 and sys.version_info.minor >= 11:
         return sys.executable
     else:
@@ -56,8 +55,10 @@ run(f"{py} manage.py migrate", echo=True)
 print("backend: Running 'manage.py makemigrations'...")
 run(f"{py} manage.py makemigrations", echo=True)
 
-#print("Running 'manage.py createsuperuser'...")
-#run(f"{py} manage.py createsuperuser")
+if len(sys.argv) > 1 and sys.argv[1] == "admin":
+   print("Running 'manage.py createsuperuser'...")
+   os.system(f"{py} manage.py createsuperuser")
+   exit(0)
 
 os.chdir(os.path.join(os.path.dirname(__file__), "frontend"))
 
