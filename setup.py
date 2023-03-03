@@ -10,7 +10,7 @@ def run(cmd, echo=False):
     err = err.decode('utf-8').strip()
     if echo:
         print('\x1b[90m    ' + out.replace('\n', '\n    ') + '\x1b[0m')
-        print('\x1b[1m    ' + err.replace('\n', '\n    ') + '\x1b[0m')
+        print('\x1b[31m    ' + err.replace('\n', '\n    ') + '\x1b[0m')
     return out
 
 def find_python():
@@ -19,18 +19,22 @@ def find_python():
         return sys.executable
     else:
         print("Looking for Python 3.11...")
-        exes = ["py -3.11", "python3.11", "python", "python3"]
+        exes = ["py -3.11", "py", "python3.11", "python", "python3"]
         for exe in exes:
             try:
-                print("Trying", exe)
+                print(f"Trying '{exe}'")
                 version = run(exe + " --version")
                 if not version.startswith("Python 3"):
                     continue
-                version = version[7:]
-                if version.startswith("3.11"):
+                version = version[7:].split('.')
+                major = int(version[0])
+                minor = int(version[1])
+                if (major >= 3 and minor >= 11):
                     return exe
             except FileNotFoundError:
                 continue
+        print("Could not find Python 3.11 or newer, please install it.")
+        exit(1)
 
 py = find_python()
 
