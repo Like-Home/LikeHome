@@ -134,7 +134,7 @@ function djangoLog(line) {
         ready = true // TODO: maybe check vite too, larger projects might take longer to build
         return (line + '\n'
             + `${pfx} | \n`
-            + `${pfx} | Running at ${color('http://localhost:80/', YELLOW)}\n`
+            + `${pfx} | Running at ${color(`http://localhost:${PRODUCTION ? '80' : '8080'}/`, YELLOW)}\n`
             + `${pfx} | `)
     }
 }
