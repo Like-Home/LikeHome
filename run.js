@@ -58,10 +58,10 @@ function loadDotEnv(postfix = '') {
 }
 
 function checkVersion(cmd, version, options = {}) {
-    cmd = cmd.split(' ')
-    const child = subprocess.spawnSync(cmd[0], cmd.slice(1), { encoding: 'utf8', ...options });
+    const cmdParts = cmd.split(' ')
+    const child = subprocess.spawnSync(cmdParts[0], cmdParts.slice(1), { encoding: 'utf8', ...options });
     if (child.status !== 0) {
-        console.log(`Error: The program "${path}" failed with status code "${child.status}"`)
+        console.log(`Error: The program "${cmd}" failed with status code "${child.status}"`)
         process.exit(1)
     }
 
