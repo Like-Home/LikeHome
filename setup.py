@@ -41,16 +41,21 @@ if not "poetry " in list:
 
 os.chdir(os.path.join(os.path.dirname(__file__), "backend"))
 
-print("Running 'poetry install'...")
+print("backend: Running 'poetry install'...")
 run(f"{py} -m poetry install", echo=True)
 
 py = f"{py} -m poetry run python"
 
-print("Running 'manage.py migrate'...")
+print("backend: Running 'manage.py migrate'...")
 run(f"{py} manage.py migrate", echo=True)
 
-print("Running 'manage.py makemigrations'...")
+print("backend: Running 'manage.py makemigrations'...")
 run(f"{py} manage.py makemigrations", echo=True)
 
 #print("Running 'manage.py createsuperuser'...")
 #run(f"{py} manage.py createsuperuser")
+
+os.chdir(os.path.join(os.path.dirname(__file__), "frontend"))
+
+print("frontend: Running 'npm install'...")
+run("npm install", echo=True)
