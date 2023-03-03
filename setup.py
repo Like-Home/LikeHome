@@ -4,7 +4,7 @@ import os
 
 def run(cmd, echo=False):
     import subprocess
-    proc = subprocess.Popen(cmd.split(' '),  stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    proc = subprocess.Popen(cmd.split(' '), shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     out, err = proc.communicate()
     out = out.decode('utf-8').strip()
     err = err.decode('utf-8').strip()
@@ -35,7 +35,7 @@ def find_python():
 py = find_python()
 
 list = run(f"{py} -m pip list")
-if not "poetry" in list:
+if not "poetry " in list:
     print("Installing poetry...")
     run(py + " -m pip install poetry")
 
