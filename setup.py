@@ -45,9 +45,9 @@ if not "poetry " in list:
 os.chdir(os.path.join(os.path.dirname(__file__), "backend"))
 
 print("backend: Running 'poetry install'...")
-run(f"{py} -m poetry install", echo=True)
+run(f"{py} -m poetry --quiet install", echo=True)
 
-py = f"{py} -m poetry run python"
+py = f"{py} -m poetry --quiet run python"
 
 print("backend: Running 'manage.py migrate'...")
 run(f"{py} manage.py migrate", echo=True)
