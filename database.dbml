@@ -10,18 +10,11 @@ Table User {
 Enum PropertyType {
   Hotel
   Motel
-}
-
-Table Property {
-  id int [pk, increment]
-  first_name varchar(40)
-  last_name  varchar(40)
-  type PropertyType
-  address varchar(200)
-  city varchar(50)
-  state varchar(50)
-  zip varchar(10)
-  country varchar(3)
+  Cabin
+  Condo
+  Villa
+  Apartment
+  Resort
 }
 
 Enum BookingStatus {
@@ -34,9 +27,10 @@ Enum BookingStatus {
 Table Booking {
   id int [pk, increment]
   stripe_id varchar(200)
+  amount_paid float
+  guest_count integer
   points_earned integer
   status BookingStatus
-  property_id int [ref: > Property.id]
   user_id int [ref: > User.id]
   start_date date
   end_date date
@@ -45,7 +39,6 @@ Table Booking {
 
 Table Review {
   id int [pk, increment]
-  property_id int [ref: > Property.id]
   user_id int [ref: > User.id]
   rating int
   comment varchar(200)
@@ -54,7 +47,6 @@ Table Review {
 
 Table Image {
   id int [pk, increment]
-  property_id int [ref: > Property.id]
   url varchar(200)
   created_at timestamp
 }
