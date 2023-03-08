@@ -1,10 +1,19 @@
 #!/usr/bin/env python3
 
-import sys, os
+import os
+import subprocess
+import sys
+
+GIT_ROOT = os.path.dirname(os.path.realpath(__file__))
+
 
 def run(cmd, echo=False):
-    import subprocess
-    proc = subprocess.Popen(cmd.split(' '), shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    proc = subprocess.Popen(
+        cmd,
+        shell=True,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+    )
     out, err = proc.communicate()
     out = out.decode('utf-8').strip()
     err = err.decode('utf-8').strip()
@@ -14,7 +23,7 @@ def run(cmd, echo=False):
     return out
 
 def find_python():
-    if False and sys.version_info.major >= 3 and sys.version_info.minor >= 11:
+    if sys.version_info.major >= 3 and sys.version_info.minor >= 11:
         return sys.executable
     else:
         print("Looking for Python 3.11...")
@@ -37,12 +46,12 @@ def find_python():
 
 py = find_python()
 
-list = run(f"{py} -m pip list")
-if not "poetry " in list:
+installed_python_modules = run(f"{py} -m pip list")
+if "poetry " not in installed_python_modules:
     print("Installing poetry...")
     run(py + " -m pip install poetry")
 
-os.chdir(os.path.join(os.path.dirname(__file__), "backend"))
+os.chdir(os.path.join(GIT_ROOT, "backend"))
 
 print("backend: Running 'poetry install'...")
 run(f"{py} -m poetry --quiet install", echo=True)
@@ -56,11 +65,11 @@ print("backend: Running 'manage.py makemigrations'...")
 run(f"{py} manage.py makemigrations", echo=True)
 
 if len(sys.argv) > 1 and sys.argv[1] == "admin":
-   print("Running 'manage.py createsuperuser'...")
-   os.system(f"{py} manage.py createsuperuser")
-   exit(0)
+    print("Running 'manage.py createsuperuser'...")
+    os.system(f"{py} manage.py createsuperuser")
+    exit(0)
 
-os.chdir(os.path.join(os.path.dirname(__file__), "frontend"))
+os.chdir(os.path.join(GIT_ROOT, "frontend"))
 
 print("frontend: Running 'npm install'...")
 run("npm install", echo=True)
