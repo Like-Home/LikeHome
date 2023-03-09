@@ -7,7 +7,7 @@ function HotelPage() {
   return (
     <div>
       <h1>Hotel Information</h1>
-      <pre>hotelId: {hotelId}</pre>
+      <pre>hotelId: {hotelId} </pre>
     </div>
   );
 }
