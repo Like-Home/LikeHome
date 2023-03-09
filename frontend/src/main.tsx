@@ -1,22 +1,27 @@
-import React from 'react'
-import ReactDOM from 'react-dom/client'
+import React from 'react';
+import ReactDOM from 'react-dom/client';
 
-import {
-  createBrowserRouter,
-  RouterProvider,
-} from "react-router-dom";
+import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 
 import { RecoilRoot } from 'recoil';
-import IndexPage from './pages/index'
-import AuthPage from './pages/auth'
+import IndexPage from './pages/index';
+import HotelPage from './pages/hotel';
+import AuthPage from './pages/auth';
+import Booking from './pages/booking';
+import Search from './pages/search';
+import Checkout from './pages/checkout';
+import Bookings from './pages/bookings';
+import Home from './pages/home';
+import About from './pages/about';
+import Rewards from './pages/rewards';
 
-import './index.scss'
+import './index.scss';
 
-import ErrorLayout from "./layouts/error";
-import RootLayout from './layouts/root'
+import ErrorLayout from './layouts/error';
+import RootLayout from './layouts/root';
 
 // ensures a CSRF token is set in the cookies
-fetch('/api/csrf')
+fetch('/api/csrf');
 
 const router = createBrowserRouter([
   {
@@ -31,9 +36,40 @@ const router = createBrowserRouter([
       {
         path: '/auth',
         element: <AuthPage />,
-      }
+      },
+      {
+        path: '/hotel/:hotelId',
+        element: <HotelPage />,
+      },
+      {
+        path: '/booking/:id',
+        element: <Booking />,
+      },
+      {
+        path: '/search/:query',
+        element: <Search />,
+      },
+      {
+        path: '/checkout',
+        element: <Checkout />,
+      },
+      {
+        path: '/bookings',
+        element: <Bookings />,
+      },
+      {
+        path: '/home',
+        element: <Home />,
+      },
+      {
+        path: '/about',
+        element: <About />,
+      },
+      {
+        path: '/rewards',
+        element: <Rewards />,
+      },
     ],
-
   },
 ]);
 
