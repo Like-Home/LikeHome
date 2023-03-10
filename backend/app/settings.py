@@ -184,3 +184,10 @@ STATIC_URL = 'static/'
 # https://docs.djangoproject.com/en/4.1/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+from amadeus import Client, ResponseError
+amadeus = Client(
+    client_id=AMADEUS_CLIENT_ID,
+    client_secret=AMADEUS_CLIENT_SECRET,
+    log_level='debug'
+)
