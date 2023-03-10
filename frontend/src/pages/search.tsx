@@ -1,7 +1,7 @@
 import React from 'react';
 import { useParams } from 'react-router-dom';
 
-function Search() {
+function SearchPage() {
   const { query } = useParams();
 
   return (
@@ -12,4 +12,4 @@ function Search() {
   );
 }
 
-export default Search;
+export default SearchPage;

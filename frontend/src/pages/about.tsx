@@ -1,7 +1,7 @@
 import React from 'react';
 
-export function About() {
+export function AboutPage() {
   return <div>A page about us</div>;
 }
 
-export default About;
+export default AboutPage;

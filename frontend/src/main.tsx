@@ -7,12 +7,12 @@ import { RecoilRoot } from 'recoil';
 import HomePage from './pages/home';
 import HotelPage from './pages/hotel';
 import AuthPage from './pages/auth';
-import Booking from './pages/booking';
-import Search from './pages/search';
-import Checkout from './pages/checkout';
-import Bookings from './pages/bookings';
-import About from './pages/about';
-import Rewards from './pages/rewards';
+import BookingPage from './pages/booking';
+import SearchPage from './pages/search';
+import CheckoutPage from './pages/checkout';
+import BookingsPage from './pages/bookings';
+import AboutPage from './pages/about';
+import RewardsPage from './pages/rewards';
 
 import './index.scss';
 
@@ -42,27 +42,27 @@ const router = createBrowserRouter([
       },
       {
         path: '/booking/:id',
-        element: <Booking />,
+        element: <BookingPage />,
       },
       {
         path: '/search/:query',
-        element: <Search />,
+        element: <SearchPage />,
       },
       {
         path: '/checkout',
-        element: <Checkout />,
+        element: <CheckoutPage />,
       },
       {
         path: '/bookings',
-        element: <Bookings />,
+        element: <BookingsPage />,
       },
       {
         path: '/about',
-        element: <About />,
+        element: <AboutPage />,
       },
       {
         path: '/rewards',
-        element: <Rewards />,
+        element: <RewardsPage />,
       },
     ],
   },
