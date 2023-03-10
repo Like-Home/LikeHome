@@ -18,6 +18,8 @@ import './index.scss';
 
 import ErrorLayout from './layouts/error';
 import RootLayout from './layouts/root';
+import { CssBaseline } from '@mui/material';
+import { createTheme, ThemeProvider } from '@mui/material/styles';
 
 // ensures a CSRF token is set in the cookies
 fetch('/api/csrf');
@@ -68,10 +70,19 @@ const router = createBrowserRouter([
   },
 ]);
 
+const darkTheme = createTheme({
+  palette: {
+    mode: 'dark',
+  },
+});
+
 ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
   <React.StrictMode>
-    <RecoilRoot>
-      <RouterProvider router={router} />
-    </RecoilRoot>
+    <ThemeProvider theme={darkTheme}>
+      <CssBaseline />
+      <RecoilRoot>
+        <RouterProvider router={router} />
+      </RecoilRoot>
+    </ThemeProvider>
   </React.StrictMode>,
 );
