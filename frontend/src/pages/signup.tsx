@@ -1,11 +1,11 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import reactLogo from '../assets/react.svg';
 import '../App.scss';
 
 import userAtom from '../recoil/user';
 import { useRecoilValue } from 'recoil';
 
-function SignUpPage() {
+export default function SignUpPage() {
   const [count, setCount] = useState(0);
   const user = useRecoilValue(userAtom);
 
@@ -35,5 +35,3 @@ function SignUpPage() {
     </div>
   );
 }
-
-export default SignUpPage;

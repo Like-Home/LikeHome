@@ -1,7 +1,6 @@
-import React from 'react';
 import { useParams } from 'react-router-dom';
 
-function HotelPage() {
+export default function HotelPage() {
   const { hotelId } = useParams();
 
   return (
@@ -11,5 +10,3 @@ function HotelPage() {
     </div>
   );
 }
-
-export default HotelPage;
