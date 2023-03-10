@@ -11,7 +11,7 @@ https://docs.djangoproject.com/en/4.1/ref/settings/
 """
 
 from pathlib import Path
-
+from amadeus import Client, ResponseError
 from . import config
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -185,9 +185,3 @@ STATIC_URL = 'static/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-from amadeus import Client, ResponseError
-amadeus = Client(
-    client_id=AMADEUS_CLIENT_ID,
-    client_secret=AMADEUS_CLIENT_SECRET,
-    log_level='debug'
-)
