@@ -4,14 +4,13 @@ import ReactDOM from 'react-dom/client';
 import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 
 import { RecoilRoot } from 'recoil';
-import IndexPage from './pages/index';
+import HomePage from './pages/home';
 import HotelPage from './pages/hotel';
 import AuthPage from './pages/auth';
 import Booking from './pages/booking';
 import Search from './pages/search';
 import Checkout from './pages/checkout';
 import Bookings from './pages/bookings';
-import Home from './pages/home';
 import About from './pages/about';
 import Rewards from './pages/rewards';
 
@@ -31,7 +30,7 @@ const router = createBrowserRouter([
     children: [
       {
         path: '/',
-        element: <IndexPage />,
+        element: <HomePage />,
       },
       {
         path: '/auth',
@@ -56,10 +55,6 @@ const router = createBrowserRouter([
       {
         path: '/bookings',
         element: <Bookings />,
-      },
-      {
-        path: '/home',
-        element: <Home />,
       },
       {
         path: '/about',
