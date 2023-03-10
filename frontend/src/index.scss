@@ -7,17 +7,48 @@ body {
   min-height: 100vh;
 }
 
+// Background is separate element to allow for multiple layered blurs
+body::after {
+  content: ' ';
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  z-index: -1000;
+
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-position: right center;
+  background-image: url('/images/placeholders/pexels-beach.jpg');
+
+  filter: blur(0px) brightness(0.8);
+}
+
 #root {
   width: 100%;
 }
 
 a {
-  color: #646cff;
+  color: #9b99ff;
   text-decoration: inherit;
 }
 
 a:hover {
-  color: #535bf2;
+  color: #7f7cff;
   text-decoration: underline;
   text-underline-offset: 4px;
+}
+
+.text-center {
+  text-align: center;
+}
+
+.push-right {
+  margin-left: auto;
+}
+
+.push-center {
+  margin-left: auto;
+  margin-right: auto;
 }

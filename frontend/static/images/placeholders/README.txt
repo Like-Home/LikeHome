@@ -1,0 +1,2 @@
+- All placeholder images here are freely licensed as CC0 from https://pexels.com/
+- While it's not required by the license, if we keep any of these images, we could add specific attribution.

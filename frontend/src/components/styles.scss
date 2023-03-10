@@ -1,0 +1,21 @@
+.card {
+  background: rgba(41, 41, 41, 0.75);
+  box-shadow: 0px 11px 17px -6px rgba(0, 0, 0, 0.25);
+  backdrop-filter: blur(15px);
+  border-radius: 8px;
+  padding: 1.25em;
+}
+
+.navbar {
+  padding: 1.25em 2em;
+  margin-bottom: 2em;
+  display: flex;
+  justify-content: space-between;
+
+  a {
+    margin-right: 20px;
+  }
+  a:last-child {
+    margin-right: 0;
+  }
+}
