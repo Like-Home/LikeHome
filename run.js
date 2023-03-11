@@ -65,7 +65,12 @@ function loadDotEnv(postfix = '') {
             logger('info', `| Loading environment variables from ${location}`)
             fs.readFileSync(location, 'utf8').split('\n').forEach(line => {
                 line = line.trim()
-                if (line.startsWith('#') || line === '') return
+                if (line.startsWith('#') || line === '') {
+                    return
+                }
+                if (line.startsWith('export ')) {
+                    line = line.slice(7).trim()
+                }
                 const [key, ...value] = line.split('=')
                 process.env[key] = value.join('=')
             })

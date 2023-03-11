@@ -1,13 +1,13 @@
-import React, { useState } from 'react'
-import reactLogo from '../assets/react.svg'
-import '../App.scss'
+import { useState } from 'react';
+import reactLogo from '../assets/react.svg';
+import '../App.scss';
 
 import userAtom from '../recoil/user';
 import { useRecoilValue } from 'recoil';
 
-function IndexPage() {
-  const [count, setCount] = useState(0)
-  const user = useRecoilValue(userAtom)
+export default function HomePage() {
+  const [count, setCount] = useState(0);
+  const user = useRecoilValue(userAtom);
 
   return (
     <div className="App">
@@ -26,16 +26,12 @@ function IndexPage() {
           Edit <code>src/App.tsx</code> and save to test HMR
         </p>
       </div>
-      { user && (
+      {user && (
         <div className="card">
           <h2>Logged in as {user.email}</h2>
         </div>
       )}
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
+      <p className="read-the-docs">Click on the Vite and React logos to learn more</p>
     </div>
   );
 }
-
-export default IndexPage
