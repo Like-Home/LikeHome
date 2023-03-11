@@ -1,4 +1,7 @@
+from amadeus import Location, ResponseError
+from api.modules.amadeus import amadeus
 from django.contrib.auth.models import User
+from django.http import JsonResponse
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import ensure_csrf_cookie
 from rest_framework import permissions, views, viewsets
@@ -8,6 +11,21 @@ from rest_framework.response import Response
 
 from .models.Booking import Booking
 from .serializers import BookingSerializer, UserSerializer
+
+
+def search_city(req, param):
+    if req.method == "GET":
+        try:
+            print(param)
+            response = amadeus.reference_data.locations.get(
+                keyword=param, subType=Location.ANY)
+            context = {
+                "data": response.data
+            }
+            return JsonResponse(context)
+        except ResponseError as error:
+            print(error)
+        return JsonResponse({"error": "Invalid request"})
 
 
 @method_decorator(ensure_csrf_cookie, name='dispatch')
