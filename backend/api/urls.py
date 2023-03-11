@@ -26,4 +26,5 @@ router.register(r'user', views.UserView, 'User')
 urlpatterns = [
     path('csrf', views.CSRFGeneratorView.as_view()),
     path('', include(router.urls)),
+    path('search_city/<str:param>', views.search, name='search'),
 ]
