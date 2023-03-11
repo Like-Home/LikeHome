@@ -1,24 +1,14 @@
+from django.contrib.auth.models import User
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import ensure_csrf_cookie
 from rest_framework import permissions, views, viewsets
-from rest_framework.decorators import api_view
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.request import Request
 from rest_framework.response import Response
 
-from .models.User import User
 from .models.Booking import Booking
-from .serializers import UserSerializer
-from .serializers import BookingSerializer
+from .serializers import BookingSerializer, UserSerializer
 
-
-class UserView(viewsets.ModelViewSet):
-    serializer_class = UserSerializer
-    queryset = User.objects.all()
-
-
-class BookingView(viewsets.ModelViewSet):
-    serializer_class = BookingSerializer
-    queryset = Booking.objects.all()
 
 @method_decorator(ensure_csrf_cookie, name='dispatch')
 class CSRFGeneratorView(views.APIView):
@@ -28,17 +18,41 @@ class CSRFGeneratorView(views.APIView):
         return Response({'success': True})
 
 
-class UserView(views.APIView):
-    # TODO: figure out why this doesn't work
-    permissions_classes = [permissions.IsAuthenticated]
+class BookingView(viewsets.ModelViewSet):
+    serializer_class = BookingSerializer
+    permission_classes = [IsAuthenticated]
 
-    def get(self, request: Request, format=None):
-        user = request.user
+    def get_queryset(self):
+        """
+        This view should return a list of all the purchases
+        for the currently authenticated user.
+        """
+        return Booking.objects.filter(user=self.request.user)
 
-        if not user.is_authenticated:
-            return Response({'error': 'User not authenticated'}, status=401)
+    def get_object(self):
+        """Get a single booking object by pk
 
-        return Response({
-            'username': user.username,
-            'email': user.email,
-        })
+        Returns:
+            _type_: _description_
+        """
+        pk = self.kwargs.get('pk')
+
+        if pk is not None:
+            return Booking.objects.get(id=pk, user=self.request.user)
+
+        return super().get_object()
+
+
+class UserView(viewsets.ModelViewSet):
+    queryset = User.objects.all()
+    serializer_class = UserSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_object(self):
+        pk = self.kwargs.get('pk')
+
+        if pk == "me":
+            return self.request.user
+
+        # TODO: only allow admins to list all other users
+        return super().get_object()

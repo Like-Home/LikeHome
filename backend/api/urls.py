@@ -19,10 +19,11 @@ from rest_framework import routers
 from . import views
 
 router = routers.DefaultRouter()
-# router.register(r'users', views.UserView, 'User')
+router.register(r'booking', views.BookingView, 'Booking')
+router.register(r'user', views.UserView, 'User')
+
 
 urlpatterns = [
     path('csrf', views.CSRFGeneratorView.as_view()),
-    path('user/me', views.UserView.as_view()),
     path('', include(router.urls)),
 ]
