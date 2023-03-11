@@ -1,9 +1,14 @@
 from rest_framework import serializers
 
-from .models.todo import Todo
+from .models.User import User
+from .models.Booking import Booking
 
 
-class TodoSerializer(serializers.ModelSerializer):
+class UserSerializer(serializers.ModelSerializer):
     class Meta:
-        model = Todo
-        fields = ('id', 'title', 'description', 'completed')
+        model = User
+
+
+class BookingSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Booking

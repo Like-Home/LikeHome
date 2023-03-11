@@ -5,14 +5,20 @@ from rest_framework.decorators import api_view
 from rest_framework.request import Request
 from rest_framework.response import Response
 
-from .models.todo import Todo
-from .serializers import TodoSerializer
+from .models.User import User
+from .models.Booking import Booking
+from .serializers import UserSerializer
+from .serializers import BookingSerializer
 
 
-class TodoView(viewsets.ModelViewSet):
-    serializer_class = TodoSerializer
-    queryset = Todo.objects.all()
+class UserView(viewsets.ModelViewSet):
+    serializer_class = UserSerializer
+    queryset = User.objects.all()
 
+
+class BookingView(viewsets.ModelViewSet):
+    serializer_class = BookingSerializer
+    queryset = Booking.objects.all()
 
 @method_decorator(ensure_csrf_cookie, name='dispatch')
 class CSRFGeneratorView(views.APIView):
