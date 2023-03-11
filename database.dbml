@@ -1,27 +1,15 @@
-Table User {
-  id integer
-  email varchar(200)
-  travel_points integer
-  username varchar(60)
-  password varchar(200)
-  created_at timestamp
-}
-
-Enum PropertyType {
-  Hotel
-  Motel
-}
-
-Table Property {
+// from djando.contrib.auth.models import User
+Table User { 
   id int [pk, increment]
-  first_name varchar(40)
-  last_name  varchar(40)
-  type PropertyType
-  address varchar(200)
-  city varchar(50)
-  state varchar(50)
-  zip varchar(10)
-  country varchar(3)
+  first_name varchar(200)
+  last_name varchar(200)
+  email varchar(200) [unique]
+}
+
+// from api.models import Account
+Table Account {
+  user_id int [ref: > User.id]
+  travel_points integer
 }
 
 Enum BookingStatus {
@@ -31,31 +19,16 @@ Enum BookingStatus {
   Past
 }
 
+// from api.models import Booking
 Table Booking {
   id int [pk, increment]
   stripe_id varchar(200)
+  amount_paid float
+  guest_count integer
   points_earned integer
   status BookingStatus
-  property_id int [ref: > Property.id]
   user_id int [ref: > User.id]
   start_date date
   end_date date
   created_at timestamp
 }
-
-Table Review {
-  id int [pk, increment]
-  property_id int [ref: > Property.id]
-  user_id int [ref: > User.id]
-  rating int
-  comment varchar(200)
-  created_at timestamp
-}
-
-Table Image {
-  id int [pk, increment]
-  property_id int [ref: > Property.id]
-  url varchar(200)
-  created_at timestamp
-}
-

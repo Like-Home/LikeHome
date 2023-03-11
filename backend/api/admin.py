@@ -1,10 +1,21 @@
 from django.contrib import admin
+from django.contrib.auth.admin import UserAdmin
+from django.contrib.auth.models import User
 
-from .models.todo import Todo
+from .models.Account import Account
+from .models.Booking import Booking
 
 
-class TodoAdmin(admin.ModelAdmin):
-    list = ('title', 'description', 'completed')
+class AccountInline(admin.StackedInline):
+    model = Account
+    can_delete = False
+    verbose_name_plural = 'Accounts'
 
 
-admin.site.register(Todo, TodoAdmin)
+class MyUserAdmin(UserAdmin):
+    inlines = (AccountInline, )
+
+
+admin.site.unregister(User)
+admin.site.register(User, MyUserAdmin)
+admin.site.register(Booking)

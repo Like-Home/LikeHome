@@ -1,8 +1,9 @@
 import hashlib
 import time
 
-from app import config
 from requests import Session
+
+from app import config
 
 
 def generate_signature(api_key: str, secret: str) -> str:

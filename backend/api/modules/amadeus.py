@@ -1,4 +1,5 @@
-from amadeus import Client, ResponseError
+from amadeus import Client, ResponseError  # type: ignore
+
 from app import config
 
 amadeus = Client(
