@@ -10,6 +10,14 @@ from rest_framework import permissions, views, viewsets
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.request import Request
 from rest_framework.response import Response
+import json
+from amadeus import ResponseError, Location
+from api.modules.amedeus import amedeus
+from django.shortcuts import render
+from django.contrib import messages
+from .hotel import Hotel
+from .room import Room
+from django.http import HttpResponse
 
 from .models.Booking import Booking
 from .serializers import BookingSerializer, UserSerializer
@@ -101,3 +109,7 @@ class UserView(viewsets.ModelViewSet):
 
         # TODO: only allow admins to list all other users
         return super().get_object()
+        return Response({
+            'username': user.username,
+            'email': user.email,
+        })
