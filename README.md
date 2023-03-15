@@ -30,6 +30,7 @@
 - [Poetry](https://github.com/python-poetry/poetry) (will be installed automatically)
 
 To install Caddy:
+
 - For Windows, a copy of `caddy.exe` is already included for easy development.
 - On Linux and macOS, [install Caddy](https://caddyserver.com/docs/install) through your package manager.
   - You can also download it manually from Caddy's website if you prefer.
@@ -37,6 +38,7 @@ To install Caddy:
 ### Running
 
 Now run the following: (replace `python` with whatever command you use for Python 3)
+
 ```
 python setup.py
 ```
@@ -44,6 +46,7 @@ python setup.py
 You only need to run `setup.py` once **after first cloning** the repo or **after pulling** the latest changes (when dependencies or the DB model have changed).
 
 If everything succeeded, you can now start the app any time with:
+
 ```
 node run.js
 ```
@@ -55,10 +58,20 @@ To create an account for the Django admin console, run `py setup.py admin` and e
 ## Environment
 
 Our project will use a `.env` file that contains different variables and secrets that will be used for both development and production.
-Contact @NoahCardoza#3669 for more info regarding the Google client_id and secrets, which will be sent via Signal Messenger.
+Contact @NoahCardoza#3669 for more info regarding the Google client_id and secrets, .
 
-- Development: To get started, copy the sample .env file to the project root directory with the filename: `.env`.
-- Production: Same as above, but save file as: `prod.env`.
+- Development
+
+  - Copy the sample `.env.example` file to `.env` in the `/backend` and `/frontend` directories.
+  - For `GOOGLE_CLIENT_ID` and `GOOGLE_CLIENT_SECRET` values
+    1. Install [Signal Messenger](https://signal.org/en/).
+    2. Talk with @NoahCardoza#3669 for the values which will be sent to you via Signal.
+  - For the `AMADEUS_CLIENT_ID` and `AMADEUS_CLIENT_SECRET` values, register at [amadeus.com](https://developers.amadeus.com/register).
+  - For the `HOTELBEDS_CLIENT_ID` and `HOTELBEDS_CLIENT_SECRET` values, register at [hotelbeds.com](https://developer.hotelbeds.com/register/).
+
+- Production
+  - Follow development instructions above.
+  - Set `POSTGRES_*` variables in `/backend/.env` to the production database credentials.
 
 To emulate production mode (will run on port 80) without Docker:
 
