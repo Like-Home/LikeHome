@@ -1,8 +1,6 @@
-const fs = require('fs')
 const subprocess = require('child_process')
-const path = require('path')
     
-const BLACK = 0, RED = 1, GREEN = 2, YELLOW = 3, BLUE = 4, MAGENTA = 5, CYAN = 6, WHITE = 7, GRAY = 60
+const RED = 1, GREEN = 2, YELLOW = 3, BLUE = 4, MAGENTA = 5, CYAN = 6, WHITE = 7, GRAY = 60
 const PRODUCTION = (process.argv[2] ?? process.env['ENV'] ?? '').startsWith('prod')
 
 if (PRODUCTION) {
@@ -40,44 +38,6 @@ const createSubLogger = log => (level, msg) => log(prefix(level, {
         debug: CYAN,
     }[level], 5), '| ', msg)
 
-/**
- * Load environment variables from .env files
- */
-function loadDotEnv(postfix = '') {
-    const logger = createSubLogger((...args) => {
-        console.log(`${prefix('Environ', GREEN)} |`, ...args)
-    })
-    
-    const filename = `.env${postfix}`
-
-    const locations = [
-        path.join(__dirname, 'backend', filename),
-        path.join(__dirname, 'frontend', filename),
-        path.join(__dirname, filename),
-    ]
-
-    const existingLocations = locations.filter(fs.existsSync)
-
-    if (existingLocations.length === 0) {
-        logger('warn', 'No .env file found.')
-    } else {
-        existingLocations.forEach(location => {
-            logger('info', `| Loading environment variables from ${location}`)
-            fs.readFileSync(location, 'utf8').split('\n').forEach(line => {
-                line = line.trim()
-                if (line.startsWith('#') || line === '') {
-                    return
-                }
-                if (line.startsWith('export ')) {
-                    line = line.slice(7).trim()
-                }
-                const [key, ...value] = line.split('=')
-                process.env[key] = value.join('=')
-            })
-        })
-    }
-}
-
 function checkVersion(cmd, version, options = {}) {
     const cmdParts = cmd.split(' ')
     const child = subprocess.spawnSync(cmdParts[0], cmdParts.slice(1), { encoding: 'utf8', ...options });
@@ -98,7 +58,6 @@ if (!checkVersion(`${PYTHON_PATH} -V`, '3.11.', { cwd: 'backend' })) {
 }
 
 if (!PRODUCTION) {
-    loadDotEnv()
     log('Running development server...')
     spawn(prefix('Django', RED), `${PYTHON_PATH} manage.py runserver`, {
         callback: djangoLog,
@@ -110,7 +69,6 @@ if (!PRODUCTION) {
     spawn(prefix('Caddy', YELLOW), `${CADDY_PATH} run`, {callback: caddyLog})
 
 } else {
-    loadDotEnv('.prod')
     log('Running production test server...')
     spawn(prefix('Django', RED), `${PYTHON_PATH} manage.py runserver`, {
         callback: djangoLog,
