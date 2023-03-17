@@ -4,13 +4,13 @@ import ReactDOM from 'react-dom/client';
 import { RouterProvider } from 'react-router-dom';
 
 import { RecoilRoot } from 'recoil';
-import router from './router';
-
-import './index.scss';
-
 import { CssBaseline } from '@mui/material';
 
 import { createTheme, ThemeProvider } from '@mui/material/styles';
+
+import router from './router';
+import AppLoadingSpinner from './components/AppLoadingSpinner';
+import './index.scss';
 
 const darkTheme = createTheme({
   palette: {
@@ -26,7 +26,9 @@ ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
     <ThemeProvider theme={darkTheme}>
       <CssBaseline />
       <RecoilRoot>
-        <RouterProvider router={router} />
+        <React.Suspense fallback={<AppLoadingSpinner />}>
+          <RouterProvider router={router} />
+        </React.Suspense>
       </RecoilRoot>
     </ThemeProvider>
   </React.StrictMode>,
