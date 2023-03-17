@@ -1,6 +1,6 @@
+import { useRecoilValue } from 'recoil';
 import CSRFToken from '../components/useCSRFToken';
 import userAtom from '../recoil/user';
-import { useRecoilValue } from 'recoil';
 
 export default function AuthPage() {
   const user = useRecoilValue(userAtom);

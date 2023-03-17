@@ -1,5 +1,6 @@
 import { createBrowserRouter, Outlet, Navigate } from 'react-router-dom';
 
+import { useRecoilValue } from 'recoil';
 import HomePage from './pages/home';
 import HotelPage from './pages/hotel';
 import AuthPage from './pages/auth';
@@ -14,7 +15,6 @@ import ErrorLayout from './layouts/error';
 import RootLayout from './layouts/root';
 
 import userAtom from './recoil/user';
-import { useRecoilValue } from 'recoil';
 
 const AuthGuard = () => {
   const user = useRecoilValue(userAtom);
@@ -52,7 +52,7 @@ const router = createBrowserRouter([
         element: <AuthGuard />,
         children: [
           {
-            path: '/booking/:id',
+            path: '/booking/:bookingId',
             element: <BookingPage />,
           },
           {

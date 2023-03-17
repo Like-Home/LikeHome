@@ -1,7 +1,7 @@
-import CSRFToken from './useCSRFToken';
-import userAtom from '../recoil/user';
 import { useRecoilValue } from 'recoil';
 import { Link } from 'react-router-dom';
+import CSRFToken from './useCSRFToken';
+import userAtom from '../recoil/user';
 import './styles.scss';
 
 export default function Navbar() {
@@ -10,6 +10,7 @@ export default function Navbar() {
   return (
     <nav className="card navbar">
       <Link to="/">Home</Link>
+      <Link to="/bookings">My Bookings</Link>
       {user ? (
         <form action="/accounts/logout/" method="post">
           <CSRFToken />
