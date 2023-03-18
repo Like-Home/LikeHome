@@ -3,6 +3,8 @@
 import os
 from typing import Any
 
+import stripe
+
 
 def getenv(key: str, default: Any = None, required=False) -> Any:
     """Retrieves a value from the environment.
@@ -42,6 +44,7 @@ HOTELBEDS_API_SECRET = getenv('HOTELBEDS_API_SECRET')
 
 STRIPE_PUBLISHABLE_KEY = getenv('STRIPE_PUBLISHABLE_KEY', required=PRODUCTION)
 STRIPE_SECRET_KEY = getenv('STRIPE_SECRET_KEY', required=PRODUCTION)
+STRIPE_ENDPOINT_SECRET = getenv('STRIPE_ENDPOINT_SECRET', required=PRODUCTION)
 
 POSTGRES_USER = getenv('POSTGRES_USER', required=PRODUCTION)
 POSTGRES_HOST = getenv('POSTGRES_HOST', required=PRODUCTION)
@@ -53,3 +56,5 @@ SECRET_KEY = getenv(
     default='django-insecure-6i6ophe6dmuw@1vn!h5xw6@^g#x+pp&n6mfitr_r1%t!l7+3gj',
     required=PRODUCTION
 )
+
+stripe.api_key = STRIPE_SECRET_KEY

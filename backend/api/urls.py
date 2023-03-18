@@ -26,6 +26,7 @@ router.register(r'user', views.UserView, 'User')
 urlpatterns = [
     path('csrf', views.CSRFGeneratorView.as_view()),
     path('', include(router.urls)),
+    path('checkout/', views.create_checkout_session, name='search_city'),
     path('search_city/<str:param>', views.search_city, name='search_city'),
     path('search_hotel/<str:citycode>/<str:checkindata>/<str:checkoutdata>/<str:rooms>/<str:travelers>',
          views.search_hotel, name='search_hotel')
