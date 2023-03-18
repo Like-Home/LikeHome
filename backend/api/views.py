@@ -1,4 +1,5 @@
 import traceback
+from typing import Any
 
 from amadeus import Location, ResponseError
 from api.modules.amadeus import amadeus
@@ -34,14 +35,13 @@ def search_city(req, param):
 def search_hotel(req, citycode, checkindata, checkoutdata, rooms, travelers):
     if req.method == "GET":
         try:
-            print(citycode)
             hotel_list = amadeus.reference_data.locations.hotels.by_city.get(
                 cityCode=citycode)
 
             hotel_names = []
             for i in hotel_list.data:
                 hotel_names.append(i['hotelId'])
-            print(hotel_names)
+
             hotel_offers = amadeus.shopping.hotel_offers_search.get(
                 hotelIds=hotel_names[:10], adults=travelers, checkInDate=checkindata,
                 checkOutDate=checkoutdata,

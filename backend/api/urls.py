@@ -14,6 +14,7 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.urls import include, path
+from django.views.decorators.csrf import csrf_exempt
 from rest_framework import routers
 
 from . import views
@@ -21,7 +22,6 @@ from . import views
 router = routers.DefaultRouter()
 router.register(r'booking', views.BookingView, 'Booking')
 router.register(r'user', views.UserView, 'User')
-
 
 urlpatterns = [
     path('csrf', views.CSRFGeneratorView.as_view()),
