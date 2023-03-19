@@ -2,6 +2,7 @@ from django.contrib.auth.models import User
 from django.db import models
 from django.db.models import (CharField, DateTimeField, FloatField, ForeignKey,
                               IntegerField, TextChoices)
+from django.utils.timezone import now
 
 
 class Booking(models.Model):
@@ -24,7 +25,7 @@ class Booking(models.Model):
     user = ForeignKey(User, on_delete=models.CASCADE)
     start_date = DateTimeField()
     end_date = DateTimeField()
-    created_at = DateTimeField()
+    created_at = DateTimeField(default=now, editable=False)
 
     def _str_(self):
         return self.hotel_id
