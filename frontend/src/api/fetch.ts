@@ -45,7 +45,6 @@ const getApiBaseUrl = (url?: string) => {
 const API_BASE_URL = getApiBaseUrl(import.meta.env.API_BASE_URL);
 
 async function http<T>(path: string, config: RequestInit): Promise<T> {
-  // if the path is not a full url, then it is a relative path
   const prefixedPath = path.startsWith('http') ? path : `${API_BASE_URL}/api${path}`.replace(/\/+/g, '/');
 
   const request = new Request(prefixedPath, config);
