@@ -47,6 +47,25 @@ class BookingSerializer(serializers.ModelSerializer):
 
         model = Booking
 
+    '''
+APP-21-65 implement a function that takes in a 
+booking and checks whether it is double booked 
+by checking its tart and end time and comparing 
+it with other bookings the user booked. 
+''' 
+
+    def validate(self, attrs):
+        print(attrs)
+        conflicting_bookings = Booking.objects.filter(
+            user=self.context['request'].user,
+            start_date__lt=attrs['end_date'], # checking if start
+            end_date__gt=attrs['start_date']
+        )
+        if conflicting_bookings.exists():
+            raise serializers.ValidationError(detail="Booking overlaps with previous booking")
+        return super().validate(attrs)
+    
+
     def create(self,  validated_data):
         amount_paid = 100000
         booking = Booking(
