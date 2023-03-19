@@ -1,7 +1,34 @@
 from django.contrib.auth.models import User
 from rest_framework import serializers
+from rest_framework.utils.representation import smart_repr
 
 from .models.Booking import Booking
+
+
+class DateBeforeValidator:
+    """
+    Validator for checking if a start date is before an end date field.
+    Implementation based on `UniqueTogetherValidator` of Django Rest Framework.
+    """
+
+    def __init__(self, start_date_field="start_date", end_date_field="end_date", message=None):
+        self.start_date_field = start_date_field
+        self.end_date_field = end_date_field
+
+    def __call__(self, attrs):
+        if attrs[self.start_date_field] > attrs[self.end_date_field]:
+            raise serializers.ValidationError(
+                {
+                    'date': 'IMPOSABLE_DATE_RANGE'
+                },
+            )
+
+    def __repr__(self):
+        return '<%s(start_date_field=%s, end_date_field=%s)>' % (
+            self.__class__.__name__,
+            smart_repr(self.start_date_field),
+            smart_repr(self.end_date_field)
+        )
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -32,6 +59,12 @@ class BookingSerializer(serializers.ModelSerializer):
         default=serializers.CurrentUserDefault()
     )
 
+    # force booking even if there is an overlap
+    force = serializers.BooleanField(
+        write_only=True,
+        default=False
+    )
+
     # TODO: setup permissions
     class Meta:
         fields = '__all__'
@@ -46,6 +79,10 @@ class BookingSerializer(serializers.ModelSerializer):
 
         model = Booking
 
+        validators = [
+            DateBeforeValidator(),
+        ]
+
     def validate(self, attrs):
         """
         APP-21-65: implement a function that takes in a 
@@ -53,6 +90,9 @@ class BookingSerializer(serializers.ModelSerializer):
         by checking its tart and end time and comparing 
         it with other bookings the user booked. 
         """
+
+        if attrs['force']:
+            return super().validate(attrs)
 
         conflicting_bookings = Booking.objects.filter(
             user=self.context['request'].user,
@@ -62,7 +102,10 @@ class BookingSerializer(serializers.ModelSerializer):
 
         if conflicting_bookings.exists():
             raise serializers.ValidationError(
-                detail="Booking overlaps with previous booking")
+                {
+                    'date': 'CONFLICTING_BOOKING'
+                }
+            )
 
         return super().validate(attrs)
 
