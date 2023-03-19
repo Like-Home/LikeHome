@@ -1,8 +1,8 @@
 import { useState } from 'react';
+import { useRecoilValue } from 'recoil';
 import reactLogo from '../assets/react.svg';
 
 import userAtom from '../recoil/user';
-import { useRecoilValue } from 'recoil';
 
 export default function HomePage() {
   const [count, setCount] = useState(0);
@@ -30,7 +30,7 @@ export default function HomePage() {
               <img src={reactLogo} className="logo react" alt="React logo" />
             </a>
           </div>
-          <button onClick={() => setCount((count) => count + 1)}>count is {count}</button>
+          <button onClick={() => setCount((state) => state + 1)}>count is {count}</button>
           {user && (
             <div className="card">
               <h2>Logged in as {user.email}</h2>
