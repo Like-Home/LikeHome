@@ -15,7 +15,6 @@ from rest_framework.response import Response
 from .models.Booking import Booking
 from .serializers import BookingSerializer, UserSerializer
 
-
 def search_city(req, param):
     if req.method == "GET":
         try:
@@ -53,6 +52,20 @@ def search_hotel(req, citycode, checkindata, checkoutdata, rooms, travelers):
             print(error.response.data)
             print(error.code)
         return JsonResponse({"error": "Invalid request"})
+        
+'''
+APP-21-65 implement a function that takes in a 
+booking and checks whether it is double booked 
+by checking its tart and end time and comparing 
+it with other bookings the user booked. 
+'''
+def is_double_booked(booking):
+    conflicting_bookings = Booking.objects.filter(
+        user=booking.user,
+        start_date__lt=booking.end_date, # checking if start
+        end_date__gt=booking.start_date
+    ).exclude(pk=booking.pk) #exclude the primary key of the new booking
+    return conflicting_bookings.exists()
 
 
 @method_decorator(ensure_csrf_cookie, name='dispatch')
