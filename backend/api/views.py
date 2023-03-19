@@ -1,4 +1,5 @@
 import traceback
+from typing import Any
 
 from amadeus import Location, ResponseError
 from api.modules.amadeus import amadeus
@@ -41,7 +42,7 @@ def search_hotel(req, citycode, checkindata, checkoutdata, rooms, travelers):
             hotel_names = []
             for i in hotel_list.data:
                 hotel_names.append(i['hotelId'])
-            print(hotel_names)
+
             hotel_offers = amadeus.shopping.hotel_offers_search.get(
                 hotelIds=hotel_names[:10], adults=travelers, checkInDate=checkindata,
                 checkOutDate=checkoutdata,
@@ -53,20 +54,6 @@ def search_hotel(req, citycode, checkindata, checkoutdata, rooms, travelers):
             print(error.response.data)
             print(error.code)
         return JsonResponse({"error": "Invalid request"})
-
-'''
-APP-21-65 implement a function that takes in a 
-booking and checks whether it is double booked 
-by checking its tart and end time and comparing 
-it with other bookings the user booked. 
-'''
-def is_double_booked(booking):
-    conflicting_bookings = Booking.objects.filter(
-        user=booking.user,
-        start_date__lt=booking.end_date, # checking if start
-        end_date__gt=booking.start_date
-    ).exclude(pk=booking.pk) #exclude the primary key of the new booking
-    return conflicting_bookings.exists()
 
 
 @method_decorator(ensure_csrf_cookie, name='dispatch')
@@ -102,7 +89,7 @@ class BookingView(viewsets.ModelViewSet):
         return super().get_object()
 
 
-class UserView(viewsets.ModelViewSet):
+class UserView(viewsets.ReadOnlyModelViewSet, viewsets.mixins.UpdateModelMixin):
     queryset = User.objects.all()
     serializer_class = UserSerializer
     permission_classes = [IsAuthenticated]
@@ -115,3 +102,11 @@ class UserView(viewsets.ModelViewSet):
 
         # TODO: only allow admins to list all other users
         return super().get_object()
+
+    def update(self, request: Request, *args: Any, **kwargs: Any) -> Response:
+        user = self.get_object()
+
+        if user != request.user:
+            return Response(status=403)
+
+        return super().update(request, *args, **kwargs)
