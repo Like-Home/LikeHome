@@ -39,11 +39,12 @@ while from_index < total_index:
     # Set the starting index to be one after left off
     from_index = to_index + 1
     # If there are less than 1000 elements left, get the remaining few
-    if (total_index - to_index) < 1000:
-        to_index = total_index
-    # Otherwise, get another 1000 destinations
-    else:
-        to_index += 1000
+    to_index = min(total_index, to_index + 1000)
+    # if (total_index - to_index) < 1000:
+    #     to_index = total_index
+    # # Otherwise, get another 1000 destinations
+    # else:
+    #     to_index += 1000
 
 with open('destinations.json', 'w') as outfile:
     json.dump(combined_destinations, outfile, indent=2)
