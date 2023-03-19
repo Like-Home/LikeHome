@@ -35,6 +35,7 @@ def search_city(req, param):
 def search_hotel(req, citycode, checkindata, checkoutdata, rooms, travelers):
     if req.method == "GET":
         try:
+            print(citycode)
             hotel_list = amadeus.reference_data.locations.hotels.by_city.get(
                 cityCode=citycode)
 
