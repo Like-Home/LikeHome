@@ -88,7 +88,7 @@ class BookingView(viewsets.ModelViewSet):
         return super().get_object()
 
 
-class UserView(viewsets.ModelViewSet):
+class UserView(viewsets.ReadOnlyModelViewSet, viewsets.mixins.UpdateModelMixin):
     queryset = User.objects.all()
     serializer_class = UserSerializer
     permission_classes = [IsAuthenticated]
@@ -101,3 +101,11 @@ class UserView(viewsets.ModelViewSet):
 
         # TODO: only allow admins to list all other users
         return super().get_object()
+
+    def update(self, request: Request, *args: Any, **kwargs: Any) -> Response:
+        user = self.get_object()
+
+        if user != request.user:
+            return Response(status=403)
+
+        return super().update(request, *args, **kwargs)
