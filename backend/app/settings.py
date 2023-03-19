@@ -13,7 +13,7 @@ https://docs.djangoproject.com/en/4.1/ref/settings/
 import os
 from pathlib import Path
 
-import whitenoise
+import dj_database_url
 
 from . import config
 
@@ -31,12 +31,16 @@ SECRET_KEY = config.SECRET_KEY
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = not config.PRODUCTION
+IS_HEROKU = "DYNO" in os.environ
 
-ALLOWED_HOSTS = [] if DEBUG else [
-    'likehome.dev',
-    'localhost',
-    '127.0.0.1',
-]
+if IS_HEROKU:
+    ALLOWED_HOSTS = ["*"]
+else:
+    ALLOWED_HOSTS = [] if DEBUG else [
+        'likehome.dev',
+        'localhost',
+        '127.0.0.1',
+    ]
 INTERNAL_IPS = ['127.0.0.1']
 
 VITE_APP_DIR = FRONTEND_DIR
@@ -45,6 +49,7 @@ STATIC_URL = "/static/"
 STATICFILES_DIRS = [
     VITE_APP_DIR / "dist"
 ]
+
 
 # Application definition
 
@@ -124,21 +129,30 @@ WSGI_APPLICATION = 'app.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/4.1/ref/settings/#databases
 
+MAX_CONN_AGE = 600
+
 DATABASES = {
-    'default':
-    {
+    'default': {
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': BACKEND_DIR / 'db.sqlite3',
+    }
+}
+
+if "DATABASE_URL" in os.environ:
+    # Configure Django for DATABASE_URL environment variable.
+    DATABASES["default"] = dj_database_url.config(  # type: ignore
+        conn_max_age=MAX_CONN_AGE, ssl_require=True)
+
+    # TODO: see https://github.com/heroku/python-getting-started/blob/main/gettingstarted/settings.py bout automated tests
+elif config.PRODUCTION:
+    DATABASES["default"] = {
         'ENGINE': 'django.db.backends.postgresql',
         'NAME': config.POSTGRES_DB,
         'USER': config.POSTGRES_USER,
         'PASSWORD': config.POSTGRES_PASSWORD,
         'HOST': config.POSTGRES_HOST,
         'PORT': 5432,
-    } if config.PRODUCTION else
-    {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BACKEND_DIR / 'db.sqlite3',
     }
-}
 
 
 # Password validation
