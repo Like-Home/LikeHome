@@ -39,13 +39,15 @@ function getRandomMemeWaitingMessage() {
 function Spinner() {
   const memeWaitingMessage = getRandomMemeWaitingMessage();
   return (
-    <div className="spinner-container">
-      <div className="spinner">
-        <div className="bounce1" />
-        <div className="bounce2" />
-        <div className="bounce3" />
+    <div className="card" style={{ maxWidth: 600, marginTop: 100, margin: 'auto' }}>
+      <div className="spinner-container">
+        <div className="spinner">
+          <div className="bounce1" />
+          <div className="bounce2" />
+          <div className="bounce3" />
+        </div>
+        <p>{memeWaitingMessage}</p>
       </div>
-      <p>{memeWaitingMessage}</p>
     </div>
   );
 }
