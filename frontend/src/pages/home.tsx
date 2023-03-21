@@ -22,12 +22,6 @@ export default function HomePage() {
         </div>
 
         <SearchBars />
-
-        {user && (
-          <div className="card">
-            <h2>Logged in as {user.email}</h2>
-          </div>
-        )}
       </main>
     </>
   );

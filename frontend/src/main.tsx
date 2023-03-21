@@ -29,6 +29,13 @@ const darkTheme = createTheme({
         },
       },
     },
+    MuiMenu: {
+      styleOverrides: {
+        paper: {
+          borderRadius: '8px',
+        },
+      },
+    },
   },
 });
 
