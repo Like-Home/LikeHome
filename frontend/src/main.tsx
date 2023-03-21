@@ -26,6 +26,7 @@ const darkTheme = createTheme({
         root: {
           borderRadius: '6px',
           textTransform: 'none',
+          lineHeight: '1.5',
         },
       },
     },

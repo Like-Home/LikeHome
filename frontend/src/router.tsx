@@ -3,7 +3,6 @@ import { createBrowserRouter, Outlet, Navigate } from 'react-router-dom';
 import { useRecoilValue } from 'recoil';
 import HomePage from './pages/home';
 import HotelPage from './pages/hotel';
-import AuthPage from './pages/auth';
 import BookingPage from './pages/booking';
 import SearchPage from './pages/search';
 import CheckoutPage from './pages/checkout';
@@ -31,10 +30,6 @@ const router = createBrowserRouter([
       {
         path: '/',
         element: <HomePage />,
-      },
-      {
-        path: '/auth',
-        element: <AuthPage />,
       },
       {
         path: '/hotel/:hotelId',
