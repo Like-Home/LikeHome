@@ -3,6 +3,15 @@ import { Stack } from '@mui/system';
 import Add from '@mui/icons-material/Add';
 import Remove from '@mui/icons-material/Remove';
 
+type NumberStepperProps = {
+  value?: number;
+  min?: number;
+  step?: number;
+  label?: string;
+  max?: number;
+  onChange?: (value: number) => void;
+};
+
 export default function NumberStepper({
   value = 0,
   min = 0,
@@ -10,7 +19,7 @@ export default function NumberStepper({
   label = '',
   max = Number.POSITIVE_INFINITY,
   onChange = () => null,
-}: any) {
+}: NumberStepperProps) {
   const StepperButton = (props: ButtonProps) => (
     <Button size="small" sx={{ maxWidth: 30, minWidth: 30 }} fullWidth={false} variant="outlined" {...props} />
   );

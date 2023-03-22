@@ -1,16 +1,18 @@
-import { Paper, PaperProps, Stack, SxProps } from '@mui/material';
+import React from 'react';
+import { Paper, Stack, SxProps } from '@mui/material';
+
+type Icon = (props: { color?: string }) => JSX.Element;
 
 export interface ControlProps {
-  onClick?: any;
-  icon?: any;
+  onClick?: React.MouseEventHandler<HTMLDivElement>;
+  icon?: Icon;
   label?: string;
-  children?: any;
+  children?: React.ReactNode;
   sx?: SxProps;
-  [arbitrary: string]: any;
+  [arbitrary: string]: unknown;
 }
 
 export function Control({ sx = {}, icon, label, onClick, children = [], ...props }: ControlProps) {
-  console.log(icon);
   return (
     <Paper
       sx={{

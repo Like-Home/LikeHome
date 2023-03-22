@@ -85,7 +85,7 @@ function BookingItem({ booking }: { booking: Booking }) {
 function BookingsList() {
   const bookings = useRecoilValue(bookingsAtom);
 
-  return (
+  return bookings.length > 0 ? (
     <List sx={{ width: '100%' }}>
       {bookings.map((booking, index) => (
         <>
@@ -94,12 +94,22 @@ function BookingsList() {
         </>
       ))}
     </List>
+  ) : (
+    <div
+      style={{
+        textAlign: 'center',
+      }}
+    >
+      <h3>Nothing to see here. </h3>
+      <p>Go spend some money and check back.</p>
+    </div>
   );
 }
 
 export default function BookingsPage() {
   return (
     <main className="card push-center" style={{ marginTop: 50, maxWidth: 900 }}>
+      <h1>My Bookings</h1>
       <BookingsList />
     </main>
   );

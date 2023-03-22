@@ -1,3 +1,6 @@
+/* eslint-disable guard-for-in */
+import { getCSRFValue } from './csrf';
+
 class APIError extends Error {
   name: string;
 
@@ -27,11 +30,23 @@ class APIError extends Error {
   }
 }
 
+const getApiBaseUrl = (url?: string) => {
+  if (url === undefined) {
+    return '';
+  }
+
+  if (url.endsWith('/')) {
+    return url.slice(0, -1);
+  }
+
+  return url;
+};
+
+const API_BASE_URL = getApiBaseUrl(import.meta.env.API_BASE_URL);
+
 async function http<T>(path: string, config: RequestInit): Promise<T> {
   // if the path is not a full url, then it is a relative path
-  const prefixedPath = path.startsWith('http')
-    ? path
-    : `${document.location.origin}${import.meta.env.BASE_URL}/api${path}`;
+  const prefixedPath = path.startsWith('http') ? path : `${API_BASE_URL}/api${path}`.replace(/\/+/g, '/');
 
   const request = new Request(prefixedPath, config);
   const response = await fetch(request);
@@ -55,8 +70,18 @@ export function get<T>(path: string, config?: RequestInit): Promise<T> {
   return http<T>(path, init);
 }
 
-export function post<T, U>(path: string, body: T, config?: RequestInit): Promise<U> {
-  const init = { method: 'post', body: JSON.stringify(body), ...config };
+type PostObject = { [arbitrary: string]: string | boolean };
+
+export function post<T extends PostObject, U>(path: string, body: T, config?: RequestInit): Promise<U> {
+  const formData = new FormData();
+
+  // eslint-disable-next-line no-restricted-syntax
+  for (const key in body) {
+    formData.append(key, JSON.stringify(body[key]));
+  }
+
+  formData.append('csrfmiddlewaretoken', getCSRFValue());
+  const init = { method: 'post', body: formData, ...config };
   return http<U>(path, init);
 }
 

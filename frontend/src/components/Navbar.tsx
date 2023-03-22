@@ -1,10 +1,9 @@
 import { createRef, useState } from 'react';
 import IconButton from '@mui/material/IconButton';
-import AccountCircle from '@mui/icons-material/AccountCircle';
-import { Avatar, Button, ButtonProps, Menu, MenuItem, Stack, Typography } from '@mui/material';
+import { Avatar, Button, ButtonProps, Menu, MenuItem } from '@mui/material';
 import { useRecoilValue } from 'recoil';
 import { useNavigate } from 'react-router-dom';
-import CSRFToken from './useCSRFToken';
+import InputCSRF from '../api/csrf';
 import userAtom from '../recoil/user';
 import './styles.scss';
 
@@ -12,11 +11,18 @@ function NavButton(props?: ButtonProps) {
   return <Button variant="text" sx={{ color: '#9b99ff' }} {...props} />;
 }
 
-const makeLink = (Component: any) =>
-  function Link({ to, children }: { to: string; children?: any }) {
+type WithLinkProps = {
+  children?: React.ReactNode | React.ReactElement;
+  to: string;
+};
+
+const makeLink = (Component: React.ComponentType) => {
+  const Link = ({ to, children }: WithLinkProps) => {
     const navigate = useNavigate();
     return <Component onClick={() => navigate(to)}>{children}</Component>;
   };
+  return Link;
+};
 
 const LinkButton = makeLink(NavButton);
 const LinkMenuItem = makeLink(MenuItem);
@@ -27,13 +33,17 @@ function AccountMenu() {
 
   return (
     <>
-      <IconButton onClick={(e: any) => setAnchorEl(e.target)} sx={{ p: 0.5 }} size="large">
+      <IconButton
+        onClick={(e: Event | React.SyntheticEvent) => setAnchorEl(e.target as HTMLElement)}
+        sx={{ p: 0.5 }}
+        size="large"
+      >
         <Avatar />
       </IconButton>
       <Menu anchorEl={anchorEl} open={!!anchorEl} onClose={() => setAnchorEl(null)}>
         <LinkMenuItem to="/bookings">My Bookings</LinkMenuItem>
         <form ref={ref} action="/accounts/logout/" method="post">
-          <CSRFToken />
+          <InputCSRF />
           <MenuItem onClick={() => ref.current && ref.current.submit()}>Log out</MenuItem>
         </form>
       </Menu>
@@ -51,7 +61,7 @@ export default function Navbar() {
         <AccountMenu />
       ) : (
         <form action="/accounts/google/login/?process=login" method="post">
-          <CSRFToken />
+          <InputCSRF />
           <Button variant="contained" type="submit">
             Log in
           </Button>

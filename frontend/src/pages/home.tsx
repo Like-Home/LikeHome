@@ -1,14 +1,6 @@
-import { useState } from 'react';
-import { useRecoilValue } from 'recoil';
-import reactLogo from '../assets/react.svg';
 import SearchBars from '../components/SearchBars';
 
-import userAtom from '../recoil/user';
-
 export default function HomePage() {
-  const [count, setCount] = useState(0);
-  const user = useRecoilValue(userAtom);
-
   return (
     <>
       <main className="card push-center" style={{ marginTop: 200, maxWidth: 900 }}>
