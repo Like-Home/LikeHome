@@ -1,6 +1,8 @@
 # Docker Thins
 postgres
 
+staticfiles
+
 # General
 .DS_Store
 

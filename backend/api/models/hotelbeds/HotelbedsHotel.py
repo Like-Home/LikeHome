@@ -17,6 +17,7 @@ from .HotelbedsSegment import HotelbedsSegment
 class HotelbedsHotel(models.Model):
     code = IntegerField(primary_key=True)
     name = models.CharField(max_length=255)
+    email = models.CharField(max_length=255, null=True)
     description = models.CharField(max_length=500)
     countryCode = models.CharField(max_length=3)
     stateCode = models.CharField(max_length=3)
@@ -25,21 +26,22 @@ class HotelbedsHotel(models.Model):
     latitude = models.FloatField()
 
     category = models.ForeignKey(
-        HotelbedsCategory, on_delete=models.CASCADE)
+        HotelbedsCategory, on_delete=models.CASCADE, null=True)
     categoryGroup = models.ForeignKey(
-        HotelbedsGroupCategory, on_delete=models.CASCADE)
-    chain = models.ForeignKey(HotelbedsChain, on_delete=models.CASCADE)
+        HotelbedsGroupCategory, on_delete=models.CASCADE, null=True)
+    chain = models.ForeignKey(
+        HotelbedsChain, on_delete=models.CASCADE, null=True)
     accommodationType = models.ForeignKey(
-        HotelbedsAccommodation, on_delete=models.CASCADE)
+        HotelbedsAccommodation, on_delete=models.CASCADE, null=True)
     # boards = models.ManyToManyField(HotelbedsBoard)
     segments = models.ManyToManyField(HotelbedsSegment)
 
-    web = models.CharField(max_length=255)
+    web = models.CharField(max_length=255, null=True)
     ranking = models.IntegerField()
 
-    address = models.CharField(max_length=255)
-    postalCode = models.CharField(max_length=10)
-    city = models.CharField(max_length=255)
+    address = models.CharField(max_length=255, null=True)
+    postalCode = models.CharField(max_length=10, null=True)
+    city = models.CharField(max_length=255, null=True)
 
     def _str_(self):
         return self.name
@@ -60,8 +62,7 @@ class HotelbedsHotelImage(models.Model):
         HotelbedsImageType, on_delete=models.CASCADE)
     path = models.CharField(max_length=255)
     roomCode = models.CharField(max_length=255, null=True)
-    roomType = models.ForeignKey(
-        HotelbedsRoom, null=True, on_delete=models.CASCADE)
+    roomType = models.CharField(max_length=20, null=True)
     characteristicCode = models.CharField(max_length=255, null=True)
     order = models.IntegerField()
     visualOrder = models.IntegerField()
@@ -122,9 +123,9 @@ class HotelbedsHotelRoom(models.Model):
     maxAdults = models.IntegerField()
     maxChildren = models.IntegerField()
     minAdults = models.IntegerField()
-    roomType = models.ForeignKey(HotelbedsRoom, on_delete=models.CASCADE)
+    roomType = models.CharField(max_length=20)
     characteristicCode = models.CharField(max_length=255)
-    PMSRoomCode = models.CharField(max_length=255)
+    PMSRoomCode = models.CharField(max_length=20, null=True)
 
     hotel = models.ForeignKey(
         HotelbedsHotel, on_delete=models.CASCADE, related_name='rooms')
@@ -178,6 +179,7 @@ class HotelbedsHotelRoomFacility(models.Model):
     facilityGroup = models.ForeignKey(
         HotelbedsFacilityGroup, on_delete=models.CASCADE)
     indLogic = models.BooleanField(null=True)
+    indFee = models.BooleanField(null=True)
     indYesOrNo = models.BooleanField(null=True)
     number = models.IntegerField()
     voucher = models.BooleanField()
@@ -217,7 +219,7 @@ class HotelbedsHotelFacility(models.Model):
         HotelbedsHotel, on_delete=models.CASCADE, related_name='facilities')
 
 
-class HotelbedsHotelInterestPoints(models.Model):
+class HotelbedsHotelInterestPoint(models.Model):
     """{
       "facilityCode": 10,
       "facilityGroupCode": 100,
@@ -230,7 +232,7 @@ class HotelbedsHotelInterestPoints(models.Model):
     facilityGroup = models.ForeignKey(
         HotelbedsFacilityGroup, on_delete=models.CASCADE)
     order = models.IntegerField()
-    poiName = models.CharField(max_length=255)
+    poiName = models.CharField(max_length=255, null=True)
     distance = models.IntegerField()
     hotel = models.ForeignKey(
         HotelbedsHotel, on_delete=models.CASCADE, related_name='interestPoints')
@@ -245,9 +247,9 @@ class HotelbedsHotelWildcard(models.Model):
         "content": "High Floor Superior Room - 1 King Hrng Accs"
       }
     },"""
-    roomCode = models.ForeignKey(HotelbedsRoom, on_delete=models.CASCADE)
-    roomType = models.CharField(max_length=255)
-    characteristicCode = models.CharField(max_length=255)
+    roomCode = models.CharField(max_length=20)
+    roomType = models.CharField(max_length=20)
+    characteristicCode = models.CharField(max_length=20)
     hotelRoomDescription = models.CharField(max_length=255)
     hotel = models.ForeignKey(
         HotelbedsHotel, on_delete=models.CASCADE, related_name='wildcards')
