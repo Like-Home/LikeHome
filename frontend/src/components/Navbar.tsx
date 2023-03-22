@@ -11,13 +11,10 @@ function NavButton(props?: ButtonProps) {
   return <Button variant="text" sx={{ color: '#9b99ff' }} {...props} />;
 }
 
-type WithLinkProps = {
-  children?: React.ReactNode | React.ReactElement;
-  to: string;
-};
+type ComponentType = React.ComponentType<{ onClick: () => void; children: React.ReactNode }>;
 
-const makeLink = (Component: React.ComponentType) => {
-  const Link = ({ to, children }: WithLinkProps) => {
+const makeLink = (Component: ComponentType) => {
+  const Link = ({ to, children }: { to: string; children: React.ReactNode }) => {
     const navigate = useNavigate();
     return <Component onClick={() => navigate(to)}>{children}</Component>;
   };
