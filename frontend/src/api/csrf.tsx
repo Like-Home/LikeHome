@@ -12,9 +12,11 @@ function getCookie(name: string): string | null {
   return null;
 }
 
-const csrftoken = getCookie('csrftoken') || '';
+export const getCSRFValue = () => getCookie('csrftoken') || '';
 
-const CSRFToken = () => {
-  return <input type="hidden" name="csrfmiddlewaretoken" value={csrftoken} />;
+const InputCSRF = () => {
+  const token = getCSRFValue();
+  return <input type="hidden" name="csrfmiddlewaretoken" value={token} />;
 };
-export default CSRFToken;
+
+export default InputCSRF;
