@@ -10,25 +10,44 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.1/ref/settings/
 """
 
+import os
 from pathlib import Path
+
+import dj_database_url
 
 from . import config
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
-
+BACKEND_DIR = BASE_DIR  # rename variable for clarity
+FRONTEND_DIR = BASE_DIR.parent / 'frontend'
+STATIC_ROOT = BACKEND_DIR / "staticfiles"
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-6i6ophe6dmuw@1vn!h5xw6@^g#x+pp&n6mfitr_r1%t!l7+3gj'
+SECRET_KEY = config.SECRET_KEY
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = not config.PRODUCTION
+IS_HEROKU = "DYNO" in os.environ
 
-ALLOWED_HOSTS = [] if DEBUG else [
-    'likehome.dev',
+if IS_HEROKU:
+    ALLOWED_HOSTS = ["*"]
+else:
+    ALLOWED_HOSTS = [] if DEBUG else [
+        'likehome.dev',
+        'localhost',
+        '127.0.0.1',
+    ]
+INTERNAL_IPS = ['127.0.0.1']
+
+VITE_APP_DIR = FRONTEND_DIR
+
+STATIC_URL = "/static/"
+STATICFILES_DIRS = [
+    VITE_APP_DIR / "dist"
 ]
 
 
@@ -45,18 +64,20 @@ INSTALLED_APPS = [
     # installed
     'corsheaders',
     'rest_framework',
-    # custom
-    'api',
     # Add the following django-allauth apps
     'allauth',
     'allauth.account',
     'allauth.socialaccount',
     'allauth.socialaccount.providers.google',  # for Google OAuth 2.0
+    # custom
+    'api',
 ]
 
 MIDDLEWARE = [
     # default
     'django.middleware.security.SecurityMiddleware',
+    'app.middleware.SPAMiddleware',
+    # 'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -66,6 +87,7 @@ MIDDLEWARE = [
     # installed
     'corsheaders.middleware.CorsMiddleware',
 ]
+
 
 # package: corsheaders
 CORS_ORIGIN_WHITELIST = [
@@ -94,8 +116,12 @@ TEMPLATES = [
                 'django.contrib.messages.context_processors.messages',
             ],
         },
+
     },
 ]
+
+STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
+
 
 WSGI_APPLICATION = 'app.wsgi.application'
 
@@ -103,19 +129,30 @@ WSGI_APPLICATION = 'app.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/4.1/ref/settings/#databases
 
+MAX_CONN_AGE = 600
+
 DATABASES = {
     'default': {
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': BACKEND_DIR / 'db.sqlite3',
+    }
+}
+
+if "DATABASE_URL" in os.environ:
+    # Configure Django for DATABASE_URL environment variable.
+    DATABASES["default"] = dj_database_url.config(  # type: ignore
+        conn_max_age=MAX_CONN_AGE, ssl_require=True)
+
+    # TODO: see https://github.com/heroku/python-getting-started/blob/main/gettingstarted/settings.py bout automated tests
+elif config.PRODUCTION:
+    DATABASES["default"] = {
         'ENGINE': 'django.db.backends.postgresql',
         'NAME': config.POSTGRES_DB,
         'USER': config.POSTGRES_USER,
         'PASSWORD': config.POSTGRES_PASSWORD,
         'HOST': config.POSTGRES_HOST,
         'PORT': 5432,
-    } if config.PRODUCTION else {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
     }
-}
 
 
 # Password validation
