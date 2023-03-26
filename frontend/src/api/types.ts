@@ -1,5 +1,5 @@
 export type BookingPostArgs = {
-  force?: boolean;
+  force?: string; // 'true' or 'false'
 };
 
 export type BookingPost = {

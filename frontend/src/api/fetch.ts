@@ -69,14 +69,14 @@ export function get<T>(path: string, config?: RequestInit): Promise<T> {
   return http<T>(path, init);
 }
 
-type PostObject = { [arbitrary: string]: string | boolean };
+type PostObject = { [arbitrary: string]: string };
 
 export function post<T extends PostObject, U>(path: string, body: T, config?: RequestInit): Promise<U> {
   const formData = new FormData();
 
   // eslint-disable-next-line no-restricted-syntax
   for (const key in body) {
-    formData.append(key, JSON.stringify(body[key]));
+    formData.append(key, body[key]);
   }
 
   formData.append('csrfmiddlewaretoken', getCSRFValue());
