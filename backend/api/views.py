@@ -15,42 +15,118 @@ from rest_framework.response import Response
 from .models.Booking import Booking
 from .serializers import BookingSerializer, UserSerializer
 from api.modules.hotelbeds import hotelbeds
-from .models.HotelbedsLocation import HotelbedsLocation
-from .models.HotelbedsHotel import HotelbedsHotel
-
+from .models.hotelbeds.HotelbedsDestinationLocation import HotelbedsDestinationLocation
+from .models.hotelbeds.HotelbedsHotel import HotelbedsHotel, HotelbedsHotelImage
+from rest_framework import serializers
 
 def search_city(req, param):
     if req.method == "GET":
         try:
-            return JsonResponse({"locations": HotelbedsLocation.objects.filter(name__icontains=param).values('pk', 'name')})
+            return JsonResponse({"locations": list(HotelbedsDestinationLocation.objects.filter(name__icontains=param).values('pk', 'name'))})
         except ResponseError as error:
             print(error)
         return JsonResponse({"error": "Invalid request"})
+    
 
+        
 
 def search_hotel(req, citycode, checkindata, checkoutdata, rooms, travelers):
+    """_summary_
+
+    Args:
+        req (_type_): _description_
+        citycode (_type_): _description_
+        checkindata (_type_): _description_
+        checkoutdata (_type_): _description_
+        rooms (_type_): _description_
+        travelers (_type_): _description_
+    
+    Filters:
+        min_price (_type_): minimum price
+        max_price (_type_): maximum price
+        accommodation (_type_): accommodation type
+        rooms (_type_): Room code
+        keywords (_type_): List of Numbers
+        boards (_type_):  Board codes
+        maxRooms (_type_): maximum number of rooms
+        paymentType (_type_): Payment type
+
+    Returns:
+        _type_: _description_
+    """
     if req.method == "GET":
         try:
-            hotels = HotelbedsHotel.object.filter(citycode = citycode)
-            offers = hotelbeds.post('/hotels', json={
-                                            "stay": {
-                                            "checkIn": checkindata,
-                                            "checkOut": checkoutdata,
-                                            },
-                                            "occupancies": [
-                                            {
-                                            "rooms": rooms,
-                                            "adults": travelers,
-                                            "children": 0
-                                            }
-                                            ],
-                                            "hotels": {
-                                            "hotel": [
-                                                hotel.pk for hotel in hotels        
-                                            ]
-                                            }
-                                            })
-            return JsonResponse({"hotels": offers.json()})
+            filters = {}
+
+            if 'min_price' in req.GET:
+                filters['minRate'] = req.GET['min_price']
+            
+            if 'max_price' in req.GET:
+                filters['maxRate'] = req.GET['max_price']
+            
+            if 'accommodation' in req.GET:
+                filters['accommodation'] = req.GET['accommodation'].split(',')
+            
+            if 'rooms' in req.GET:
+                filters['room'] = {
+                    'included': 'true',
+                    'room' : req.GET['rooms'].split(',')
+                }
+            
+            if 'keywords' in req.GET:
+                filters['keyword'] = {
+                    'keyword' : req.GET['keywords'].split(',')
+                }
+            
+            if 'boards' in req.GET:
+                filters['board'] = {
+                    'included': 'true',
+                    'board' : req.GET['boards'].split(',')
+                }
+            
+            if 'maxRooms' in req.GET:
+                filters['maxRooms'] = req.GET['maxRooms']
+
+            if 'paymentType' in req.GET:
+                filters['paymentType'] = req.GET['paymentType']
+
+            
+
+            payload = {
+                "stay": {
+                    "checkIn": checkindata,
+                    "checkOut": checkoutdata,
+                },
+                "occupancies": [
+                    {
+                        "rooms": rooms,
+                        "adults": travelers,
+                        "children": 0
+                    }
+                ],
+                "destination": {
+                    "code": citycode
+                }
+            }
+
+            if filters:
+                payload['filters'] = filters
+
+            offers = hotelbeds.post('/hotel-api/1.0/hotels', json=payload)
+
+            offers = offers.json()
+            for hotel in offers["hotels"]["hotels"]:
+                for room in hotel['rooms']:
+                    room['images'] = list(HotelbedsHotelImage.objects.filter(
+                        hotel=HotelbedsHotel.objects.get(code=hotel['code']), roomCode=room['code']).values('imageType',
+                                                                                                            'path',
+                                                                                                            'order',
+                                                                                                            'visualOrder',))
+            #     print(list(images))
+            return JsonResponse({"hotels": offers['hotels']})
+            # return JsonResponse({"hotels": offers})
+            # return JsonResponse({"hotels": list(hotels.values('pk', 'name', 'description', 'longitude', 'latitude', 'address', 'postalCode', 'city', 'countryCode', 'stateCode', 'email', 'web', 'ranking'))})
+            # return JsonResponse({"hotels": HotelSerializer(hotels).data})
         except ResponseError as error:
             print(error)
         return JsonResponse({"error": "Invalid request"})
