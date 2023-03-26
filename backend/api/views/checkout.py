@@ -219,6 +219,12 @@ class CheckoutView(viewsets.mixins.CreateModelMixin, viewsets.GenericViewSet):
             metadata = session['metadata']
 
             booking = Booking.objects.get(id=metadata['booking_id'])
+
+            if booking.status != Booking.BookingStatus.PENDING:
+                return Response({
+                    'message': 'Booking has already been processed.'
+                }, status=400)
+
             booking.stripe_id = session['id']
             booking.status = Booking.BookingStatus.CONFIRMED
 
