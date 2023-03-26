@@ -3,21 +3,23 @@ from typing import Any
 
 from amadeus import Location, ResponseError
 from api.modules.amadeus import amadeus
+from api.modules.hotelbeds import hotelbeds
 from django.contrib.auth.models import User
 from django.http import JsonResponse
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import ensure_csrf_cookie
-from rest_framework import permissions, views, viewsets
+from rest_framework import permissions, serializers, views, viewsets
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.request import Request
 from rest_framework.response import Response
 
 from .models.Booking import Booking
+from .models.hotelbeds.HotelbedsDestinationLocation import \
+    HotelbedsDestinationLocation
+from .models.hotelbeds.HotelbedsHotel import (HotelbedsHotel,
+                                              HotelbedsHotelImage)
 from .serializers import BookingSerializer, UserSerializer
-from api.modules.hotelbeds import hotelbeds
-from .models.hotelbeds.HotelbedsDestinationLocation import HotelbedsDestinationLocation
-from .models.hotelbeds.HotelbedsHotel import HotelbedsHotel, HotelbedsHotelImage
-from rest_framework import serializers
+
 
 def search_city(req, param):
     if req.method == "GET":
@@ -26,9 +28,7 @@ def search_city(req, param):
         except ResponseError as error:
             print(error)
         return JsonResponse({"error": "Invalid request"})
-    
 
-        
 
 def search_hotel(req, citycode, checkindata, checkoutdata, rooms, travelers):
     """_summary_
@@ -40,7 +40,7 @@ def search_hotel(req, citycode, checkindata, checkoutdata, rooms, travelers):
         checkoutdata (_type_): _description_
         rooms (_type_): _description_
         travelers (_type_): _description_
-    
+
     Filters:
         min_price (_type_): minimum price
         max_price (_type_): maximum price
@@ -54,43 +54,41 @@ def search_hotel(req, citycode, checkindata, checkoutdata, rooms, travelers):
     Returns:
         _type_: _description_
     """
-    if req.method == "GET":
-        try:
+    try:
+        if req.method == "GET":
             filters = {}
 
             if 'min_price' in req.GET:
-                filters['minRate'] = req.GET['min_price']
-            
+                filters['minRate'] = int(req.GET['min_price'])
+
             if 'max_price' in req.GET:
-                filters['maxRate'] = req.GET['max_price']
-            
+                filters['maxRate'] = int(req.GET['max_price'])
+
             if 'accommodation' in req.GET:
                 filters['accommodation'] = req.GET['accommodation'].split(',')
-            
+
             if 'rooms' in req.GET:
                 filters['room'] = {
                     'included': 'true',
-                    'room' : req.GET['rooms'].split(',')
+                    'room': req.GET['rooms'].split(',')
                 }
-            
+
             if 'keywords' in req.GET:
                 filters['keyword'] = {
-                    'keyword' : req.GET['keywords'].split(',')
+                    'keyword': req.GET['keywords'].split(',')
                 }
-            
+
             if 'boards' in req.GET:
                 filters['board'] = {
                     'included': 'true',
-                    'board' : req.GET['boards'].split(',')
+                    'board': req.GET['boards'].split(',')
                 }
-            
+
             if 'maxRooms' in req.GET:
                 filters['maxRooms'] = req.GET['maxRooms']
 
             if 'paymentType' in req.GET:
                 filters['paymentType'] = req.GET['paymentType']
-
-            
 
             payload = {
                 "stay": {
@@ -110,7 +108,7 @@ def search_hotel(req, citycode, checkindata, checkoutdata, rooms, travelers):
             }
 
             if filters:
-                payload['filters'] = filters
+                payload['filter'] = filters
 
             offers = hotelbeds.post('/hotel-api/1.0/hotels', json=payload)
 
@@ -122,14 +120,10 @@ def search_hotel(req, citycode, checkindata, checkoutdata, rooms, travelers):
                                                                                                             'path',
                                                                                                             'order',
                                                                                                             'visualOrder',))
-            #     print(list(images))
             return JsonResponse({"hotels": offers['hotels']})
-            # return JsonResponse({"hotels": offers})
-            # return JsonResponse({"hotels": list(hotels.values('pk', 'name', 'description', 'longitude', 'latitude', 'address', 'postalCode', 'city', 'countryCode', 'stateCode', 'email', 'web', 'ranking'))})
-            # return JsonResponse({"hotels": HotelSerializer(hotels).data})
-        except ResponseError as error:
-            print(error)
-        return JsonResponse({"error": "Invalid request"})
+    except Exception as e:
+        traceback.print_exc()
+    return JsonResponse({"message": "An unknown error ocurred"}, status=500)
 
 
 @method_decorator(ensure_csrf_cookie, name='dispatch')
