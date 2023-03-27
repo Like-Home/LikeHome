@@ -2,9 +2,9 @@ import { ChangeEvent, useState } from 'react';
 import { Stack, Button } from '@mui/material';
 import { useNavigate, Form, useSearchParams } from 'react-router-dom';
 
-import Place from '@mui/icons-material/Place';
 import TextInput from './controls/TextInput';
 import GuestsInput from './controls/GuestsInput';
+import LocationAutocomplete from './LocationAutocomplete';
 
 interface SearchPageParams {
   location?: string;
@@ -20,7 +20,7 @@ export default function SearchBars({ query }: { query?: string }) {
   const [params] = useSearchParams();
   const parsedParams: SearchPageParams = Object.fromEntries([...params]);
 
-  const [location, setLocation] = useState(query || '');
+  const [location, setLocation] = useState(query || null);
   const [checkin, setCheckin] = useState(parsedParams.checkin);
   const [checkout, setCheckout] = useState(parsedParams.checkout);
   const [guests, setGuests] = useState(parsedParams.guests || '1');
@@ -29,13 +29,14 @@ export default function SearchBars({ query }: { query?: string }) {
   return (
     <Form method="get">
       <Stack direction="row" justifyContent="center" spacing={2} m={1}>
-        <TextInput
+        {/* <TextInput
           name="q"
           icon={(props: object) => <Place {...props} />}
           placeholder="Destination"
           value={location}
           onChange={(e: ChangeEvent<HTMLInputElement>) => setLocation(e.target.value)}
-        />
+        /> */}
+        <LocationAutocomplete value={location} setValue={setLocation} />
         <TextInput
           name="date"
           type="date"
@@ -54,7 +55,12 @@ export default function SearchBars({ query }: { query?: string }) {
         <Button
           sx={{ px: 5, fontSize: 20 }}
           onClick={() => {
-            navigate(`/search?q=${location}&checkin=${checkin}&checkout=${checkout}&guests=${guests}&rooms=${rooms}`);
+            // TODO: kidna hacky to pass this in the URL. Any ides?
+            const locationHash = btoa(JSON.stringify(location));
+            // TODO: validate dates before proceeding
+            navigate(
+              `/search?q=${locationHash}&checkin=${checkin}&checkout=${checkout}&guests=${guests}&rooms=${rooms}`,
+            );
           }}
         >
           Search

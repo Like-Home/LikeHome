@@ -14,13 +14,14 @@ interface SearchPageParams {
 
 export default function SearchPage() {
   const [params] = useSearchParams();
-  const { q: location, checkin, checkout, guests, rooms }: SearchPageParams = Object.fromEntries([...params]);
+  const { q: query, checkin, checkout, guests }: SearchPageParams = Object.fromEntries([...params]);
 
-  console.log(location, rooms);
+  const location = JSON.parse(atob(query));
 
   const onBookNow: onBookNowCallback = (hotelId, roomId) => {
     createBooking({
       hotel_id: hotelId,
+      // rooms: rooms,
       room_id: roomId,
       guest_count: guests,
       start_date: `${checkin}T00:00:00Z`,
