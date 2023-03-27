@@ -1,42 +1,77 @@
 import { Stack, Typography } from '@mui/material';
 import { useSearchParams } from 'react-router-dom';
+import { useEffect, useState } from 'react';
+import slugify from 'slugify';
 import HotelCard, { onBookNowCallback } from '../components/HotelCard';
-import SearchBars from '../components/SearchBars';
-import { createBooking } from '../api/bookings';
-
-interface SearchPageParams {
-  q?: string;
-  checkin?: string;
-  checkout?: string;
-  guests?: string;
-  rooms?: string;
-}
+import SearchBars, { SearchPageParams, onSearchProps } from '../components/SearchBars';
+// import { createBooking } from '../api/bookings';
+import { getOffers, OfferHotel } from '../api/search';
 
 export default function SearchPage() {
-  const [params] = useSearchParams();
-  const { q: query, checkin, checkout, guests }: SearchPageParams = Object.fromEntries([...params]);
+  const [rawParams] = useSearchParams();
+  const params: SearchPageParams = Object.fromEntries([...rawParams]);
 
-  const location = JSON.parse(atob(query));
+  const location = JSON.parse(atob(params.location || ''));
 
-  const onBookNow: onBookNowCallback = (hotelId, roomId) => {
-    createBooking({
-      hotel_id: hotelId,
-      // rooms: rooms,
-      room_id: roomId,
-      guest_count: guests,
-      start_date: `${checkin}T00:00:00Z`,
-      end_date: `${checkout}T00:00:00Z`,
-    });
+  const [results, setResults] = useState<OfferHotel[]>([]);
+  const [resultsMessage, setResultsMessage] = useState('...');
+
+  const onBookNow: onBookNowCallback = (hotel) => {
+    // createBooking({
+    //   hotel_id: hotelId,
+    //   // rooms: rooms,
+    //   room_id: roomId,
+    //   guest_count: params.guests || '1',
+    //   start_date: `${params.checkin}T00:00:00Z`,
+    //   end_date: `${params.checkout}T00:00:00Z`,
+    // });
+    window.open(
+      `/hotel/${hotel.code}/${slugify(hotel.name).toLowerCase()}/?checkin=${params.checkin}&checkout=${
+        params.checkout
+      }&guests=${params.guests}=&rooms=${params.rooms}`,
+      '_blank',
+    );
   };
+
+  async function onSearch(kwargs: onSearchProps) {
+    const response = await getOffers({
+      destinationCode: kwargs?.location?.pk,
+      checkin: kwargs.checkin,
+      checkout: kwargs.checkout,
+      guests: Number(kwargs.guests),
+      rooms: Number(kwargs.rooms),
+    });
+
+    setResults(response.offers.hotels);
+    setResultsMessage(`Found ${response.offers.total} hotels`);
+  }
+
+  useEffect(() => {
+    onSearch({
+      location,
+      checkin: params.checkin,
+      checkout: params.checkout,
+      guests: params.guests,
+      rooms: params.rooms,
+    });
+  }, []);
 
   return (
     <main className="card push-center" style={{ marginTop: 50, maxWidth: 1200 }}>
-      <SearchBars query={location} />
+      <SearchBars
+        location={location}
+        guests={params.guests}
+        rooms={params.rooms}
+        checkin={params.checkin}
+        checkout={params.checkout}
+        onSearch={onSearch}
+      />
       <Stack sx={{ mt: 4, maxWidth: 600, mx: 'auto' }}>
-        <Typography color="#999">Found 120 locations</Typography>
+        <Typography color="#999">{resultsMessage}</Typography>
         <Stack spacing={3} mt={2} mb={3}>
-          <HotelCard hotelId="1" roomId="1" onBookNow={onBookNow} />
-          <HotelCard hotelId="2" roomId="1" onBookNow={onBookNow} />
+          {results.map((hotel) => (
+            <HotelCard key={hotel.code} hotel={hotel} onBookNow={onBookNow} />
+          ))}
         </Stack>
       </Stack>
     </main>

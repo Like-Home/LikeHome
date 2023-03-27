@@ -113,14 +113,32 @@ def search_hotel(req, citycode, checkindata, checkoutdata, rooms, travelers):
             offers = hotelbeds.post('/hotel-api/1.0/hotels', json=payload)
 
             offers = offers.json()
+            print(offers)
+            new_offers = []
             for hotel in offers["hotels"]["hotels"]:
-                for room in hotel['rooms']:
-                    room['images'] = list(HotelbedsHotelImage.objects.filter(
-                        hotel=HotelbedsHotel.objects.get(code=hotel['code']), roomCode=room['code']).values('imageType',
-                                                                                                            'path',
-                                                                                                            'order',
-                                                                                                            'visualOrder',))
-            return JsonResponse({"hotels": offers['hotels']})
+                try:
+                    db_hotel = HotelbedsHotel.objects.get(
+                        code=hotel['code'])
+                    hotel['facilities'] = list(
+                        db_hotel.facilities.values('facility__description', 'facilityGroup__description'))
+
+                    hotel['interestPoints'] = list(
+                        db_hotel.interestPoints.values('poiName'))
+                    hotel['images'] = list(HotelbedsHotelImage.objects.filter(hotel=db_hotel, imageType='GEN').values('path',
+                                                                                                                      'order',
+                                                                                                                      'visualOrder',))
+                    for room in hotel['rooms']:
+                        room['images'] = list(HotelbedsHotelImage.objects.filter(
+                            hotel=HotelbedsHotel.objects.get(code=hotel['code']), roomCode=room['code']).values('imageType',
+                                                                                                                'path',
+                                                                                                                'order',
+                                                                                                                'visualOrder',))
+                    new_offers.append(hotel)
+                except HotelbedsHotel.DoesNotExist:
+                    print(f"Hotel {hotel['code']} not found in database")
+                    continue
+            offers['hotels']['hotels'] = new_offers
+            return JsonResponse({"offers": offers['hotels']})
     except Exception as e:
         traceback.print_exc()
     return JsonResponse({"message": "An unknown error ocurred"}, status=500)
