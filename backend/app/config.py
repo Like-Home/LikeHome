@@ -6,7 +6,7 @@ from typing import Any
 import stripe
 
 
-def getenv(key: str, default: Any = None, required=False) -> Any:
+def getenv(key: str, default: Any = None, required=False, boolean=False) -> Any:
     """Retrieves a value from the environment.
 
     Args:
@@ -21,6 +21,13 @@ def getenv(key: str, default: Any = None, required=False) -> Any:
     """
 
     if key in os.environ:
+        if boolean:
+            if os.environ[key].lower() in ['true', '1']:
+                return True
+            elif os.environ[key].lower() in ['false', '0',]:
+                return False
+            raise EnvironmentError(
+                f'The environment variable "{key}" requires a value in [0, 1, true, false].')
         return os.environ[key]
 
     if required:
@@ -50,6 +57,10 @@ POSTGRES_USER = getenv('POSTGRES_USER', required=PRODUCTION)
 POSTGRES_HOST = getenv('POSTGRES_HOST', required=PRODUCTION)
 POSTGRES_DB = getenv('POSTGRES_DB', required=PRODUCTION)
 POSTGRES_PASSWORD = getenv('POSTGRES_PASSWORD', required=PRODUCTION)
+
+GOOGLE_MAPS_API_KEY = getenv('GOOGLE_MAPS_API_KEY', required=PRODUCTION)
+GOOGLE_MAPS_API_SECERT = getenv('GOOGLE_MAPS_API_SECERT', required=PRODUCTION)
+MONEY_SAVER_MODE = getenv('MONEY_SAVER_MODE', default=True, boolean=True)
 
 SECRET_KEY = getenv(
     'SECRET_KEY',

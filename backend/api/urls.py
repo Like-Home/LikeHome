@@ -18,9 +18,11 @@ from django.views.decorators.csrf import csrf_exempt
 from rest_framework import routers
 
 from . import views
+from .views.hotel import HotelbedsHotelView
 
 router = routers.DefaultRouter()
 router.register(r'booking', views.BookingView, 'Booking')
+router.register(r'hotel', HotelbedsHotelView, 'Hotel')
 router.register(r'user', views.UserView, 'User')
 
 urlpatterns = [
