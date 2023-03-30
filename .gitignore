@@ -1,6 +1,9 @@
 # Docker Things
 postgres
 
+# Python Diskcache
+/backend/cache
+
 # Django
 staticfiles
 
