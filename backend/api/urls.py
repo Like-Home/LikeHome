@@ -14,22 +14,20 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.urls import include, path
-from django.views.decorators.csrf import csrf_exempt
 from rest_framework import routers
 
 from . import views
+from .views.destination import DestinationView
 from .views.hotel import HotelbedsHotelView
 
 router = routers.DefaultRouter()
 router.register(r'booking', views.BookingView, 'Booking')
 router.register(r'hotel', HotelbedsHotelView, 'Hotel')
 router.register(r'user', views.UserView, 'User')
+router.register(r'destination', DestinationView, 'Destination')
 
 urlpatterns = [
     path('csrf', views.CSRFGeneratorView.as_view()),
-    path('', include(router.urls)),
     path('checkout/', views.create_checkout_session, name='search_city'),
-    path('search_city/<str:param>', views.search_city, name='search_city'),
-    path('search_hotel/<str:citycode>/<str:checkindata>/<str:checkoutdata>/<str:rooms>/<str:travelers>',
-         views.search_hotel, name='search_hotel')
+    path('', include(router.urls)),
 ]

@@ -1,3 +1,4 @@
+
 import hashlib
 import json
 import pickle
@@ -7,8 +8,6 @@ from hashlib import md5
 from logging import getLogger
 from operator import itemgetter
 
-import diskcache as dc
-from app import config
 from requests import Session
 
 logger = getLogger('hotelbeds')
@@ -89,14 +88,12 @@ class HotelbedsClient(Session):
         return res
 
 
-hotelbeds = HotelbedsClient(
-    config.HOTELBEDS_ENDPOINT,
-    config.HOTELBEDS_API_KEY,
-    config.HOTELBEDS_API_SECRET,
-    cache=dc.Cache('cache') if config.MONEY_SAVER_MODE else None
-)
-
 if __name__ == '__main__':
+    hotelbeds = HotelbedsClient(
+        input('endpoint: '),
+        input('api key: '),
+        input('api secret: '),
+    )
     res = hotelbeds.get('/hotel-api/1.0/status')
     print('response:', res)
     print('body:', res.json())

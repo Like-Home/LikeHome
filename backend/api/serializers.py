@@ -1,7 +1,7 @@
+from api.validators import DateBeforeValidator
 from app import config
 from django.contrib.auth.models import User
 from rest_framework import serializers
-from rest_framework.utils.representation import smart_repr
 
 from .models.Booking import Booking
 from .models.hotelbeds.HotelbedsHotel import (HotelbedsHotel,
@@ -12,32 +12,6 @@ from .models.hotelbeds.HotelbedsHotel import (HotelbedsHotel,
                                               HotelbedsHotelRoom,
                                               HotelbedsHotelWildcard)
 from .modules.google import sign_url
-
-
-class DateBeforeValidator:
-    """
-    Validator for checking if a start date is before an end date field.
-    Implementation based on `UniqueTogetherValidator` of Django Rest Framework.
-    """
-
-    def __init__(self, start_date_field="start_date", end_date_field="end_date", message=None):
-        self.start_date_field = start_date_field
-        self.end_date_field = end_date_field
-
-    def __call__(self, attrs):
-        if attrs[self.start_date_field] > attrs[self.end_date_field]:
-            raise serializers.ValidationError(
-                {
-                    'date': 'IMPOSABLE_DATE_RANGE'
-                },
-            )
-
-    def __repr__(self):
-        return '<%s(start_date_field=%s, end_date_field=%s)>' % (
-            self.__class__.__name__,
-            smart_repr(self.start_date_field),
-            smart_repr(self.end_date_field)
-        )
 
 
 class UserSerializer(serializers.ModelSerializer):

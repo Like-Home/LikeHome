@@ -5,7 +5,6 @@ from rest_framework.request import Request
 from rest_framework.response import Response
 
 from .booking import BookingView, create_checkout_session
-from .search import search_city, search_hotel
 from .user import UserView
 
 
