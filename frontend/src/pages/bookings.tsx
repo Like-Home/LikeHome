@@ -21,7 +21,7 @@ function BookingItem({ booking }: { booking: Booking }) {
   const linkToDetails = `/booking/${booking.id}`;
   const theme = useTheme();
 
-  const isTooLateToCancel = moment(booking.start_date).isBefore(moment().add(1, 'day'));
+  const isTooLateToCancel = moment(booking.check_in).isBefore(moment().add(1, 'day'));
 
   return (
     <ListItem
