@@ -3,27 +3,16 @@
 import React from 'react';
 import { useParams, useSearchParams, Link } from 'react-router-dom';
 import { useRecoilValue } from 'recoil';
-import { List, ListItem, ListItemText, Tab, Tabs, Box, Stack, Typography } from '@mui/material';
+import { Grid, List, ListItem, ListItemText, Tab, Tabs, Box, Stack, Typography } from '@mui/material';
 import ImageList from '@mui/material/ImageList';
 import ImageListItem from '@mui/material/ImageListItem';
 import Rating from '@mui/material/Rating';
 import userAtom from '../recoil/user';
 import SearchBars from '../components/SearchBars';
-// import { createBooking } from '../api/bookings';
-import { hotelById } from '../recoil/hotel/atom';
+import { hotelById, hotelOffersById } from '../recoil/hotel/atom';
+import HotelRoomCard from '../components/HotelRoomCard';
+import { createHotelbedsSrcSetFromPath } from '../utils';
 
-function srcset(image) {
-  return {
-    src: `http://photos.hotelbeds.com/giata/bigger/${image}`,
-    srcSet: `http://photos.hotelbeds.com/giata/bigger/${image}`,
-  };
-}
-// function srcset(image, size, rows = 1, cols = 1) {
-//   return {
-//     src: `${image}?w=${size * cols}&h=${size * rows}&fit=crop&auto=format`,
-//     srcSet: `${image}?w=${size * cols}&h=${size * rows}&fit=crop&auto=format&dpr=2 2x`,
-//   };
-// }
 function a11yProps(index) {
   return {
     id: `simple-tab-${index}`,
@@ -77,37 +66,25 @@ export default function HotelPage() {
   const user = useRecoilValue(userAtom);
   console.log(user);
   const hotel = useRecoilValue(hotelById(hotelId));
+  const hotelRoomOffers = useRecoilValue(
+    hotelOffersById({
+      hotelCode: hotelId,
+      ...params,
+    }),
+  );
   const [value, setValue] = React.useState(0);
   function handleChange(event, newValue) {
-    // window.scrollTo({
-    //   top: 0,
-    //   left: 0,
-    //   behavior: 'smooth',
-    // })
     // eslint-disable-next-line no-undef
     window.location.hash = tabs[newValue].href.slice(1);
     setValue(newValue);
   }
-  // function onBookNow(roomId: string) {
-  //   createBooking({
-  //     hotel_id: hotelId as string,
-  //     // rooms: rooms,
-  //     room_id: roomId,
-  //     guest_count: params.guests || '1',
-  //     start_date: `${params.checkin}T00:00:00Z`,
-  //     end_date: `${params.checkout}T00:00:00Z`,
-  //   });
-  // }
-
-  console.log(params);
 
   return (
     <main className="card push-center" style={{ marginTop: 50, maxWidth: 1200 }}>
       <ImageList sx={{ width: '100%', height: 420 }} variant="quilted" cols={8} rowHeight={100} id="overview">
         {hotel.images.slice(0, 8).map((item, index) => (
           <ImageListItem key={item.path} {...rowColByIndex(index)}>
-            {/* <img {...srcset(item.img, 121, item.rows, item.cols)} alt={item.title} loading="lazy" /> */}
-            <img {...srcset(item.path, 121, item.rows, item.cols)} alt={item.title} loading="lazy" />
+            <img {...createHotelbedsSrcSetFromPath(item.path)} alt={item.title} loading="lazy" />
           </ImageListItem>
         ))}
       </ImageList>
@@ -139,6 +116,7 @@ export default function HotelPage() {
         </Box>
       </Stack>
       <Stack id="rooms">
+        {/* <pre>{JSON.stringify(hotelRoomOffers)}</pre> */}
         <SearchBars
           noLocation={true}
           guests={params.guests}
@@ -146,6 +124,11 @@ export default function HotelPage() {
           checkin={params.checkin}
           checkout={params.checkout}
         />
+        <Grid container spacing={2}>
+          {hotelRoomOffers.offers.rooms.map((room) => (
+            <HotelRoomCard key={room.code} room={room} />
+          ))}
+        </Grid>
       </Stack>
       <Stack direction="row" justifyContent="space-between" id="location" sx={{ marginY: 3 }}>
         <Box sx={{ flex: '25%' }}>

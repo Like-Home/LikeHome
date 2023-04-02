@@ -11,5 +11,5 @@ export type LocationResults = {
 
 // eslint-disable-next-line import/prefer-default-export
 export function getLocation(query: string) {
-  return fetch.get<LocationResults>(`/search_city/${query}`);
+  return fetch.get<LocationResults>(`/destination/search/?q=${query}`);
 }

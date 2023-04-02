@@ -52,7 +52,7 @@ export type OfferHotel = {
   images: OfferHotelRoomImage[];
 };
 
-export type OfferResults = {
+export type LocationOfferResults = {
   offers: {
     hotels: OfferHotel[];
     checkin: string;
@@ -61,9 +61,14 @@ export type OfferResults = {
   };
 };
 
+export type HotelOfferResults = {
+  offers: {
+    rooms: OfferHotelRoom[];
+  };
+};
+
 type OfferParams = {
   // required
-  destinationCode?: string;
   checkin?: string;
   checkout?: string;
   rooms?: number;
@@ -72,7 +77,22 @@ type OfferParams = {
   // TODO: add filters
 };
 
-// eslint-disable-next-line import/prefer-default-export
-export function getOffers({ destinationCode, checkin, checkout, rooms, guests }: OfferParams) {
-  return fetch.get<OfferResults>(`/search_hotel/${destinationCode}/${checkin}/${checkout}/${rooms}/${guests}`);
+export type OffersByLocation = {
+  destinationCode?: string;
+} & OfferParams;
+
+export type OffersByHotel = {
+  hotelCode?: number;
+} & OfferParams;
+
+export function getOffersByLocation({ destinationCode, checkin, checkout, rooms, guests }: OffersByLocation) {
+  return fetch.get<LocationOfferResults>(
+    `/destination/${destinationCode}/offers/?check_in=${checkin}&check_out=${checkout}&adults=${guests}&rooms=${rooms}`,
+  );
+}
+
+export function getOffersByHotel({ hotelCode, checkin, checkout, rooms, guests }: OffersByHotel) {
+  return fetch.get<HotelOfferResults>(
+    `/hotel/${hotelCode}/offers/?check_in=${checkin}&check_out=${checkout}&adults=${guests}&rooms=${rooms}`,
+  );
 }

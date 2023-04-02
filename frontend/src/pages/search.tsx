@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import slugify from 'slugify';
 import HotelCard, { onBookNowCallback } from '../components/HotelCard';
 import SearchBars, { SearchPageParams, onSearchProps } from '../components/SearchBars';
-import { getOffers, OfferHotel } from '../api/search';
+import { getOffersByLocation, OfferHotel } from '../api/search';
 
 export default function SearchPage() {
   const [rawParams] = useSearchParams();
@@ -25,7 +25,7 @@ export default function SearchPage() {
   };
 
   async function onSearch(kwargs: onSearchProps) {
-    const response = await getOffers({
+    const response = await getOffersByLocation({
       destinationCode: kwargs?.location?.pk,
       checkin: kwargs.checkin,
       checkout: kwargs.checkout,
