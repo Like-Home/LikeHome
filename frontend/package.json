@@ -26,15 +26,20 @@
   "dependencies": {
     "@emotion/react": "^11.10.6",
     "@emotion/styled": "^11.10.6",
+    "@mui/icons-material": "^5.11.11",
     "@mui/material": "^5.11.12",
+    "@mui/system": "^5.11.13",
     "@vitejs/plugin-react-swc": "^3.2.0",
+    "autosuggest-highlight": "^3.3.4",
     "moment": "^2.29.4",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-router-dom": "^6.8.2",
     "recoil": "^0.7.6",
+    "slugify": "^1.6.6",
     "vite": "^4.2.0",
-    "vite-plugin-eslint": "^1.8.1"
+    "vite-plugin-eslint": "^1.8.1",
+    "vite-plugin-pwa": "^0.14.4"
   },
   "prettier": {
     "trailingComma": "all",
@@ -76,6 +81,7 @@
     },
     "rules": {
       "no-console": "off",
+      "@typescript-eslint/ban-ts-comment": "off",
       "import/extensions": [
         "error",
         "never"

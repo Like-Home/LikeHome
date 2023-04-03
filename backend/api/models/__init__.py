@@ -1,1 +1,2 @@
-from . import Account, Booking
+from . import *
+from .hotelbeds import *

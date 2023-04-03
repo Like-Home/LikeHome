@@ -1,5 +1,11 @@
-# Docker Thins
+# Docker Things
 postgres
+
+# Python Diskcache
+/backend/cache
+
+# Django
+staticfiles
 
 # General
 .DS_Store

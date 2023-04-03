@@ -40,6 +40,10 @@ a:hover {
   text-underline-offset: 4px;
 }
 
+::-webkit-calendar-picker-indicator {
+  filter: invert(1);
+}
+
 .text-center {
   text-align: center;
 }

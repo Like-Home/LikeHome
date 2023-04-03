@@ -1,13 +1,6 @@
-import { useState } from 'react';
-import { useRecoilValue } from 'recoil';
-import reactLogo from '../assets/react.svg';
-
-import userAtom from '../recoil/user';
+import SearchBars from '../components/SearchBars';
 
 export default function HomePage() {
-  const [count, setCount] = useState(0);
-  const user = useRecoilValue(userAtom);
-
   return (
     <>
       <main className="card push-center" style={{ marginTop: 200, maxWidth: 900 }}>
@@ -19,25 +12,7 @@ export default function HomePage() {
             }
           </p>
         </div>
-
-        {/* Vite test components. Remove me! */}
-        <div className="text-center">
-          <div>
-            <a href="https://vitejs.dev" target="_blank" rel="noreferrer">
-              <img src="/vite.svg" className="logo" alt="Vite logo" />
-            </a>
-            <a href="https://reactjs.org" target="_blank" rel="noreferrer">
-              <img src={reactLogo} className="logo react" alt="React logo" />
-            </a>
-          </div>
-          <button onClick={() => setCount((state) => state + 1)}>count is {count}</button>
-          {user && (
-            <div className="card">
-              <h2>Logged in as {user.email}</h2>
-            </div>
-          )}
-          <p className="read-the-docs">Click on the Vite and React logos to learn more</p>
-        </div>
+        <SearchBars />
       </main>
     </>
   );

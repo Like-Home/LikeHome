@@ -14,7 +14,29 @@ import './index.scss';
 
 const darkTheme = createTheme({
   palette: {
+    primary: { main: '#615EFF' },
     mode: 'dark',
+  },
+  components: {
+    MuiButton: {
+      defaultProps: {
+        variant: 'contained',
+      },
+      styleOverrides: {
+        root: {
+          borderRadius: '6px',
+          textTransform: 'none',
+          lineHeight: '1.5',
+        },
+      },
+    },
+    MuiMenu: {
+      styleOverrides: {
+        paper: {
+          borderRadius: '8px',
+        },
+      },
+    },
   },
 });
 
