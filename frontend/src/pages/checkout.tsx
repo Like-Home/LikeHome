@@ -1,10 +1,53 @@
 import { ChangeEvent, useState } from 'react';
-import { Stack, Typography, Button } from '@mui/material';
+import { Box, Modal, Button, Stack, Typography, Button } from '@mui/material';
 import { useParams } from 'react-router-dom';
 import { useRecoilValue } from 'recoil';
 import { createStripeCheckout } from '../api/checkout';
 import { checkoutDetails } from '../recoil/checkout/atom';
 import TextInput from '../components/controls/TextInput';
+
+const style = {
+  position: 'absolute' as const,
+  top: '50%',
+  left: '50%',
+  transform: 'translate(-50%, -50%)',
+  width: 400,
+  bgcolor: 'background.paper',
+  border: '2px solid #000',
+  boxShadow: 24,
+  p: 4,
+};
+
+export default function BasicModal() {
+  const [open, setOpen] = useState(false);
+  const handleOpen = () => setOpen(true);
+  const handleClose = () => setOpen(false);
+  return (
+    <div>
+      <Button onClick={handleOpen}>Open modal</Button>
+      <Modal
+        open={open}
+        onClose={handleClose}
+        aria-labelledby="modal-modal-title"
+        aria-describedby="modal-modal-description"
+      >
+        <Box sx={style}>
+          <Typography id="modal-modal-title" variant="h6" component="h2">
+            Warning
+          </Typography>
+          <Typography id="modal-modal-description" sx={{ mt: 2 }}>
+            You have an existing booking! <br></br>
+            <br></br> Canceling 48 hours before check in will occur in a 25% fee.
+            <p>
+              <Button onClick={handleClose}>Cancel</Button>
+              <Button onClick={handleClose}>Continue to reservation</Button>
+            </p>
+          </Typography>
+        </Box>
+      </Modal>
+    </div>
+  )
+}
 
 export default function CheckoutPage() {
   const { rateKey } = useParams();
