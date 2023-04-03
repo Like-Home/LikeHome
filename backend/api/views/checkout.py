@@ -134,8 +134,6 @@ class CheckoutView(viewsets.mixins.CreateModelMixin, viewsets.GenericViewSet):
                 check_out__gt=check_in_date
             )
 
-            print(conflicting_bookings)
-
             if conflicting_bookings.exists():
                 raise serializers.ValidationError(
                     {

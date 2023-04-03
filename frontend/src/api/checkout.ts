@@ -22,6 +22,7 @@ type StripeCheckoutRequest = {
   last_name: string;
   email: string;
   phone: string;
+  force: string;
 };
 
 type StripeCheckoutResponse = {

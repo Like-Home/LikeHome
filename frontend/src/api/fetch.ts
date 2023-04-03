@@ -1,7 +1,7 @@
 /* eslint-disable guard-for-in */
 import { getCSRFValue } from './csrf';
 
-class APIError extends Error {
+export class APIError extends Error {
   name: string;
 
   request: Request;
