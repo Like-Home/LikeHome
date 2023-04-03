@@ -16,7 +16,7 @@ export type SearchPageParams = {
 
 export type onSearchProps = {
   location?: {
-    pk: string;
+    code: string;
     name: string;
   };
   checkin?: string;
@@ -27,7 +27,7 @@ export type onSearchProps = {
 
 type SearchBarProps = SearchPageParams & {
   location?: {
-    pk: string;
+    code: string;
     name: string;
   };
   noLocation?: boolean;

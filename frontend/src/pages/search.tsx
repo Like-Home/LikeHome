@@ -25,8 +25,10 @@ export default function SearchPage() {
   };
 
   async function onSearch(kwargs: onSearchProps) {
+    console.log(kwargs?.location);
+
     const response = await getOffersByLocation({
-      destinationCode: kwargs?.location?.pk,
+      destinationCode: kwargs?.location?.code,
       checkin: kwargs.checkin,
       checkout: kwargs.checkout,
       guests: Number(kwargs.guests),

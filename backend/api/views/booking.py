@@ -34,6 +34,20 @@ class BookingView(viewsets.ModelViewSet):
 
         return super().get_object()
 
+    # def create(self, request: Request):
+    #     """Create a new booking
+
+    #     Returns:
+    #         _type_: _description_
+    #     """
+    #     request
+
+    #     serializer = self.get_serializer(data=request.data)
+    #     serializer.is_valid(raise_exception=True)
+    #     serializer.save(user=request.user)
+
+    #     return Response(serializer.data)
+
 
 def stripe_create_checkout(hotel_name, room_number, check_in, check_out, hotel_price, hotel_image):
     domain_url = 'http://localhost:8080/'

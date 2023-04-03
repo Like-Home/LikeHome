@@ -13,10 +13,12 @@ import {
   CardActions,
   Button,
 } from '@mui/material';
+import { useNavigate } from 'react-router-dom';
 import { createHotelbedsSrcSetFromPath } from '../utils';
 // import { createBooking } from '../api/bookings';
 
 export default function HotelRoomCard({ room }) {
+  const navigate = useNavigate();
   // function onBookNow(roomId: string) {
   //   createBooking({
   //     hotel_id: hotelId as string,
@@ -28,8 +30,12 @@ export default function HotelRoomCard({ room }) {
   //   });
   // }
 
+  function onReserve() {
+    navigate(`/checkout/${btoa(room.rates[0].rateKey)}`);
+  }
+
   return (
-    <Grid item sx={12} md={6} lg={4} key={room.code}>
+    <Grid item sm={12} md={6} lg={4} key={room.code}>
       <Card sx={{ height: '100%', width: '100%' }}>
         <img
           {...createHotelbedsSrcSetFromPath(room.images[0].path)}
@@ -56,7 +62,9 @@ export default function HotelRoomCard({ room }) {
           </Stack>
         </CardContent>
         <CardActions>
-          <Button size="small">Reserve</Button>
+          <Button size="small" onClick={onReserve}>
+            Reserve
+          </Button>
         </CardActions>
       </Card>
     </Grid>
