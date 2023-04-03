@@ -4,8 +4,7 @@ import { useEffect, useState } from 'react';
 import slugify from 'slugify';
 import HotelCard, { onBookNowCallback } from '../components/HotelCard';
 import SearchBars, { SearchPageParams, onSearchProps } from '../components/SearchBars';
-// import { createBooking } from '../api/bookings';
-import { getOffers, OfferHotel } from '../api/search';
+import { getOffersByLocation, OfferHotel } from '../api/search';
 
 export default function SearchPage() {
   const [rawParams] = useSearchParams();
@@ -17,25 +16,19 @@ export default function SearchPage() {
   const [resultsMessage, setResultsMessage] = useState('...');
 
   const onBookNow: onBookNowCallback = (hotel) => {
-    // createBooking({
-    //   hotel_id: hotelId,
-    //   // rooms: rooms,
-    //   room_id: roomId,
-    //   guest_count: params.guests || '1',
-    //   start_date: `${params.checkin}T00:00:00Z`,
-    //   end_date: `${params.checkout}T00:00:00Z`,
-    // });
     window.open(
       `/hotel/${hotel.code}/${slugify(hotel.name).toLowerCase()}/?checkin=${params.checkin}&checkout=${
         params.checkout
-      }&guests=${params.guests}=&rooms=${params.rooms}`,
+      }&guests=${params.guests}&rooms=${params.rooms}`,
       '_blank',
     );
   };
 
   async function onSearch(kwargs: onSearchProps) {
-    const response = await getOffers({
-      destinationCode: kwargs?.location?.pk,
+    console.log(kwargs?.location);
+
+    const response = await getOffersByLocation({
+      destinationCode: kwargs?.location?.code,
       checkin: kwargs.checkin,
       checkout: kwargs.checkout,
       guests: Number(kwargs.guests),

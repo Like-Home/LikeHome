@@ -3,8 +3,10 @@
 import os
 from typing import Any
 
+import stripe
 
-def getenv(key: str, default: Any = None, required=False) -> Any:
+
+def getenv(key: str, default: Any = None, required=False, boolean=False) -> Any:
     """Retrieves a value from the environment.
 
     Args:
@@ -19,6 +21,13 @@ def getenv(key: str, default: Any = None, required=False) -> Any:
     """
 
     if key in os.environ:
+        if boolean:
+            if os.environ[key].lower() in ['true', '1']:
+                return True
+            elif os.environ[key].lower() in ['false', '0',]:
+                return False
+            raise EnvironmentError(
+                f'The environment variable "{key}" requires a value in [0, 1, true, false].')
         return os.environ[key]
 
     if required:
@@ -40,14 +49,23 @@ HOTELBEDS_ENDPOINT = getenv('HOTELBEDS_ENDPOINT')
 HOTELBEDS_API_KEY = getenv('HOTELBEDS_API_KEY')
 HOTELBEDS_API_SECRET = getenv('HOTELBEDS_API_SECRET')
 
+STRIPE_PUBLISHABLE_KEY = getenv('STRIPE_PUBLISHABLE_KEY', required=PRODUCTION)
+STRIPE_SECRET_KEY = getenv('STRIPE_SECRET_KEY', required=PRODUCTION)
+STRIPE_ENDPOINT_SECRET = getenv('STRIPE_ENDPOINT_SECRET', required=PRODUCTION)
 
 POSTGRES_USER = getenv('POSTGRES_USER', required=PRODUCTION)
 POSTGRES_HOST = getenv('POSTGRES_HOST', required=PRODUCTION)
 POSTGRES_DB = getenv('POSTGRES_DB', required=PRODUCTION)
 POSTGRES_PASSWORD = getenv('POSTGRES_PASSWORD', required=PRODUCTION)
 
+GOOGLE_MAPS_API_KEY = getenv('GOOGLE_MAPS_API_KEY', required=PRODUCTION)
+GOOGLE_MAPS_API_SECERT = getenv('GOOGLE_MAPS_API_SECERT', required=PRODUCTION)
+MONEY_SAVER_MODE = getenv('MONEY_SAVER_MODE', default=True, boolean=True)
+
 SECRET_KEY = getenv(
     'SECRET_KEY',
     default='django-insecure-6i6ophe6dmuw@1vn!h5xw6@^g#x+pp&n6mfitr_r1%t!l7+3gj',
     required=PRODUCTION
 )
+
+stripe.api_key = STRIPE_SECRET_KEY

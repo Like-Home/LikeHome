@@ -81,6 +81,7 @@
     },
     "rules": {
       "no-console": "off",
+      "@typescript-eslint/ban-ts-comment": "off",
       "import/extensions": [
         "error",
         "never"

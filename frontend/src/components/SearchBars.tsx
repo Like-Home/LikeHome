@@ -16,7 +16,7 @@ export type SearchPageParams = {
 
 export type onSearchProps = {
   location?: {
-    pk: string;
+    code: string;
     name: string;
   };
   checkin?: string;
@@ -27,9 +27,10 @@ export type onSearchProps = {
 
 type SearchBarProps = SearchPageParams & {
   location?: {
-    pk: string;
+    code: string;
     name: string;
   };
+  noLocation?: boolean;
   onSearch?: (props: onSearchProps) => void;
 };
 
@@ -51,7 +52,7 @@ export default function SearchBars(props: SearchPageParams & SearchBarProps) {
   return (
     <Form method="get">
       <Stack direction="row" justifyContent="center" spacing={2} m={1}>
-        <LocationAutocomplete value={location} setValue={setLocation} />
+        {!props.noLocation && <LocationAutocomplete value={location} setValue={setLocation} />}
         <TextInput
           name="date"
           type="date"

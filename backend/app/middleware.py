@@ -11,6 +11,10 @@ class SPAMiddleware(WhiteNoiseMiddleware):
     """
 
     index_name = 'static/index.html'
+    non_static_prefixes = ('/api', '/admin', '/static', '/accounts')
+
+    def request_is_spq(self, request):
+        return not any(request.path_info.startswith(prefix) for prefix in self.non_static_prefixes)
 
     def get_file(self, path_info):
         if self.autorefresh:
@@ -24,8 +28,7 @@ class SPAMiddleware(WhiteNoiseMiddleware):
             return self.serve(static_file, request)
 
         response = self.get_response(request)
-
-        if response.status_code == 404:
+        if response.status_code == 404 and self.request_is_spq(request):
             static_file = self.get_file('/')
             return self.serve(static_file, request)
         return response

@@ -59,7 +59,7 @@ const router = createBrowserRouter([
             element: <RewardsPage />,
           },
           {
-            path: '/checkout',
+            path: '/checkout/:rateKey',
             element: <CheckoutPage />,
           },
         ],
