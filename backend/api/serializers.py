@@ -1,4 +1,3 @@
-from api.validators import DateBeforeValidator
 from app import config
 from django.contrib.auth.models import User
 from rest_framework import serializers
@@ -37,78 +36,9 @@ class UserSerializer(serializers.ModelSerializer):
 
 
 class BookingSerializer(serializers.ModelSerializer):
-    user = serializers.PrimaryKeyRelatedField(
-        read_only=True,
-        default=serializers.CurrentUserDefault()
-    )
-
-    # force booking even if there is an overlap
-    force = serializers.BooleanField(
-        write_only=True,
-        default=False
-    )
-
-    # TODO: setup permissions
     class Meta:
         fields = '__all__'
-
-        read_only_fields = ('id',
-                            'points_earned',
-                            'user',
-                            'status',
-                            'stripe_id',
-                            'amount_paid',
-                            'created_at')
-
         model = Booking
-
-        validators = [
-            DateBeforeValidator(),
-        ]
-
-    def validate(self, attrs):
-        """
-        APP-21-65: implement a function that takes in a 
-        booking and checks whether it is double booked 
-        by checking its tart and end time and comparing 
-        it with other bookings the user booked. 
-        """
-
-        if attrs['force']:
-            return super().validate(attrs)
-
-        conflicting_bookings = Booking.objects.filter(
-            user=self.context['request'].user,
-            start_date__lt=attrs['end_date'],  # checking if start
-            end_date__gt=attrs['start_date']
-        )
-
-        if conflicting_bookings.exists():
-            raise serializers.ValidationError(
-                {
-                    'date': 'CONFLICTING_BOOKING'
-                }
-            )
-
-        return super().validate(attrs)
-
-    def create(self,  validated_data):
-        amount_paid = 100000
-        booking = Booking(
-            user=self.context['request'].user,
-            hotel_id=validated_data['hotel_id'],
-            room_id=validated_data['room_id'],
-            guest_count=validated_data['guest_count'],
-            start_date=validated_data['start_date'],
-            end_date=validated_data['end_date'],
-            amount_paid=amount_paid,
-            points_earned=amount_paid // 100,
-            status=Booking.BookingStatus.PENDING,
-            stripe_id='sub_xxxxxxxxxxxxxx',
-        )
-
-        booking.save()
-        return booking
 
 
 class HotelbedsHotelImageSerializer(serializers.ModelSerializer):

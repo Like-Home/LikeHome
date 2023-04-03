@@ -1,5 +1,4 @@
-from api.models.hotelbeds.HotelbedsHotel import (HotelbedsHotel,
-                                                 HotelbedsHotelImage,
+from api.models.hotelbeds.HotelbedsHotel import (HotelbedsHotelImage,
                                                  HotelbedsHotelInterestPoint,
                                                  HotelbedsHotelRoom,
                                                  HotelbedsHotelRoomFacility)

@@ -4,24 +4,15 @@ import traceback
 
 import stripe
 from api.models.Booking import Booking
-from api.models.hotelbeds.HotelbedsDestinationLocation import \
-    HotelbedsDestinationLocation
 from api.models.hotelbeds.HotelbedsHotel import (HotelbedsHotel,
                                                  HotelbedsHotelImage)
 from api.modules.hotelbeds import hotelbeds
-from api.modules.hotelbeds.serializers import HotelbedsAPIOfferHotelSerializer
-from api.serializers import BookingSerializer
-from api.validators import OfferFilterParams, OfferSearchParams
 from app.config import STRIPE_ENDPOINT_SECRET
 from django.utils.dateparse import parse_date
-from django.views.decorators.csrf import csrf_exempt
 from rest_framework import serializers, viewsets
 from rest_framework.decorators import action
 from rest_framework.request import Request
 from rest_framework.response import Response
-
-# class LocationOfferSearchParams(OfferSearchParams, OfferFilterParams):
-#     pass
 
 
 class CheckoutSerializer(serializers.Serializer):
@@ -30,11 +21,9 @@ class CheckoutSerializer(serializers.Serializer):
     email = serializers.EmailField()
     phone = serializers.CharField()
     rate_key = serializers.CharField()
-    force = serializers.BooleanField(default=False)
 
-
-# class DestinationLocationParams(serializers.Serializer):
-#     q = serializers.CharField()
+    # force booking even if there is an overlap
+    force = serializers.BooleanField(default=False, write_only=True)
 
 
 def stripe_create_checkout(
@@ -73,6 +62,11 @@ def stripe_create_checkout(
 
 
 class CheckoutView(viewsets.mixins.CreateModelMixin, viewsets.GenericViewSet):
+    def get_serializer_class(self):
+        if self.action == 'create':
+            return CheckoutSerializer
+        return serializers.Serializer
+
     def retrieve(self, request: Request, pk=None):
         """Returns a list of offers for a specific hotel id.
 
@@ -136,9 +130,11 @@ class CheckoutView(viewsets.mixins.CreateModelMixin, viewsets.GenericViewSet):
         if not params['force']:
             conflicting_bookings = Booking.objects.filter(
                 user=request.user,
-                check_in__lt=check_in_date,
-                check_out__gt=check_out_date
+                check_in__lt=check_out_date,
+                check_out__gt=check_in_date
             )
+
+            print(conflicting_bookings)
 
             if conflicting_bookings.exists():
                 raise serializers.ValidationError(
@@ -189,7 +185,8 @@ class CheckoutView(viewsets.mixins.CreateModelMixin, viewsets.GenericViewSet):
                 'url': checkout_session['url']
             })
         except Exception as e:
-            return Response({'message': str(e)})
+            traceback.print_exc()
+            return Response({'message': str(e)}, status=500)
 
     @action(detail=False, methods=['post'])
     def webhook(self, request: Request):

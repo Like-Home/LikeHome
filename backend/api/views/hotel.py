@@ -2,7 +2,8 @@ from api.models.hotelbeds.HotelbedsHotel import HotelbedsHotel
 from api.modules.hotelbeds import hotelbeds
 from api.modules.hotelbeds.serializers import \
     HotelbedsAPIOfferHotelRoomSerializer
-from api.serializers import DateBeforeValidator, HotelbedsHotelSerializer
+from api.serializers import HotelbedsHotelSerializer
+from api.validators import DateBeforeValidator
 from rest_framework import serializers, viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response
