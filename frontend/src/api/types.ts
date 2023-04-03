@@ -2,14 +2,6 @@ export type BookingPostArgs = {
   force?: string; // 'true' or 'false'
 };
 
-export type BookingPost = {
-  hotel_id: string;
-  room_id: string;
-  guest_count: string;
-  start_date: string;
-  end_date: string;
-};
-
 export type Booking = {
   id: number;
   stripe_id: string;
@@ -18,7 +10,16 @@ export type Booking = {
   status: string;
   user: number;
   created_at: string;
-} & BookingPost;
+  hotel: {
+    name: string;
+  };
+  room_code: string;
+  adults: string;
+  image: string;
+  children: string;
+  check_in: string;
+  check_out: string;
+};
 
 export type User = {
   username: string;

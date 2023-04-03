@@ -15,20 +15,9 @@ import {
 } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import { createHotelbedsSrcSetFromPath } from '../utils';
-// import { createBooking } from '../api/bookings';
 
 export default function HotelRoomCard({ room }) {
   const navigate = useNavigate();
-  // function onBookNow(roomId: string) {
-  //   createBooking({
-  //     hotel_id: hotelId as string,
-  //     // rooms: rooms,
-  //     room_id: roomId,
-  //     guest_count: params.guests || '1',
-  //     start_date: `${params.checkin}T00:00:00Z`,
-  //     end_date: `${params.checkout}T00:00:00Z`,
-  //   });
-  // }
 
   function onReserve() {
     navigate(`/checkout/${btoa(room.rates[0].rateKey)}`);

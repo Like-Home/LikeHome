@@ -40,7 +40,7 @@ class BookingView(viewsets.ReadOnlyModelViewSet):
             return Response({'status': 'booking already cancelled'}, status=status.HTTP_400_BAD_REQUEST)
 
         # Dont allow cancellation within 24 hours of start date
-        if booking.check_in < timezone.now() + timezone.timedelta(hours=24):
+        if booking.check_in < timezone.now().date() + timezone.timedelta(hours=24):
             return Response({'status': 'booking cannot be cancelled within 24 hours of start date'}, status=status.HTTP_400_BAD_REQUEST)
 
         booking.status = Booking.BookingStatus.CANCELLED
