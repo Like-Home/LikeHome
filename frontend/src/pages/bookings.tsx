@@ -1,27 +1,25 @@
 import { Link } from 'react-router-dom';
-import { useRecoilValue } from 'recoil';
+// eslint-disable-next-line camelcase
+import { useRecoilValue, useRecoilRefresher_UNSTABLE } from 'recoil';
 import { useTheme } from '@mui/material/styles';
-import List from '@mui/material/List';
-import ListItem from '@mui/material/ListItem';
-import Divider from '@mui/material/Divider';
-import ListItemText from '@mui/material/ListItemText';
-import Button from '@mui/material/Button';
-import ListItemAvatar from '@mui/material/ListItemAvatar';
-import Avatar from '@mui/material/Avatar';
-import Typography from '@mui/material/Typography';
+import { List, ListItem, Divider, ListItemText, Button, ListItemAvatar, Avatar, Typography } from '@mui/material';
 import moment from 'moment';
 import { Booking } from '../api/types';
-import bookingsAtom from '../recoil/bookings/index';
-
-const exampleBookingImage =
-  'https://images.unsplash.com/photo-1631049307264-da0ec9d70304?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=3270&q=80';
-const exampleHotelName = 'Luxor';
+import { cancelBooking } from '../api/bookings';
+import { bookingsSelector } from '../recoil/bookings/atom';
+import { createHotelbedsSrcSetFromPath } from '../utils';
 
 function BookingItem({ booking }: { booking: Booking }) {
   const linkToDetails = `/booking/${booking.id}`;
+  const refreshBookings = useRecoilRefresher_UNSTABLE(bookingsSelector);
   const theme = useTheme();
 
-  const isTooLateToCancel = moment(booking.start_date).isBefore(moment().add(1, 'day'));
+  const isTooLateToCancel = booking.status === 'CA' || moment(booking.check_in).isBefore(moment().add(1, 'day'));
+
+  const onCancel = async () => {
+    await cancelBooking(booking.id);
+    refreshBookings();
+  };
 
   return (
     <ListItem
@@ -39,7 +37,7 @@ function BookingItem({ booking }: { booking: Booking }) {
           >
             View
           </Button>
-          <Button variant="contained" color="error" component={Link} to={linkToDetails} disabled={isTooLateToCancel}>
+          <Button variant="contained" color="error" disabled={isTooLateToCancel} onClick={onCancel}>
             Cancel
           </Button>
         </>
@@ -48,7 +46,7 @@ function BookingItem({ booking }: { booking: Booking }) {
       <ListItemAvatar>
         <Avatar
           alt="Hotel Room Image"
-          src={exampleBookingImage}
+          {...createHotelbedsSrcSetFromPath(booking.image)}
           variant="rounded"
           sx={{
             width: theme.spacing(20),
@@ -60,19 +58,24 @@ function BookingItem({ booking }: { booking: Booking }) {
       <ListItemText
         primary={
           <Typography variant="h4" color="text.primary">
-            {exampleHotelName}
+            {booking.hotel.name}
           </Typography>
         }
         secondary={
           <div>
             <div>
               <Typography variant="body2" color="text.primary">
-                Check-in: {moment(booking.start_date).format('ll')}
+                Status: {booking.status}
               </Typography>
             </div>
             <div>
               <Typography variant="body2" color="text.primary">
-                Check-out: {moment(booking.end_date).format('ll')}
+                Check-in: {moment(booking.check_in).format('ll')}
+              </Typography>
+            </div>
+            <div>
+              <Typography variant="body2" color="text.primary">
+                Check-out: {moment(booking.check_out).format('ll')}
               </Typography>
             </div>
           </div>
@@ -83,7 +86,7 @@ function BookingItem({ booking }: { booking: Booking }) {
 }
 
 function BookingsList() {
-  const bookings = useRecoilValue(bookingsAtom);
+  const bookings = useRecoilValue(bookingsSelector);
 
   return bookings.length > 0 ? (
     <List sx={{ width: '100%' }}>

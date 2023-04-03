@@ -116,7 +116,6 @@ export default function HotelPage() {
         </Box>
       </Stack>
       <Stack id="rooms">
-        {/* <pre>{JSON.stringify(hotelRoomOffers)}</pre> */}
         <SearchBars
           noLocation={true}
           guests={params.guests}

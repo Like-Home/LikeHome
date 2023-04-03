@@ -35,12 +35,6 @@ class UserSerializer(serializers.ModelSerializer):
         model = User
 
 
-class BookingSerializer(serializers.ModelSerializer):
-    class Meta:
-        fields = '__all__'
-        model = Booking
-
-
 class HotelbedsHotelImageSerializer(serializers.ModelSerializer):
     class Meta:
         exclude = ['hotel']
@@ -78,7 +72,15 @@ class HotelbedsHotelRoomSerializer(serializers.ModelSerializer):
         model = HotelbedsHotelRoom
 
 
-class HotelbedsHotelSerializer(serializers.ModelSerializer):
+class HotelbedsHotelSerializerSimple(serializers.ModelSerializer):
+    phones = HotelbedsHotelPhoneSerializer(many=True)
+
+    class Meta:
+        fields = '__all__'
+        model = HotelbedsHotel
+
+
+class HotelbedsHotelSerializer(HotelbedsHotelSerializerSimple):
     images = serializers.SerializerMethodField()
     google_map_url = serializers.SerializerMethodField()
     wildcards = HotelbedsHotelWildcardSerializer(many=True)
@@ -100,3 +102,22 @@ class HotelbedsHotelSerializer(serializers.ModelSerializer):
     def get_images(self, instance):
         images = instance.images.all().order_by('order')
         return HotelbedsHotelImageSerializer(images, many=True).data
+
+
+class BookingSerializer(serializers.ModelSerializer):
+    image = serializers.SerializerMethodField()
+    hotel = HotelbedsHotelSerializerSimple()
+
+    class Meta:
+        fields = '__all__'
+        model = Booking
+
+    def get_image(self, instance):
+        image = HotelbedsHotelImage.objects.filter(
+            hotel=instance.hotel, roomCode=instance.room_code
+        ).order_by('visualOrder').first()
+
+        if image:
+            return image.path
+
+        return None

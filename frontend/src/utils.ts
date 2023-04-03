@@ -9,8 +9,9 @@ export function createHotelbedsSrcSetFromPath(path: string) {
     { width: 74, suffix: 'small/' },
     { width: 117, suffix: 'medium/' },
     { width: 800, suffix: 'bigger/' },
-    { width: 1024, suffix: 'xl/' },
-    { width: 2048, suffix: 'xxl/' },
+    // not all hotels support these sizes
+    // { width: 1024, suffix: 'xl/' },
+    // { width: 2048, suffix: 'xxl/' },
   ];
 
   const srcset = imageSizes
