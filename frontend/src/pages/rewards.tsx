@@ -3,21 +3,21 @@ import { Stack, Typography } from '@mui/material';
 import { Box } from '@mui/system';
 import moment from 'moment';
 import { bookingsSelector } from '../recoil/bookings/atom';
-import { Booking } from '../api/types';
 
 export default function RewardsPage() {
   const bookings = useRecoilValue(bookingsSelector);
+
+  const pointBalance = bookings.reduce<number>(
+    (points, booking) => points + booking.points_earned - booking.points_spent,
+    0,
+  );
+
   return (
     <main className="card push-center" style={{ marginTop: 50, maxWidth: 1200 }}>
       <Stack direction="column" spacing={2} m={1}>
         <Box>
           <Typography variant="h3">Point balance</Typography>
-          <Typography variant="body1">
-            {
-              /* tslint:disable-next-line */
-              bookings.reduce<number>((points, booking) => points + booking.points_earned - booking.points_spent, 0)
-            }
-          </Typography>
+          <Typography variant="body1">{pointBalance}</Typography>
         </Box>
         {bookings.map((booking) => (
           <Box key={booking.id}>
