@@ -27,7 +27,7 @@ class Booking(models.Model):
     adults = IntegerField()
     children = IntegerField()
     points_earned = IntegerField()
-    travel_points_spent = IntegerField(default=0)
+    points_spent = IntegerField(default=0)
     status = CharField(
         max_length=2, choices=BookingStatus.choices, default=BookingStatus.PENDING)
     user = ForeignKey(User, on_delete=models.CASCADE)
