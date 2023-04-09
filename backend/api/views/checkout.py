@@ -196,7 +196,7 @@ class CheckoutView(viewsets.mixins.CreateModelMixin, viewsets.GenericViewSet):
             check_out=check_out_date,
             amount_paid=total_net_float,
             points_earned=int(total_net_float),
-            apply_points_spent=points_used,
+            points_spent=points_used,
             status=Booking.BookingStatus.PENDING,
             stripe_id=None,
         )
