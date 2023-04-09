@@ -7,6 +7,7 @@ export type Booking = {
   stripe_id: string;
   amount_paid: number;
   points_earned: number;
+  points_spent: number;
   status: string;
   user: number;
   created_at: string;
