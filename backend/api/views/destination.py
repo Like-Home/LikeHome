@@ -1,5 +1,7 @@
 
+import re
 import traceback
+from typing import Any, Dict, List, cast
 
 from api.models.hotelbeds.HotelbedsDestinationLocation import \
     HotelbedsDestinationLocation
@@ -12,7 +14,8 @@ from rest_framework import serializers, viewsets
 from rest_framework.decorators import action
 from rest_framework.request import Request
 from rest_framework.response import Response
-import re
+
+
 # Sorting ratings
 def convert_category_to_rating_props(category_description):
     numbers = re.findall(r'\d', category_description)
@@ -22,9 +25,10 @@ def convert_category_to_rating_props(category_description):
         value = int(numbers[0])
 
     if re.search(r'half', category_description, re.IGNORECASE):
-       value += 0.5
+        value += 0.5
 
     return value
+
 
 def convert_rooms(hotel_id: int, rooms: list):
     """DANGER: This function mutates the rooms list.
@@ -194,15 +198,16 @@ class DestinationView(viewsets.mixins.RetrieveModelMixin, viewsets.GenericViewSe
 
         offers = hotelbeds.post('/hotel-api/1.0/hotels', json=payload).json()
         hotels = offers['hotels']['hotels']
-        hotels = HotelbedsAPIOfferHotelSerializer(
-                    hotels,
-                    many=True
-                ).data
+        hotels = cast(List[Dict[str, Any]], HotelbedsAPIOfferHotelSerializer(
+            hotels,
+            many=True
+        ).data)
+
         if params.get('sort_by') == 'price':
-            hotels.sort(key=lambda hotel: hotel['minRate'], reverse = params['sort_order'] == 'desc')
+            hotels.sort(
+                key=lambda hotel: hotel['minRate'], reverse=params['sort_order'] == 'desc')
         elif params.get('sort_by') == 'rating':
             hotels.sort(key=lambda hotel: hotel['categoryName'])
-
 
         if offers['hotels']['total'] == 0:
             return Response({
