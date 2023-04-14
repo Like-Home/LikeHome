@@ -1,5 +1,7 @@
 
+import re
 import traceback
+from typing import Any, Dict, List, cast
 
 from api.models.hotelbeds.HotelbedsDestinationLocation import \
     HotelbedsDestinationLocation
@@ -12,6 +14,20 @@ from rest_framework import serializers, viewsets
 from rest_framework.decorators import action
 from rest_framework.request import Request
 from rest_framework.response import Response
+
+
+# Sorting ratings
+def convert_category_to_rating_props(category_description):
+    numbers = re.findall(r'\d', category_description)
+    value = 0
+
+    if numbers:
+        value = int(numbers[0])
+
+    if re.search(r'half', category_description, re.IGNORECASE):
+        value += 0.5
+
+    return value
 
 
 def convert_rooms(hotel_id: int, rooms: list):
@@ -62,7 +78,10 @@ def convert_offers_to_response(offers):
 
 
 class LocationOfferSearchParams(OfferSearchParams, OfferFilterParams):
-    pass
+    sort_by = serializers.ChoiceField(
+        choices=['price', 'rating'], required=False)
+    sort_order = serializers.ChoiceField(
+        choices=['asc', 'desc'], default='desc')
 
 
 class DestinationLocationSerializer(serializers.ModelSerializer):
@@ -178,6 +197,17 @@ class DestinationView(viewsets.mixins.RetrieveModelMixin, viewsets.GenericViewSe
         }
 
         offers = hotelbeds.post('/hotel-api/1.0/hotels', json=payload).json()
+        hotels = offers['hotels']['hotels']
+        hotels = cast(List[Dict[str, Any]], HotelbedsAPIOfferHotelSerializer(
+            hotels,
+            many=True
+        ).data)
+
+        if params.get('sort_by') == 'price':
+            hotels.sort(
+                key=lambda hotel: hotel['minRate'], reverse=params['sort_order'] == 'desc')
+        elif params.get('sort_by') == 'rating':
+            hotels.sort(key=lambda hotel: hotel['categoryName'])
 
         if offers['hotels']['total'] == 0:
             return Response({
@@ -190,9 +220,6 @@ class DestinationView(viewsets.mixins.RetrieveModelMixin, viewsets.GenericViewSe
         return Response({
             "offers": {
                 **offers['hotels'],
-                'hotels': HotelbedsAPIOfferHotelSerializer(
-                    offers['hotels']['hotels'],
-                    many=True
-                ).data
+                'hotels': hotels
             }
         })
