@@ -7,7 +7,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
 
-class BookingView(viewsets.ReadOnlyModelViewSet):
+class BookingView(viewsets.ReadOnlyModelViewSet, viewsets.mixins.UpdateModelMixin):
     serializer_class = BookingSerializer
     permission_classes = [IsAuthenticated]
 
