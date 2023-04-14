@@ -12,3 +12,7 @@ export function getBooking(id: string) {
 export function cancelBooking(id: number) {
   return fetch.get<Booking>(`/booking/${id}/cancel/`);
 }
+
+export function editBooking(id: number) {
+  return fetch.get<Booking>(`/booking/${id}/edit/`);
+}
