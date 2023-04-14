@@ -106,10 +106,28 @@ class HotelbedsHotelSerializer(HotelbedsHotelSerializerSimple):
 
 class BookingSerializer(serializers.ModelSerializer):
     image = serializers.SerializerMethodField()
-    hotel = HotelbedsHotelSerializerSimple()
+    hotel = HotelbedsHotelSerializerSimple(read_only=True)
+    email = serializers.EmailField()
 
     class Meta:
         fields = '__all__'
+        read_only_fields = (
+            'image',
+            'hotel', 
+            'rate_key',
+            'stripe_id',
+            'hotel',
+            'room_code',
+            'amount_paid',
+            'adults',
+            'children',
+            'points_earned',
+            'status',
+            'user',
+            'check_in',
+            'check_out',
+            'created_at',
+        )
         model = Booking
 
     def get_image(self, instance):
