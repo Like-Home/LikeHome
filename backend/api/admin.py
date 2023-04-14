@@ -16,6 +16,10 @@ class MyUserAdmin(UserAdmin):
     inlines = (AccountInline, )
 
 
+class BookingAdmin(admin.ModelAdmin):
+    raw_id_fields = ('hotel', 'user')
+
+
 admin.site.unregister(User)
 admin.site.register(User, MyUserAdmin)
-admin.site.register(Booking)
+admin.site.register(Booking, BookingAdmin)

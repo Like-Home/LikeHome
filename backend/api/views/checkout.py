@@ -25,6 +25,10 @@ class CheckoutSerializer(serializers.Serializer):
     # force booking even if there is an overlap
     force = serializers.BooleanField(default=False, write_only=True)
 
+    # apply travel points to booking
+    apply_point_balance = serializers.BooleanField(
+        default=False, write_only=True)
+
 
 def stripe_create_checkout(
         booking_id,
@@ -96,6 +100,31 @@ class CheckoutView(viewsets.mixins.CreateModelMixin, viewsets.GenericViewSet):
             "hotel": response['hotel']
         })
 
+    @staticmethod
+    def deduct_travel_points(net_cost: float, reward_points: int):
+        """Does the math to deduct travel points from the cost of a booking.
+
+        Args:
+            net_cost (float): The net cost of the booking.
+            reward_points (int): The users reward point balance.
+
+        Returns:
+            Tuple[float, int, int]: (
+                The net cost after travel points have been deducted,
+                The number of travel points used,
+                The remaining travel points
+            )
+        """
+        discount = reward_points / 100
+        net_cost_after_discount = net_cost - discount
+
+        if net_cost_after_discount < 0:
+            points_used = int(net_cost * 100)
+            reward_points_remaining = reward_points - points_used
+            return (0, points_used, reward_points_remaining)
+        else:
+            return (net_cost_after_discount, reward_points, 0)
+
     def create(self, request: Request):
         """Returns a list of offers for a specific hotel id.
 
@@ -142,6 +171,15 @@ class CheckoutView(viewsets.mixins.CreateModelMixin, viewsets.GenericViewSet):
                 )
 
         total_net_float = float(response['hotel']['totalNet'])
+        points_used = 0
+        if params['apply_point_balance']:
+            (total_net_float, points_used, points_remaining) = self.deduct_travel_points(
+                total_net_float,
+                request.user.travel_points
+            )
+
+            request.user.travel_points = points_remaining
+            request.user.save()
 
         booking = Booking(
             first_name=params['first_name'],
@@ -158,6 +196,7 @@ class CheckoutView(viewsets.mixins.CreateModelMixin, viewsets.GenericViewSet):
             check_out=check_out_date,
             amount_paid=total_net_float,
             points_earned=int(total_net_float),
+            points_spent=points_used,
             status=Booking.BookingStatus.PENDING,
             stripe_id=None,
         )
@@ -169,6 +208,8 @@ class CheckoutView(viewsets.mixins.CreateModelMixin, viewsets.GenericViewSet):
         ).order_by('visualOrder').first()
 
         try:
+            # TODO: indicate the discount in the stripe checkout
+            #       we might need to create a custom checkout page with elements
             checkout_session = stripe_create_checkout(
                 booking.id,
                 response['hotel']['name'],
@@ -228,9 +269,35 @@ class CheckoutView(viewsets.mixins.CreateModelMixin, viewsets.GenericViewSet):
             booking.stripe_id = session['id']
             booking.status = Booking.BookingStatus.CONFIRMED
 
-            booking.user.account.travel_points += booking.points_earned
+            booking.user.account.apply_points += booking.points_earned
             booking.user.account.save()
 
             booking.save()
 
         return Response(status=200)
+
+
+if __name__ == '__main__':
+    (net_cost, points_used, points_remaining) = CheckoutView.deduct_travel_points(100, 1000)
+
+    assert net_cost == 90
+    assert points_used == 1000
+    assert points_remaining == 0
+
+    (net_cost, points_used, points_remaining) = CheckoutView.deduct_travel_points(100, 100)
+
+    assert net_cost == 99
+    assert points_used == 100
+    assert points_remaining == 0
+
+    (net_cost, points_used, points_remaining) = CheckoutView.deduct_travel_points(100, 10000)
+
+    assert net_cost == 0
+    assert points_used == 10000
+    assert points_remaining == 0
+
+    (net_cost, points_used, points_remaining) = CheckoutView.deduct_travel_points(100, 10001)
+
+    assert net_cost == 0
+    assert points_used == 10000
+    assert points_remaining == 1

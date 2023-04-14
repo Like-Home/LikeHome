@@ -3,7 +3,7 @@ import { getBookingHistory, getBooking } from '../../api/bookings';
 
 export const bookingsSelector = selector({
   key: 'bookingsDefault',
-  get: async () => getBookingHistory().catch(() => []),
+  get: async () => getBookingHistory(),
 });
 
 export const bookingById = selectorFamily({
