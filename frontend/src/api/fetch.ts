@@ -69,9 +69,9 @@ export function get<T>(path: string, config?: RequestInit): Promise<T> {
   return http<T>(path, init);
 }
 
-type PostObject = { [arbitrary: string]: string };
+type JsonFormData = { [arbitrary: string]: string };
 
-export function post<T extends PostObject, U>(path: string, body: T, config?: RequestInit): Promise<U> {
+function jsonToFormData(body: JsonFormData): FormData {
   const formData = new FormData();
 
   // eslint-disable-next-line no-restricted-syntax
@@ -79,12 +79,30 @@ export function post<T extends PostObject, U>(path: string, body: T, config?: Re
     formData.append(key, body[key]);
   }
 
-  formData.append('csrfmiddlewaretoken', getCSRFValue());
-  const init = { method: 'post', body: formData, ...config };
+  return formData;
+}
+
+export function post<T extends JsonFormData, U>(path: string, body: T, config?: RequestInit): Promise<U> {
+  const init = {
+    method: 'post',
+    body: jsonToFormData(body),
+    headers: {
+      'X-CSRFTOKEN': getCSRFValue(),
+      ...config?.headers,
+    },
+  };
   return http<U>(path, init);
 }
 
-export function put<T, U>(path: string, body: T, config?: RequestInit): Promise<U> {
-  const init = { method: 'put', body: JSON.stringify(body), ...config };
+export function put<T extends JsonFormData, U>(path: string, body: T, config?: RequestInit): Promise<U> {
+  const init = {
+    method: 'put',
+    body: jsonToFormData(body),
+    ...config,
+    headers: {
+      'X-CSRFTOKEN': getCSRFValue(),
+      ...config?.headers,
+    },
+  };
   return http<U>(path, init);
 }

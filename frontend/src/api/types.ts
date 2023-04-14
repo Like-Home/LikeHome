@@ -2,7 +2,14 @@ export type BookingPostArgs = {
   force?: string; // 'true' or 'false'
 };
 
-export type Booking = {
+export type BookingPutArgs = {
+  first_name: string;
+  last_name: string;
+  email: string;
+  phone: string;
+};
+
+export type Booking = BookingPutArgs & {
   id: number;
   stripe_id: string;
   amount_paid: number;
