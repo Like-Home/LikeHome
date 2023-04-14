@@ -133,7 +133,7 @@ class DestinationView(viewsets.mixins.RetrieveModelMixin, viewsets.GenericViewSe
         params = params.data
         try:
             queryset = HotelbedsDestinationLocation.objects.filter(
-                name__icontains=params['q'])
+                name__icontains=params['q'])[:10]
             serializer = DestinationLocationSerializer(
                 queryset,
                 many=True
@@ -178,7 +178,15 @@ class DestinationView(viewsets.mixins.RetrieveModelMixin, viewsets.GenericViewSe
         }
 
         offers = hotelbeds.post('/hotel-api/1.0/hotels', json=payload).json()
-        print(offers)
+
+        if offers['hotels']['total'] == 0:
+            return Response({
+                "offers": {
+                    "total": 0,
+                    "hotels": []
+                }
+            })
+
         return Response({
             "offers": {
                 **offers['hotels'],
