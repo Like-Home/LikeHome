@@ -178,7 +178,7 @@ class DestinationView(viewsets.mixins.RetrieveModelMixin, viewsets.GenericViewSe
         }
 
         offers = hotelbeds.post('/hotel-api/1.0/hotels', json=payload).json()
-
+        print(offers)
         return Response({
             "offers": {
                 **offers['hotels'],
