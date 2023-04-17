@@ -3,7 +3,7 @@ import SearchBars from '../components/SearchBars';
 export default function HomePage() {
   return (
     <>
-      <main className="card push-center" style={{ marginTop: 200, maxWidth: 900 }}>
+      <main className="card push-center" style={{ marginTop: 200, maxWidth: 1000 }}>
         <div style={{ margin: '20px 100px' }}>
           <h1 className="text-center">Every hotel, simple pricing.</h1>
 

@@ -21,6 +21,7 @@ export default function GuestsInput({
   return (
     <>
       <Control
+        sx={{ minWidth: 175 }}
         name="guests"
         label="Guests"
         onClick={(e: Event | React.SyntheticEvent) => {
