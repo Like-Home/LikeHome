@@ -1,4 +1,4 @@
-import { Box, Stack, Button, CardActionArea } from '@mui/material';
+import { Box, Stack, Button, CardActionArea, Skeleton } from '@mui/material';
 import { OfferHotel } from '../api/search';
 
 export type onBookNowCallback = (hotel: OfferHotel) => void;
@@ -7,6 +7,37 @@ type HotelCardProps = {
   hotel: OfferHotel;
   onBookNow: onBookNowCallback;
 };
+
+export function HotelCardSkeleton() {
+  return (
+    <div className="card" style={{ padding: 0 }}>
+      <Stack style={{ display: 'flex', padding: 0 }} direction="row" alignItems="stretch">
+        <Skeleton variant="rectangular" height={173} sx={{ flex: '33%' }} />
+        <Box mx={2} sx={{ flex: '66%', p: 1.5 }}>
+          <Stack direction="row" justifyContent="space-between" alignItems="end">
+            <h2 style={{ marginBottom: 2, marginTop: 8 }}>
+              <Skeleton width={200} />
+            </h2>
+            <h2 style={{ marginBottom: 2, marginTop: 16 }}>
+              <Skeleton width={50} />
+            </h2>
+          </Stack>
+          <Stack direction="row" justifyContent="space-between" alignItems="end">
+            <small style={{ opacity: 0.5 }}>
+              <Skeleton width={150} />
+            </small>
+            <small style={{ opacity: 0.5 }}>
+              <Skeleton width={100} />
+            </small>
+          </Stack>
+          <p style={{ marginTop: 10, fontSize: 14 }}>
+            <Skeleton width={350} height={50} />
+          </p>
+        </Box>
+      </Stack>
+    </div>
+  );
+}
 
 export default function HotelCard({ hotel, onBookNow }: HotelCardProps) {
   const onBookNowWrapper = () => {
