@@ -77,7 +77,7 @@ export default function SearchPage() {
     );
   };
 
-  async function onSearch(kwargs: onSearchProps) {
+  function onSearch(kwargs: onSearchProps) {
     // update url params
     const searchParams = new URLSearchParams();
     searchParams.set('location', btoa(JSON.stringify(kwargs.location)));
@@ -104,28 +104,35 @@ export default function SearchPage() {
 
     setOfferHotelsArgs(args);
 
-    // Do a delayed request
-    // TODO: Exclude the first page of 5 somehow
-    setTimeout(
-      () =>
-        getOffersByLocation({ ...args, size: 100 }).then((res) => {
-          setLoading(false);
-          setResults(res.results);
-        }),
-      1000,
-    );
+    let cancel = false;
 
     // Do an immediate request
-    const response = await getOffersByLocation({ ...args, size: 5 });
-    if (results.length < 5) setResults(response.results);
+    getOffersByLocation({ ...args, size: 5 }).then((response) => {
+      if (!cancel) setResults(response.results);
+    });
+
+    // Do a delayed request
+    // TODO: Exclude the first page of 5 somehow
+    getOffersByLocation({ ...args, size: 100 }).then((res) => {
+      if (cancel) return;
+      setLoading(false);
+      setResults(res.results);
+      cancel = true;
+    });
+
+    return () => {
+      cancel = true;
+    };
   }
 
   // Begin search
   useEffect(() => {
     if (pageParamsAreInvalid(offerHotelsArgs)) {
-      return;
+      return () => {
+        /* do nothing */
+      };
     }
-    onSearch({
+    return onSearch({
       location,
       checkin: params.checkin,
       checkout: params.checkout,
