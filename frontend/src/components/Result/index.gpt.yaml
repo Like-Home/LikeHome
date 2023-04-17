@@ -1,0 +1,69 @@
+prompt: Complete this TypeScript React component.
+name: Result
+imports:
+    - @mui/material
+    - @mui/icons-material
+description: A component that displays the result of an action.
+props:
+  variant:
+    type: enum
+    description:
+      - It defined the color of the primary button.
+      - It defines the default icon.
+      - It defines a default title message.
+    options:
+      - value: success
+        set_default:
+          icon: CheckCircleIcon
+          title: Yay it worked!
+          primaryButtonColor: success
+          primaryButtonText: Okay
+      - value: error
+        set_default:
+          icon: ErrorOutline
+          title: Oh no something went wrong.
+          primaryButtonColor: error
+          primaryButtonText: Back
+      - value: warning
+        set_default:
+          icon: Warning
+          title: Uh oh something might be wrong.
+          primaryButtonColor: warning
+          primaryButtonText: Okay
+      - value: info
+        set_default:
+          icon: Info
+          title: Heads up!
+          primaryButtonColor: info
+          primaryButtonText: Okay
+    required: true
+  title:
+    description: The title to display as a h3 variant typography.
+    type: string
+  message:
+    description: The message to display as a body1 variant typography.
+    type: string
+    required: true
+  icon:
+    description: An alternative icon to display.
+    type: component
+  primaryButtonText:
+    description: An alternative text to display on the primary button.
+    type: string
+  secondaryButtonText:
+    description: An alternative text to display on the secondary button.
+    type: string
+  onPrimaryButtonClick:
+    description: An alternative function to call when the primary button is clicked.
+    type: function
+  onSecondaryButtonClick:
+    description: An alternative function to call when the secondary button is clicked.
+    type: function
+children: none
+style:
+  root:
+    description: All children should be center aligned.
+  secondaryButton:
+    description: 
+      - Only show the secondary button if the secondaryButtonText prop is provided.
+      - The secondary button should be outlined.

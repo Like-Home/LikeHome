@@ -1,4 +1,5 @@
 import * as fetch from './fetch';
+import { PaginationResponse } from './types';
 
 export type OfferHotelRoomImage = {
   imageType: string;
@@ -52,20 +53,8 @@ export type OfferHotel = {
   images: OfferHotelRoomImage[];
 };
 
-export type LocationOfferResults = {
-  offers: {
-    hotels: OfferHotel[];
-    checkin: string;
-    checkout: string;
-    total: number;
-  };
-};
-
-export type HotelOfferResults = {
-  offers: {
-    rooms: OfferHotelRoom[];
-  };
-};
+export type LocationOfferResults = PaginationResponse<OfferHotel>;
+export type HotelOfferResults = PaginationResponse<OfferHotelRoom>;
 
 type OfferParams = {
   // required

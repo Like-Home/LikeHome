@@ -2,6 +2,15 @@ export type BookingPostArgs = {
   force?: string; // 'true' or 'false'
 };
 
+export type PaginationResponse<T> = {
+  links: {
+    next?: string;
+    previous?: string;
+  };
+  count: number;
+  results: T[];
+};
+
 export type BookingPutArgs = {
   first_name: string;
   last_name: string;

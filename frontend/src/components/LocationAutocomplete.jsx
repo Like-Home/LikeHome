@@ -32,7 +32,7 @@ export default function LocationAutocomplete({ value, setValue }) {
       return undefined;
     }
 
-    fetch(inputValue, ({ locations }) => {
+    fetch(inputValue, ({ results }) => {
       if (active) {
         let newOptions = [];
 
@@ -40,8 +40,8 @@ export default function LocationAutocomplete({ value, setValue }) {
           newOptions = [value];
         }
 
-        if (locations.length > 0) {
-          newOptions = [...newOptions, ...locations];
+        if (results.length > 0) {
+          newOptions = [...newOptions, ...results];
         }
 
         setOptions(newOptions);

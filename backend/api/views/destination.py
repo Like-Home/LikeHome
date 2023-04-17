@@ -10,7 +10,7 @@ from api.models.hotelbeds.HotelbedsHotel import (HotelbedsHotel,
 from api.modules.hotelbeds import hotelbeds
 from api.modules.hotelbeds.serializers import HotelbedsAPIOfferHotelSerializer
 from api.validators import OfferFilterParams, OfferSearchParams
-from rest_framework import serializers, viewsets
+from rest_framework import pagination, serializers, viewsets
 from rest_framework.decorators import action
 from rest_framework.request import Request
 from rest_framework.response import Response
@@ -30,51 +30,20 @@ def convert_category_to_rating_props(category_description):
     return value
 
 
-def convert_rooms(hotel_id: int, rooms: list):
-    """DANGER: This function mutates the rooms list.
+class CustomPagination(pagination.PageNumberPagination):
+    page_size = 5
+    page_size_query_param = 'size'
+    max_page_size = 10
 
-    Args:
-        hotel_id (int): The hotel id the rooms are from
-        rooms (list): List of rooms to be converted.
-    """
-    hotel = HotelbedsHotel.objects.get(code=hotel_id)
-    for room in rooms:
-        room['images'] = list(HotelbedsHotelImage.objects.filter(
-            hotel=hotel, roomCode=room['code']).values('imageType',
-                                                       'path',
-                                                       'order',
-                                                       'visualOrder',))
-        # room['details']
-
-
-def convert_offers_to_response(offers):
-    """ DANGER: This function mutates the offers dict.
-    TODO: return more than 10 offers
-    """
-    offers["hotels"]["hotels"] = offers["hotels"]["hotels"][:10]
-    new_offers = []
-    for hotel in offers["hotels"]["hotels"]:
-        try:
-            db_hotel = HotelbedsHotel.objects.get(
-                code=hotel['code'])
-            hotel['facilities'] = list(
-                db_hotel.facilities.values('facility__description', 'facilityGroup__description'))
-
-            hotel['interestPoints'] = list(
-                db_hotel.interestPoints.values('poiName'))
-            hotel['images'] = list(HotelbedsHotelImage.objects.filter(hotel=db_hotel, imageType='GEN').values('path',
-                                                                                                              'order',
-                                                                                                              'visualOrder',))
-            convert_rooms(hotel['code'], hotel['rooms'])
-            new_offers.append(hotel)
-        except HotelbedsHotel.DoesNotExist:
-            print(f"Hotel {hotel['code']} not found in database")
-            continue
-
-    return {
-        **offers['hotels'],
-        'hotels': new_offers
-    }
+    def get_paginated_response(self, data):
+        return Response({
+            'links': {
+                'next': self.get_next_link(),
+                'previous': self.get_previous_link()
+            },
+            'count': self.page.paginator.count,
+            'results': data
+        })
 
 
 class LocationOfferSearchParams(OfferSearchParams, OfferFilterParams):
@@ -135,45 +104,25 @@ def extract_hotelbeds_offer_filters_from_params(params):
 class DestinationView(viewsets.mixins.RetrieveModelMixin, viewsets.GenericViewSet):
     serializer_class = DestinationLocationSerializer
     queryset = HotelbedsDestinationLocation.objects.all()
+    pagination_class = CustomPagination
 
     @action(detail=False, methods=['get'])
     def search(self, request: Request):
-        """Search for a destination location by name
-
-        Args:
-            request (Request): The request object
-            param (str): The search param
-
-        Returns:
-            _type_: _description_
-        """
+        """Search for a destination location by name."""
         params = DestinationLocationParams(data=request.GET)
         params.is_valid(raise_exception=True)
         params = params.data
-        try:
-            queryset = HotelbedsDestinationLocation.objects.filter(
-                name__icontains=params['q'])[:10]
-            serializer = DestinationLocationSerializer(
-                queryset,
-                many=True
-            )
-            return Response({
-                "locations": serializer.data
-            })
-        except Exception:
-            traceback.print_exc()
-            return Response({"message": "An unexpected error occurred."}, status=500)
+
+        queryset = HotelbedsDestinationLocation.objects.filter(
+            name__icontains=params['q'])
+        page = self.paginate_queryset(queryset)
+
+        serializer = self.get_serializer(page, many=True)
+        return self.get_paginated_response(serializer.data)
 
     @action(detail=True, methods=['get'])
     def offers(self, request: Request, pk=None):
-        """Returns a list of offers for a specific hotel id.
-
-        Args:
-            request (Request): The request object
-
-        Returns:
-            _type_: _description_
-        """
+        """Returns a list of offers for a specific hotel id."""
         params = LocationOfferSearchParams(data=request.GET)
         params.is_valid(raise_exception=True)
         params = params.data
@@ -207,19 +156,16 @@ class DestinationView(viewsets.mixins.RetrieveModelMixin, viewsets.GenericViewSe
             hotels.sort(
                 key=lambda hotel: hotel['minRate'], reverse=params['sort_order'] == 'desc')
         elif params.get('sort_by') == 'rating':
-            hotels.sort(key=lambda hotel: hotel['categoryName'])
+            hotels.sort(
+                key=lambda hotel: convert_category_to_rating_props(hotel['categoryName']))
 
-        if offers['hotels']['total'] == 0:
-            return Response({
-                "offers": {
-                    "total": 0,
-                    "hotels": []
-                }
-            })
+        page = self.paginate_queryset(
+            [] if offers['hotels']['total'] == 0 else offers['hotels']['hotels'],  # type: ignore
+        )
 
-        return Response({
-            "offers": {
-                **offers['hotels'],
-                'hotels': hotels
-            }
-        })
+        return self.get_paginated_response([
+            hotel for hotel in HotelbedsAPIOfferHotelSerializer(
+                page,
+                many=True
+            ).data if hotel['images']
+        ])
