@@ -71,6 +71,10 @@ export default function SearchBars(props: SearchPageParams & SearchBarProps) {
         <Button
           sx={{ px: 5, fontSize: 20 }}
           onClick={() => {
+            if (!location || !checkin || !checkout) {
+              // TODO: Alert
+              return;
+            }
             if (props.onSearch) {
               props.onSearch({
                 location,
