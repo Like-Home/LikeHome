@@ -35,7 +35,7 @@ type SearchBarProps = SearchPageParams & {
 };
 
 /**
- * Renders the hotel search bar
+ * Renders the hotel search bars
  * @param query
  * @param onSearch redirect to /search if not set
  * @returns
@@ -51,7 +51,7 @@ export default function SearchBars(props: SearchPageParams & SearchBarProps) {
 
   return (
     <Form method="get">
-      <Stack direction="row" justifyContent="center" spacing={2} m={1}>
+      <Stack direction="row" sx={{ height: 50 }} justifyContent="center" spacing={2} m={1}>
         {!props.noLocation && <LocationAutocomplete value={location} setValue={setLocation} />}
         <TextInput
           name="date"
@@ -71,6 +71,10 @@ export default function SearchBars(props: SearchPageParams & SearchBarProps) {
         <Button
           sx={{ px: 5, fontSize: 20 }}
           onClick={() => {
+            if (!location || !checkin || !checkout) {
+              // TODO: Alert
+              return;
+            }
             if (props.onSearch) {
               props.onSearch({
                 location,

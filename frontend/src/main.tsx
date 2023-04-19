@@ -31,6 +31,9 @@ const darkTheme = createTheme({
       },
     },
     MuiMenu: {
+      defaultProps: {
+        disableScrollLock: true,
+      },
       styleOverrides: {
         paper: {
           borderRadius: '8px',

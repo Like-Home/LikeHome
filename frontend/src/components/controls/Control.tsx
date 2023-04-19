@@ -12,7 +12,10 @@ export interface ControlProps {
   [arbitrary: string]: unknown;
 }
 
-export function Control({ sx = {}, icon, label, onClick, children = [], ...props }: ControlProps) {
+export const Control = React.forwardRef(function Control(
+  { sx = {}, icon, label, onClick, children = [], ...props }: ControlProps,
+  ref: React.Ref<HTMLDivElement>,
+) {
   return (
     <Paper
       sx={{
@@ -32,6 +35,7 @@ export function Control({ sx = {}, icon, label, onClick, children = [], ...props
         },
         ...sx,
       }}
+      ref={ref}
       onClick={onClick}
       {...props}
     >
@@ -46,4 +50,4 @@ export function Control({ sx = {}, icon, label, onClick, children = [], ...props
       </Stack>
     </Paper>
   );
-}
+});

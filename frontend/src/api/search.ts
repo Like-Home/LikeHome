@@ -47,8 +47,8 @@ export type OfferHotel = {
   latitude: string;
   longitude: string;
   rooms: OfferHotelRoom[];
-  minRate: string;
-  maxRate: string;
+  minRate: number;
+  maxRate: number;
   currency: string;
   images: OfferHotelRoomImage[];
 };
@@ -62,6 +62,7 @@ type OfferParams = {
   checkout?: string;
   rooms?: number;
   guests?: number;
+  size?: number;
   // filters
   // TODO: add filters
 };
@@ -74,9 +75,9 @@ export type OffersByHotel = {
   hotelCode?: number;
 } & OfferParams;
 
-export function getOffersByLocation({ destinationCode, checkin, checkout, rooms, guests }: OffersByLocation) {
+export function getOffersByLocation({ destinationCode, checkin, checkout, rooms, guests, size = 5 }: OffersByLocation) {
   return fetch.get<LocationOfferResults>(
-    `/destination/${destinationCode}/offers/?check_in=${checkin}&check_out=${checkout}&adults=${guests}&rooms=${rooms}`,
+    `/destination/${destinationCode}/offers/?check_in=${checkin}&check_out=${checkout}&adults=${guests}&rooms=${rooms}&size=${size}`,
   );
 }
 
