@@ -6,13 +6,16 @@ export default function PriceSlider({
   min = 0,
   max = 500,
   loading = false,
+  maxIncludesAbove = false,
 }: {
   priceRange: number[];
   setPriceRange: (v: number[]) => void;
   min?: number;
   max?: number;
+  maxIncludesAbove?: boolean;
   loading?: boolean;
 }) {
+  const maxPostfix = maxIncludesAbove ? '+' : '';
   return (
     <>
       <Typography mb={loading ? 0 : 5} width="100%">
@@ -29,7 +32,7 @@ export default function PriceSlider({
           step={priceRange[1] >= 300 ? 100 : 25}
           onChange={(e, v) => Array.isArray(v) && setPriceRange(v)}
           valueLabelDisplay="on"
-          valueLabelFormat={(v, i) => (i === 1 && v >= max ? `$${v}+` : `$${v}`)}
+          valueLabelFormat={(v, i) => (i === 1 && v >= max ? `$${v}${maxPostfix}` : `$${v}`)}
           disableSwap
         />
       )}

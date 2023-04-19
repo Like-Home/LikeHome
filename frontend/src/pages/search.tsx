@@ -61,8 +61,11 @@ export default function SearchPage() {
   const [zones, setZones] = useState<ZoneInfo[]>([]);
   const [resultsMessage, setResultsMessage] = useState('');
   const [loading, setLoading] = useState(false);
+  const [filterLoading, setFilterLoading] = useState(false);
 
   // Sort and filter parameters
+  const [priceRangeMax, setPriceRangeMax] = useState(0);
+  const [priceRangeMin, setPriceRangeMin] = useState(0);
   const [priceRange, setPriceRange] = useState([0, 500]);
   const [zone, setZone] = useState<string | null>(null);
   const [sort, setSort] = useState('suggested');
@@ -76,6 +79,19 @@ export default function SearchPage() {
       '_blank',
     );
   };
+
+  // update price range based on minRate and maxRate
+  useEffect(() => {
+    if (!results.length) return;
+    const minRates = results.map((h) => h.minRate);
+    const minRate = Math.min(...minRates);
+    const maxRate = Math.max(...minRates);
+
+    setPriceRangeMin(minRate);
+    setPriceRangeMax(maxRate);
+
+    setPriceRange([minRate, maxRate]);
+  }, [results]);
 
   function onSearch(kwargs: onSearchProps) {
     // update url params
@@ -93,6 +109,7 @@ export default function SearchPage() {
     setSorted([]);
     setFiltered([]);
     setLoading(true);
+    setFilterLoading(true);
 
     const args = {
       destinationCode: kwargs?.location?.code,
@@ -108,16 +125,19 @@ export default function SearchPage() {
 
     // Do an immediate request
     getOffersByLocation({ ...args, size: 5 }).then((response) => {
-      if (!cancel) setResults(response.results);
-    });
-
-    // Do a delayed request
-    // TODO: Exclude the first page of 5 somehow
-    getOffersByLocation({ ...args, size: 100 }).then((res) => {
-      if (cancel) return;
-      setLoading(false);
-      setResults(res.results);
-      cancel = true;
+      if (!cancel) {
+        setResults(response.results);
+        setResultsMessage(`Found ${response.count} hotel${response.count !== 1 ? 's' : ''}`);
+        setLoading(false);
+        if (response.links.next) {
+          // Do a delayed request
+          getOffersByLocation({ ...args, size: 100 }).then((res) => {
+            if (cancel) return;
+            setFilterLoading(false);
+            setResults(res.results);
+          });
+        }
+      }
     });
 
     return () => {
@@ -189,8 +209,7 @@ export default function SearchPage() {
 
     // Filter by price
     filteredList = filteredList.filter(
-      (hotel) =>
-        Number(hotel.minRate) >= priceRange[0] && (!(priceRange[1] < 500) || Number(hotel.minRate) <= priceRange[1]),
+      (hotel) => Number(hotel.minRate) >= priceRange[0] && Number(hotel.minRate) <= priceRange[1],
     );
 
     // Filter by zone
@@ -201,8 +220,9 @@ export default function SearchPage() {
 
   useEffect(() => {
     if (!results.length) return;
+    if (filterLoading) return;
     if (!loading) setResultsMessage(`Found ${filtered.length} hotel${filtered.length !== 1 ? 's' : ''}`);
-  }, [filtered]);
+  }, [filtered, filterLoading]);
 
   return (
     <main className="card push-center" style={{ marginTop: 50, maxWidth: 1200 }}>
@@ -216,8 +236,14 @@ export default function SearchPage() {
       />
       <Stack direction="row" spacing={4} sx={{ pt: 4 }}>
         <Stack sx={{ width: 275, p: 2, pl: 1 }} alignItems="start">
-          <PriceSlider loading={loading} priceRange={priceRange} setPriceRange={setPriceRange} />
-          {(zones.length > 0 || loading) && (
+          <PriceSlider
+            loading={filterLoading}
+            priceRange={priceRange}
+            setPriceRange={setPriceRange}
+            min={priceRangeMin}
+            max={priceRangeMax}
+          />
+          {(zones.length > 0 || filterLoading) && (
             <>
               <Stack direction="row" justifyContent="space-between" alignItems="end" width="100%" height={40}>
                 <Typography gutterBottom>Neighborhood</Typography>
@@ -228,24 +254,25 @@ export default function SearchPage() {
                 )}
               </Stack>
               <RadioGroup name="zones" value={zone} onChange={(e, v) => setZone(v)}>
-                {zones.map(({ code, name, count }) => (
-                  <FormControlLabel
-                    value={code}
-                    key={code}
-                    label={
-                      <Typography style={{ fontSize: 14 }}>
-                        {name} <small>({count})</small>
-                      </Typography>
-                    }
-                    control={<Radio />}
-                  />
-                ))}
-                {loading && (
+                {filterLoading ? (
                   <>
                     <Skeleton variant="rectangular" height={42} width={250} sx={{ borderRadius: 1, mb: 1 }} />
                     <Skeleton variant="rectangular" height={42} width={250} sx={{ borderRadius: 1, mb: 1 }} />
                     <Skeleton variant="rectangular" height={42} width={250} sx={{ borderRadius: 1, mb: 1 }} />
                   </>
+                ) : (
+                  zones.map(({ code, name, count }) => (
+                    <FormControlLabel
+                      value={code}
+                      key={code}
+                      label={
+                        <Typography style={{ fontSize: 14 }}>
+                          {name} <small>({count})</small>
+                        </Typography>
+                      }
+                      control={<Radio />}
+                    />
+                  ))
                 )}
               </RadioGroup>
             </>
@@ -259,7 +286,7 @@ export default function SearchPage() {
             <Box sx={{ flex: 4, display: 'flex', justifyContent: 'center' }}>
               {loading && results.length > 0 && <Spinner message={false} />}
             </Box>
-            {loading ? (
+            {filterLoading ? (
               <Skeleton variant="rectangular" height={40} width={150} sx={{ flex: 3, borderRadius: 1 }} />
             ) : (
               <FormControl sx={{ flex: 3 }} size="small">

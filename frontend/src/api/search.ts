@@ -47,8 +47,8 @@ export type OfferHotel = {
   latitude: string;
   longitude: string;
   rooms: OfferHotelRoom[];
-  minRate: string;
-  maxRate: string;
+  minRate: number;
+  maxRate: number;
   currency: string;
   images: OfferHotelRoomImage[];
 };
