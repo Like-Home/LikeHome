@@ -9,6 +9,7 @@ from logging import getLogger
 from operator import itemgetter
 
 from requests import Session
+from requests.adapters import HTTPAdapter, Retry
 
 logger = getLogger('hotelbeds')
 
@@ -53,7 +54,17 @@ class HotelbedsClient(Session):
         self.secret = secret
         self.cache = cache
 
+        # in case of error, retry at most 3 times, waiting
+        # at least half a second between each retry
+        retry = Retry(total=3, backoff_factor=0.1)
+
+        adapter = HTTPAdapter(max_retries=retry)
+        self.mount('http://', adapter)
+        self.mount('https://', adapter)
+
     def request(self, method, url, **kwargs):
+        refresh_cache = kwargs.pop('refresh_cache', False)
+
         kwargs.setdefault('headers', {})
         kwargs['headers'].update({
             'X-Signature': generate_signature(self.api_key, self.secret),
@@ -74,7 +85,7 @@ class HotelbedsClient(Session):
 
         key = md5(cacheable.encode('utf-8')).hexdigest()
 
-        if self.cache is not None:
+        if not refresh_cache and self.cache is not None:
             logger.info(f'Using cache for {url}')
             if key in self.cache:
                 return pickle.loads(self.cache[key])
