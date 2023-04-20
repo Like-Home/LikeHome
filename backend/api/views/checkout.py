@@ -7,7 +7,7 @@ from api.models.Booking import Booking
 from api.models.hotelbeds.HotelbedsHotel import (HotelbedsHotel,
                                                  HotelbedsHotelImage)
 from api.modules.hotelbeds import hotelbeds
-from app.config import STRIPE_ENDPOINT_SECRET
+from app import config
 from django.utils.dateparse import parse_date
 from rest_framework import serializers, viewsets
 from rest_framework.decorators import action
@@ -33,15 +33,14 @@ class CheckoutSerializer(serializers.Serializer):
 def stripe_create_checkout(
         booking_id,
         hotel_name, room_number, check_in, check_out, hotel_price, hotel_image):
-    domain_url = 'http://localhost:8080'
 
     extra_product_data = {}
     if hotel_image:
         extra_product_data['images'] = [hotel_image]
 
     return stripe.checkout.Session.create(
-        success_url=f"{domain_url}/booking/{booking_id}/?stripe=success",
-        cancel_url=f"{domain_url}/checkout/?stripe=cancelled",
+        success_url=f"{config.BASE_URL}/booking/{booking_id}/?stripe=success",
+        cancel_url=f"{config.BASE_URL}/checkout/?stripe=cancelled",
         payment_method_types=['card'],
         mode='payment',
         line_items=[
@@ -217,7 +216,7 @@ class CheckoutView(viewsets.mixins.CreateModelMixin, viewsets.GenericViewSet):
                 response['hotel']['checkIn'],
                 response['hotel']['checkOut'],
                 int(total_net_float * 100),
-                f"http://photos.hotelbeds.com/giata/medium/{hotel_image.path}" if hotel_image else None
+                f"https://photos.hotelbeds.com/giata/medium/{hotel_image.path}" if hotel_image else None
             )
             return Response({
                 'id': checkout_session['id'],
@@ -242,7 +241,7 @@ class CheckoutView(viewsets.mixins.CreateModelMixin, viewsets.GenericViewSet):
 
         try:
             event = stripe.Webhook.construct_event(
-                payload, sig_header, STRIPE_ENDPOINT_SECRET
+                payload, sig_header, config.STRIPE_ENDPOINT_SECRET
             )
         except ValueError as e:
             # Invalid payload

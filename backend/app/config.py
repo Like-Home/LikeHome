@@ -62,6 +62,9 @@ GOOGLE_MAPS_API_KEY = getenv('GOOGLE_MAPS_API_KEY', required=PRODUCTION)
 GOOGLE_MAPS_API_SECERT = getenv('GOOGLE_MAPS_API_SECERT', required=PRODUCTION)
 MONEY_SAVER_MODE = getenv('MONEY_SAVER_MODE', default=True, boolean=True)
 
+BASE_URL = getenv('BASE_URL', default='http://localhost:8000',
+                  required=PRODUCTION)
+
 SECRET_KEY = getenv(
     'SECRET_KEY',
     default='django-insecure-6i6ophe6dmuw@1vn!h5xw6@^g#x+pp&n6mfitr_r1%t!l7+3gj',
