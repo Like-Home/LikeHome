@@ -111,6 +111,7 @@ INSTALLED_APPS = [
 MIDDLEWARE = [
     # default
     'django.middleware.security.SecurityMiddleware',
+    'app.middleware.WwwRedirectMiddleware',
     'app.middleware.SPAMiddleware',
     # 'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -125,7 +126,7 @@ MIDDLEWARE = [
 
 
 # package: corsheaders
-CORS_ORIGIN_WHITELIST = [
+CORS_ORIGIN_WHITELIST = [] if config.PRODUCTION else [
     'http://localhost:3000',
 ]
 
