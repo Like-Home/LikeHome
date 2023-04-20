@@ -1,6 +1,6 @@
 import { ChangeEvent, useState } from 'react';
 import { Stack, Button, Grid } from '@mui/material';
-import { useNavigate, Form } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 
 import TextInput from './controls/TextInput';
 import GuestsInput from './controls/GuestsInput';

@@ -112,8 +112,7 @@ MIDDLEWARE = [
     # default
     'django.middleware.security.SecurityMiddleware',
     'app.middleware.WwwRedirectMiddleware',
-    'app.middleware.SPAMiddleware',
-    # 'whitenoise.middleware.WhiteNoiseMiddleware',
+    'app.middleware.SPAMiddleware',  # subclass of WhiteNoiseMiddleware
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -145,7 +144,9 @@ ROOT_URLCONF = 'app.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [
+            BACKEND_DIR / 'templates',
+        ],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
