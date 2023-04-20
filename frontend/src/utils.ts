@@ -3,7 +3,7 @@ export function test() {
 }
 
 export function createHotelbedsSrcSetFromPath(path: string) {
-  const baseImageUrl = 'http://photos.hotelbeds.com/giata/';
+  const baseImageUrl = 'https://photos.hotelbeds.com/giata/';
   const imageSizes = [
     { width: 320, suffix: '' },
     { width: 74, suffix: 'small/' },

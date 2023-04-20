@@ -67,7 +67,7 @@ export default function HotelCard({ stay, hotel, onBookNow }: HotelCardProps) {
               flex: '40%',
               backgroundSize: 'cover',
               backgroundPosition: 'center',
-              backgroundImage: `url('http://photos.hotelbeds.com/giata/${hotel.images[0].path}')`,
+              backgroundImage: `url('https://photos.hotelbeds.com/giata/${hotel.images[0].path}')`,
               borderRadius: '4px 0 0 4px',
             }}
           ></div>

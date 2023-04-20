@@ -7,7 +7,6 @@ import { Grid, List, ListItem, ListItemText, Tab, Tabs, Box, Stack, Typography }
 import ImageList from '@mui/material/ImageList';
 import ImageListItem from '@mui/material/ImageListItem';
 import Rating from '@mui/material/Rating';
-import userAtom from '../recoil/user';
 import SearchBars from '../components/SearchBars';
 import { hotelById, hotelOffersById } from '../recoil/hotel/atom';
 import HotelRoomCard from '../components/HotelRoomCard';
