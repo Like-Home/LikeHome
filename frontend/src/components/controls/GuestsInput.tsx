@@ -22,7 +22,7 @@ export default function GuestsInput({
   return (
     <>
       <Control
-        sx={{ minWidth: 175 }}
+        sx={{ minWidth: 175, height: '100%' }}
         name="guests"
         label="Guests"
         ref={ref}

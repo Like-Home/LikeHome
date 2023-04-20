@@ -48,7 +48,7 @@ const cards = [
 export default function HomePage() {
   return (
     <>
-      <main className="card push-center" style={{ marginTop: 200, maxWidth: 1200 }}>
+      <main className="card push-center">
         <Stack spacing={2}>
           <h1 className="text-center">Every hotel, simple pricing.</h1>
           <SearchBars />
@@ -75,7 +75,7 @@ export default function HomePage() {
               >
                 <Typography variant="h4">Your weekend escape plan</Typography>
                 <Typography variant="body1">
-                  As a member, you save an average of 15% on thousands of hotels, so take that spontaneous trip.
+                  As a member, you save an average of 10% on thousands of hotels, so take that spontaneous trip.
                 </Typography>
                 <Button>Access Member Prices</Button>
               </Stack>
@@ -108,10 +108,6 @@ export default function HomePage() {
               </Card>
             ))}
           </Stack>
-          <Divider></Divider>
-          <Typography variant="caption">
-            * Some hotels require you to cancel more than 24 hours before check-in. Details on site.
-          </Typography>
         </Stack>
       </main>
     </>

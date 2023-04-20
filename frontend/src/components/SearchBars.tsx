@@ -1,5 +1,5 @@
 import { ChangeEvent, useState } from 'react';
-import { Stack, Button } from '@mui/material';
+import { Stack, Button, Grid } from '@mui/material';
 import { useNavigate, Form } from 'react-router-dom';
 
 import TextInput from './controls/TextInput';
@@ -50,26 +50,46 @@ export default function SearchBars(props: SearchPageParams & SearchBarProps) {
   const [rooms, setRooms] = useState(props.rooms || '1');
 
   return (
-    <Form method="get">
-      <Stack direction="row" sx={{ height: 50 }} justifyContent="center" spacing={2} m={1}>
-        {!props.noLocation && <LocationAutocomplete value={location} setValue={setLocation} />}
-        <TextInput
-          name="date"
-          type="date"
-          label="Check-in Date"
-          value={checkin}
-          onChange={(e: ChangeEvent<HTMLInputElement>) => setCheckin(e.target.value)}
-        />
-        <TextInput
-          name="date"
-          type="date"
-          label="Checkout Date"
-          value={checkout}
-          onChange={(e: ChangeEvent<HTMLInputElement>) => setCheckout(e.target.value)}
-        />
+    <Grid container spacing={1}>
+      {!props.noLocation && (
+        <Grid item xs={24} sm={4} md={3}>
+          <LocationAutocomplete value={location} setValue={setLocation} />
+        </Grid>
+      )}
+      <Grid item xs={12} sm={4} md={2}>
+        <Stack justifyContent="center">
+          <TextInput
+            name="date"
+            type="date"
+            label="Check-in Date"
+            value={checkin}
+            onChange={(e: ChangeEvent<HTMLInputElement>) => setCheckin(e.target.value)}
+            sx={{
+              height: '100%',
+            }}
+          />
+        </Stack>
+      </Grid>
+      <Grid item xs={12} sm={4} md={2}>
+        <Stack justifyContent="center">
+          <TextInput
+            name="date"
+            type="date"
+            label="Checkout Date"
+            value={checkout}
+            onChange={(e: ChangeEvent<HTMLInputElement>) => setCheckout(e.target.value)}
+            sx={{
+              height: '100%',
+            }}
+          />
+        </Stack>
+      </Grid>
+      <Grid item xs={12} sm={6} md={3}>
         <GuestsInput guests={guests} setGuests={setGuests} rooms={rooms} setRooms={setRooms} />
+      </Grid>
+      <Grid item xs={12} sm={6} md={2}>
         <Button
-          sx={{ px: 5, fontSize: 20 }}
+          sx={{ fontSize: 20, width: '100%', height: '100%' }}
           onClick={() => {
             if (!location || !checkin || !checkout) {
               // TODO: Alert
@@ -95,7 +115,7 @@ export default function SearchBars(props: SearchPageParams & SearchBarProps) {
         >
           Search
         </Button>
-      </Stack>
-    </Form>
+      </Grid>
+    </Grid>
   );
 }
