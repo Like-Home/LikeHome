@@ -22,6 +22,7 @@ import SearchBars, { SearchPageParams, onSearchProps } from '../components/Searc
 import { getOffersByLocation, OfferHotel } from '../api/search';
 import Spinner from '../components/Spinner';
 import PriceSlider from '../components/controls/PriceSlider';
+import { nightsFromDates } from '../api/hotel';
 
 type ZoneInfo = {
   code: number | string;
@@ -55,6 +56,8 @@ export default function SearchPage() {
   });
 
   // Data
+  const [nights, setNights] = useState(0);
+  const [adults, setAdults] = useState(0);
   const [results, setResults] = useState<OfferHotel[]>([]);
   const [sorted, setSorted] = useState<OfferHotel[]>([]);
   const [filtered, setFiltered] = useState<OfferHotel[]>([]);
@@ -95,13 +98,24 @@ export default function SearchPage() {
 
   function onSearch(kwargs: onSearchProps) {
     // update url params
+
+    if (!kwargs.checkin || !kwargs.checkout || !kwargs.guests || !kwargs.rooms) {
+      // TODO: Show error
+      return () => {
+        /* do nothing */
+      };
+    }
+
     const searchParams = new URLSearchParams();
     searchParams.set('location', btoa(JSON.stringify(kwargs.location)));
-    searchParams.set('checkin', kwargs.checkin || '');
-    searchParams.set('checkout', kwargs.checkout || '');
-    searchParams.set('guests', kwargs.guests || '');
-    searchParams.set('rooms', kwargs.rooms || '');
+    searchParams.set('checkin', kwargs.checkin);
+    searchParams.set('checkout', kwargs.checkout);
+    searchParams.set('guests', kwargs.guests);
+    searchParams.set('rooms', kwargs.rooms);
     window.history.replaceState({}, '', `${window.location.pathname}?${searchParams.toString()}`);
+
+    setNights(nightsFromDates(new Date(kwargs.checkin), new Date(kwargs.checkout)));
+    setAdults(parseInt(kwargs.guests, 10));
 
     setResultsMessage('Searching...');
     setZones([]);
@@ -278,7 +292,7 @@ export default function SearchPage() {
             </>
           )}
         </Stack>
-        <Stack sx={{ flex: 1, maxWidth: 600, mx: 'auto' }}>
+        <Stack sx={{ flex: 1, mx: 'auto' }}>
           <Stack direction="row" justifyContent="space-between" alignItems="end" width="100%">
             <Typography sx={{ flex: 2 }} color="#999">
               {resultsMessage}
@@ -308,7 +322,17 @@ export default function SearchPage() {
           {loading && results.length === 0 && <Spinner />}
           <Stack spacing={3} mt={2} mb={3}>
             {filtered.length > 0 &&
-              filtered.map((hotel) => <HotelCard key={hotel.code} hotel={hotel} onBookNow={onBookNow} />)}
+              filtered.map((hotel) => (
+                <HotelCard
+                  key={hotel.code}
+                  hotel={hotel}
+                  onBookNow={onBookNow}
+                  stay={{
+                    nights,
+                    adults,
+                  }}
+                />
+              ))}
             {loading && (
               <>
                 <HotelCardSkeleton />

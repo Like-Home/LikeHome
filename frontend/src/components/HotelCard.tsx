@@ -1,9 +1,16 @@
-import { Box, Stack, Button, CardActionArea, Skeleton } from '@mui/material';
+import { Box, Stack, Typography, CardActionArea, Skeleton, Rating } from '@mui/material';
+import { Discount } from '@mui/icons-material';
+import { useTheme } from '@mui/material/styles';
 import { OfferHotel } from '../api/search';
+import { convertCategoryToRatingProps, priceBreakdown } from '../api/hotel';
 
 export type onBookNowCallback = (hotel: OfferHotel) => void;
 
 type HotelCardProps = {
+  stay: {
+    nights: number;
+    adults: number;
+  };
   hotel: OfferHotel;
   onBookNow: onBookNowCallback;
 };
@@ -39,37 +46,76 @@ export function HotelCardSkeleton() {
   );
 }
 
-export default function HotelCard({ hotel, onBookNow }: HotelCardProps) {
+const formatCurrency = (value: number) => {
+  return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(value);
+};
+
+export default function HotelCard({ stay, hotel, onBookNow }: HotelCardProps) {
+  const theme = useTheme();
   const onBookNowWrapper = () => {
     onBookNow(hotel);
   };
 
+  const price = priceBreakdown(hotel.minRate, stay.nights, stay.adults);
+
   return (
     <div className="card" style={{ padding: 0 }}>
       <CardActionArea onClick={onBookNowWrapper}>
-        <Stack style={{ display: 'flex', padding: 0 }} direction="row" alignItems="stretch">
+        <Stack style={{ display: 'flex', padding: 0 }} direction="row" alignItems="stretch" spacing={1}>
           <div
             style={{
-              flex: '33%',
+              flex: '40%',
               backgroundSize: 'cover',
               backgroundPosition: 'center',
               backgroundImage: `url('http://photos.hotelbeds.com/giata/${hotel.images[0].path}')`,
               borderRadius: '4px 0 0 4px',
             }}
           ></div>
-          <Box mx={2} sx={{ flex: '66%', p: 1.5 }}>
+          <Stack mx={1} sx={{ flex: '60%', p: 1.5 }} spacing={1}>
             <Stack direction="row" justifyContent="space-between" alignItems="end">
-              <h2 style={{ marginBottom: 2, marginTop: 8 }}>{hotel.name}</h2>
-              <h4 style={{ marginBottom: 2, marginTop: 16 }}>${hotel.minRate}</h4>
+              <Typography variant="h5" sx={{ color: 'white', marginBottom: 1, marginTop: 1 }}>
+                {hotel.name}
+              </Typography>
             </Stack>
             <Stack direction="row" justifyContent="space-between" alignItems="end">
-              <small style={{ opacity: 0.5 }}>{hotel.zoneName}</small>
-              <small style={{ opacity: 0.5 }}>{hotel.categoryName}</small>
+              <Typography variant="caption" sx={{ opacity: 0.5 }}>
+                {hotel.zoneName}
+              </Typography>
+              {hotel.categoryName && (
+                <Rating size="small" name="rating" readOnly {...convertCategoryToRatingProps(hotel.categoryName)} />
+              )}
             </Stack>
-            <p style={{ marginTop: 10, fontSize: 14 }}>
-              {`Lorem ipsum, or lipsum as it is sometimes known, is dummy text used in laying out print, graphic or web designs. The passage is attributed to an unknown typesetter in the 15th century who is thought to have scrambled parts of Cicero's De...`}
-            </p>
-          </Box>
+            <Stack direction="row" justifyContent="space-between">
+              <Stack direction={'column'} justifyContent={'end'} spacing={2}>
+                <Typography
+                  variant="body1"
+                  sx={{
+                    color: theme.palette.success.main,
+                  }}
+                >
+                  Fully refundable*
+                </Typography>
+                <Stack direction="row" spacing={1} alignItems={'center'}>
+                  <Discount color="primary" />
+                  <Typography variant="body1">Reward Point Eligible</Typography>
+                </Stack>
+              </Stack>
+              <Stack
+                sx={{
+                  maxWidth: 90,
+                }}
+              >
+                <Typography variant="h5">{formatCurrency(Math.round(price.perNightPerAdult) - 0.01)}</Typography>
+                <Typography variant="caption" sx={{ opacity: 0.5 }}>
+                  per adult per night
+                </Typography>
+                <Typography variant="body1">{formatCurrency(price.afterTax)}</Typography>
+                <Typography variant="caption" sx={{ opacity: 0.5 }}>
+                  total after tax
+                </Typography>
+              </Stack>
+            </Stack>
+          </Stack>
         </Stack>
       </CardActionArea>
     </div>

@@ -1,4 +1,4 @@
-import { Card, Stack, Button, Typography, Divider, Box } from '@mui/material';
+import { Card, Stack, Button, Typography, Box } from '@mui/material';
 import { CalendarMonth, Discount, ShieldMoon } from '@mui/icons-material';
 import SearchBars from '../components/SearchBars';
 

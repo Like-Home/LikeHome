@@ -12,6 +12,7 @@ import SearchBars from '../components/SearchBars';
 import { hotelById, hotelOffersById } from '../recoil/hotel/atom';
 import HotelRoomCard from '../components/HotelRoomCard';
 import { createHotelbedsSrcSetFromPath } from '../utils';
+import { convertCategoryToRatingProps } from '../api/hotel';
 
 function a11yProps(index) {
   return {
@@ -28,21 +29,6 @@ function rowColByIndex(index) {
     return { rows: 2, cols: 2 };
   }
   return { rows: 1, cols: 1 };
-}
-
-function convertCategoryToRatingProps(categoryDescription) {
-  const numbers = categoryDescription.match(/\d/);
-  const props = {};
-
-  if (numbers) {
-    props.value = parseInt(numbers[0], 10);
-  }
-
-  if (categoryDescription.match(/half/i)) {
-    props.precision = 0.5;
-  }
-
-  return props;
 }
 
 export default function HotelPage() {
@@ -63,8 +49,6 @@ export default function HotelPage() {
   const [rawParams] = useSearchParams();
   const params = Object.fromEntries([...rawParams]);
 
-  const user = useRecoilValue(userAtom);
-  console.log(user);
   const hotel = useRecoilValue(hotelById(hotelId));
   const hotelRoomOffers = useRecoilValue(
     hotelOffersById({

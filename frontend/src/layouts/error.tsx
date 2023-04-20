@@ -1,7 +1,6 @@
 import { isRouteErrorResponse, useRouteError } from 'react-router-dom';
 import { Stack, Typography, Box } from '@mui/material';
 import Navbar from '../components/Navbar';
-import config from '../config';
 import Result from '../components/Result';
 
 export default function ErrorLayout() {
@@ -15,7 +14,7 @@ export default function ErrorLayout() {
       <Box
         className="card"
         sx={{
-          maxWidth: config.maxWidth,
+          width: 'fit-content',
           margin: 'auto',
           padding: 7,
         }}
