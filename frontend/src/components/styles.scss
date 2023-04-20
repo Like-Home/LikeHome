@@ -5,6 +5,12 @@
   border-radius: 8px;
   padding: 1.25em;
   overflow: hidden;
+
+  // make sure cards conners hug the
+  // edge of the screen on mobile
+  @media (max-width: 600px) {
+    border-radius: 0;
+  }
 }
 
 .card .card {

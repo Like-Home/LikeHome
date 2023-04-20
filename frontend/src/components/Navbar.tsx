@@ -85,7 +85,7 @@ export default function Navbar() {
         />
         <LinkButton to="/">LikeHome</LinkButton>
       </Stack>
-      <div className="right">
+      <Stack alignItems="center" direction="row" spacing={1}>
         <LinkButton to="/about">About Us</LinkButton>
         <LinkButton to="/hotels">Hotels</LinkButton>
         {user ? (
@@ -98,7 +98,7 @@ export default function Navbar() {
             </Button>
           </form>
         )}
-      </div>
+      </Stack>
     </nav>
   );
 }
