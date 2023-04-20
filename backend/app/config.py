@@ -57,6 +57,10 @@ POSTGRES_USER = getenv('POSTGRES_USER', required=PRODUCTION)
 POSTGRES_HOST = getenv('POSTGRES_HOST', required=PRODUCTION)
 POSTGRES_DB = getenv('POSTGRES_DB', required=PRODUCTION)
 POSTGRES_PASSWORD = getenv('POSTGRES_PASSWORD', required=PRODUCTION)
+POSTGRES_PORT = int(getenv('POSTGRES_PASSWORD',
+                           default='5432',
+                           required=PRODUCTION
+                           ))
 
 GOOGLE_MAPS_API_KEY = getenv('GOOGLE_MAPS_API_KEY', required=PRODUCTION)
 GOOGLE_MAPS_API_SECERT = getenv('GOOGLE_MAPS_API_SECERT', required=PRODUCTION)
