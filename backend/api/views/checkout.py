@@ -268,7 +268,7 @@ class CheckoutView(viewsets.mixins.CreateModelMixin, viewsets.GenericViewSet):
             booking.stripe_id = session['id']
             booking.status = Booking.BookingStatus.CONFIRMED
 
-            booking.user.account.apply_points += booking.points_earned
+            booking.user.account.travel_points += booking.points_earned
             booking.user.account.save()
 
             booking.save()
