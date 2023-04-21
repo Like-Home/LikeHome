@@ -11,7 +11,7 @@ import AboutPage from './pages/about';
 import RewardsPage from './pages/rewards';
 
 import ErrorLayout from './layouts/error';
-import RootLayout from './layouts/root';
+import DefaultRouterLayout from './layouts/default';
 
 import userAtom from './recoil/user';
 
@@ -24,7 +24,7 @@ const AuthGuard = () => {
 const router = createBrowserRouter([
   {
     path: '/',
-    element: <RootLayout />,
+    element: <DefaultRouterLayout />,
     errorElement: <ErrorLayout />,
     children: [
       {

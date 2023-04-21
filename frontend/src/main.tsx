@@ -1,15 +1,11 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 
-import { RouterProvider } from 'react-router-dom';
-
 import { RecoilRoot } from 'recoil';
 import { CssBaseline } from '@mui/material';
-
 import { createTheme, ThemeProvider, responsiveFontSizes } from '@mui/material/styles';
+import RootAppLayout from './layouts/root';
 
-import router from './router';
-import AppLoadingSpinner from './components/AppLoadingSpinner';
 import './index.scss';
 
 const darkTheme = responsiveFontSizes(
@@ -53,9 +49,7 @@ ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
     <ThemeProvider theme={darkTheme}>
       <CssBaseline />
       <RecoilRoot>
-        <React.Suspense fallback={<AppLoadingSpinner />}>
-          <RouterProvider router={router} />
-        </React.Suspense>
+        <RootAppLayout />
       </RecoilRoot>
     </ThemeProvider>
   </React.StrictMode>,

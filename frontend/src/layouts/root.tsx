@@ -1,18 +1,11 @@
-import { Outlet } from 'react-router-dom';
 import { Suspense } from 'react';
+
+import { RouterProvider } from 'react-router-dom';
 import { Box, useTheme } from '@mui/material';
-import Navbar from '../components/Navbar';
-import Foorter from '../components/Footer';
-import Spinner from '../components/Spinner';
-import config from '../config';
+import router from '../router';
+import AppLoadingSpinner from '../components/AppLoadingSpinner';
 
-const Loading = () => (
-  <div className="card">
-    <Spinner />
-  </div>
-);
-
-export default function RootLayout() {
+export default function RootAppLayout() {
   const theme = useTheme();
 
   return (
@@ -23,18 +16,9 @@ export default function RootLayout() {
         },
       }}
     >
-      <Navbar />
-      <div
-        style={{
-          maxWidth: config.maxWidth,
-          margin: 'auto',
-        }}
-      >
-        <Suspense fallback={<Loading />}>
-          <Outlet />
-        </Suspense>
-        <Foorter />
-      </div>
+      <Suspense fallback={<AppLoadingSpinner />}>
+        <RouterProvider router={router} />
+      </Suspense>
     </Box>
   );
 }
