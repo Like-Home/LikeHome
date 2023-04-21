@@ -3,6 +3,7 @@ import { Discount } from '@mui/icons-material';
 import { useTheme } from '@mui/material/styles';
 import { OfferHotel } from '../api/search';
 import { convertCategoryToRatingProps, priceBreakdown } from '../api/hotel';
+import { formatCurrency } from '../utils';
 
 export type onBookNowCallback = (hotel: OfferHotel) => void;
 
@@ -45,10 +46,6 @@ export function HotelCardSkeleton() {
     </div>
   );
 }
-
-const formatCurrency = (value: number) => {
-  return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(value);
-};
 
 export default function HotelCard({ stay, hotel, onBookNow }: HotelCardProps) {
   const theme = useTheme();

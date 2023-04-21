@@ -1,20 +1,10 @@
 // @ts-nocheck
 /* eslint-disable react/prop-types */
 
-import {
-  Stack,
-  Grid,
-  List,
-  ListItem,
-  ListItemText,
-  Typography,
-  Card,
-  CardContent,
-  CardActions,
-  Button,
-} from '@mui/material';
+import { Stack, List, ListItem, ListItemText, Typography, Card, CardContent, CardActions, Button } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
-import { createHotelbedsSrcSetFromPath } from '../utils';
+import Grid from '@mui/material/Unstable_Grid2/Grid2';
+import { createHotelbedsSrcSetFromPath, formatCurrency } from '../utils';
 
 export default function HotelRoomCard({ room }) {
   const navigate = useNavigate();
@@ -46,7 +36,7 @@ export default function HotelRoomCard({ room }) {
             </ListItem>)} */}
           </List>
           <Stack direction="row" justifyContent="space-between">
-            <Typography variant="h6">{room.rates[0].net}</Typography>
+            <Typography variant="h6">{formatCurrency(room.rates[0].net)}</Typography>
             <Typography variant="body2">{`We have ${room.rates[0].allotment} left`}</Typography>
           </Stack>
         </CardContent>

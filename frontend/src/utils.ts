@@ -1,6 +1,6 @@
-export function test() {
-  return null;
-}
+export const formatCurrency = (value: number) => {
+  return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(value);
+};
 
 export function createHotelbedsSrcSetFromPath(path: string) {
   const baseImageUrl = 'https://photos.hotelbeds.com/giata/';
