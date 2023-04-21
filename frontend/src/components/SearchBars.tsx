@@ -49,14 +49,33 @@ export default function SearchBars(props: SearchPageParams & SearchBarProps) {
   const [guests, setGuests] = useState(props.guests || '1');
   const [rooms, setRooms] = useState(props.rooms || '1');
 
+  const gridLayouts = {
+    withLocation: {
+      location: { xs: 24, sm: 4, md: 3 },
+      checkin: { xs: 12, sm: 4, md: 2 },
+      checkout: { xs: 12, sm: 4, md: 2 },
+      guests: { xs: 12, sm: 6, md: 3 },
+      search: { xs: 12, sm: 6, md: 2 },
+    },
+    withoutLocation: {
+      location: { xs: 0, sm: 0, md: 0 },
+      checkin: { xs: 12, sm: 4, md: 4 },
+      checkout: { xs: 12, sm: 4, md: 4 },
+      guests: { xs: 12, sm: 4, md: 2 },
+      search: { xs: 12, sm: 12, md: 2 },
+    },
+  };
+
+  const layout = props.noLocation ? gridLayouts.withoutLocation : gridLayouts.withLocation;
+
   return (
     <Grid container spacing={1}>
       {!props.noLocation && (
-        <Grid item xs={24} sm={4} md={3}>
+        <Grid item {...layout.location}>
           <LocationAutocomplete value={location} setValue={setLocation} />
         </Grid>
       )}
-      <Grid item xs={12} sm={4} md={2}>
+      <Grid item {...layout.checkin}>
         <Stack justifyContent="center">
           <TextInput
             name="date"
@@ -70,7 +89,7 @@ export default function SearchBars(props: SearchPageParams & SearchBarProps) {
           />
         </Stack>
       </Grid>
-      <Grid item xs={12} sm={4} md={2}>
+      <Grid item {...layout.checkout}>
         <Stack justifyContent="center">
           <TextInput
             name="date"
@@ -84,10 +103,10 @@ export default function SearchBars(props: SearchPageParams & SearchBarProps) {
           />
         </Stack>
       </Grid>
-      <Grid item xs={12} sm={6} md={3}>
+      <Grid item {...layout.guests}>
         <GuestsInput guests={guests} setGuests={setGuests} rooms={rooms} setRooms={setRooms} />
       </Grid>
-      <Grid item xs={12} sm={6} md={2}>
+      <Grid item {...layout.search}>
         <Button
           sx={{ fontSize: 20, width: '100%', height: '100%' }}
           onClick={() => {
