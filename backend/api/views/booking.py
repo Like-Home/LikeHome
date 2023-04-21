@@ -16,7 +16,7 @@ class BookingView(viewsets.ReadOnlyModelViewSet, viewsets.mixins.UpdateModelMixi
         This view should return a list of all the purchases
         for the currently authenticated user.
         """
-        return Booking.objects.filter(user=self.request.user)
+        return Booking.objects.filter(user=self.request.user).exclude(status=Booking.BookingStatus.PENDING)
 
     def get_object(self):
         """Get a single booking object by pk
