@@ -16,10 +16,11 @@ class BookingView(viewsets.ReadOnlyModelViewSet, viewsets.mixins.UpdateModelMixi
         This view should return a list of all the purchases
         for the currently authenticated user.
         """
-        # filter the bookings by the request.user and order them by check_in date descending
-        return Booking.objects.filter(user=self.request.user).order_by('check_in')
 
-    def get_object(self):
+        # filter the bookings by the request.user and order them by check_in date descending
+        return Booking.objects.filter(user=self.request.user).order_by('check_in').exclude(status=Booking.BookingStatus.PENDING)
+
+   def get_object(self):
         """Get a single booking object by pk
 
         Returns:
