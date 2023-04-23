@@ -43,8 +43,12 @@ function pageParamsAreInvalid(params: setOfferHotelsArgsProps) {
 }
 
 export default function SearchPage() {
-  const [rawParams] = useSearchParams();
-  const params: SearchPageParams = Object.fromEntries([...rawParams]);
+  const [pageParams, setPageParams] = useSearchParams();
+  const [params, setParams] = useState<SearchPageParams>(Object.fromEntries([...pageParams]) as SearchPageParams);
+
+  useEffect(() => {
+    setParams(Object.fromEntries([...pageParams]) as SearchPageParams);
+  }, [pageParams]);
   const location = JSON.parse(atob(params.location || ''));
 
   const [offerHotelsArgs, setOfferHotelsArgs] = useState<setOfferHotelsArgsProps>({
@@ -112,7 +116,7 @@ export default function SearchPage() {
     searchParams.set('checkout', kwargs.checkout);
     searchParams.set('guests', kwargs.guests);
     searchParams.set('rooms', kwargs.rooms);
-    window.history.replaceState({}, '', `${window.location.pathname}?${searchParams.toString()}`);
+    setPageParams(searchParams);
 
     setNights(nightsFromDates(new Date(kwargs.checkin), new Date(kwargs.checkout)));
     setAdults(parseInt(kwargs.guests, 10));
