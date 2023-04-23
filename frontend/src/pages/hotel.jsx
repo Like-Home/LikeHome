@@ -11,7 +11,7 @@ import Rating from '@mui/material/Rating';
 import SearchBars from '../components/SearchBars';
 import { hotelById, hotelOffersById } from '../recoil/hotel/atom';
 import HotelRoomCard from '../components/HotelRoomCard';
-import { createHotelbedsSrcSetFromPath } from '../utils';
+import { createHotelbedsSrcSetFromPath, formatAddressFromHotel } from '../utils';
 import { convertCategoryToRatingProps } from '../api/hotel';
 
 function a11yProps(index) {
@@ -91,9 +91,7 @@ export default function HotelPage() {
         </Box>
         <Box sx={{ paddingTop: 3 }}>
           <img src={hotel.google_map_url} alt="Google Maps" style={{ borderRadius: '4px' }} />
-          <p>
-            {hotel.address}, {hotel.city} {hotel.state} {hotel.postalCode}
-          </p>
+          <p>{formatAddressFromHotel(hotel)}</p>
         </Box>
       </Stack>
       <Box

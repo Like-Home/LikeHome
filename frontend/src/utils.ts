@@ -1,3 +1,5 @@
+import { HotelbedsHotel } from './api/types';
+
 export const formatCurrency = (value: number) => {
   return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(value);
 };
@@ -25,4 +27,8 @@ export function createHotelbedsSrcSetFromPath(path: string) {
     src: `${baseImageUrl}${path}`,
     srcSet: srcset,
   };
+}
+
+export function formatAddressFromHotel(hotel: HotelbedsHotel) {
+  return `${hotel.address}, ${hotel.city} ${hotel.stateCode} ${hotel.postalCode}`;
 }

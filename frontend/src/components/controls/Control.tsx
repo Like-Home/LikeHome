@@ -4,6 +4,7 @@ import { Paper, Stack, SxProps } from '@mui/material';
 type Icon = (props: { color?: string }) => JSX.Element;
 
 export interface ControlProps {
+  helperText?: string;
   onClick?: React.MouseEventHandler<HTMLDivElement>;
   icon?: Icon;
   label?: string;

@@ -14,6 +14,8 @@ from rest_framework.decorators import action
 from rest_framework.request import Request
 from rest_framework.response import Response
 
+from ..serializers import HotelbedsHotelSerializer
+
 
 class CheckoutSerializer(serializers.Serializer):
     first_name = serializers.CharField()
@@ -32,7 +34,7 @@ class CheckoutSerializer(serializers.Serializer):
 
 def stripe_create_checkout(
         booking_id,
-        hotel_name, room_number, check_in, check_out, hotel_price, hotel_image):
+        hotel_name, room_number, check_in, check_out, hotel_price, hotel_image, points_remaining):
 
     extra_product_data = {}
     if hotel_image:
@@ -60,6 +62,7 @@ def stripe_create_checkout(
         ],
         metadata={
             "booking_id": booking_id,
+            "points_remaining": points_remaining,
         }
     )
 
@@ -95,9 +98,46 @@ class CheckoutView(viewsets.mixins.CreateModelMixin, viewsets.GenericViewSet):
         response = hotelbeds.post(
             '/hotel-api/1.0/checkrates', json=payload).json()
 
+        total_price = float(response['hotel']['totalNet'])
+
+        price = {
+            'beforeTax': round(total_price / 1.1, 2),
+            'afterTax': round(total_price, 2),
+            'tax': round(total_price * 0.1, 2),
+        }
+
         return Response({
-            "hotel": response['hotel']
+            'hotel': response['hotel'],
+            'price': price,
+            'extended': HotelbedsHotelSerializer(HotelbedsHotel.objects.get(code=response['hotel']['code'])).data,
+            **self.create_rewards_object(request, price),
         })
+
+    @staticmethod
+    def create_rewards_object(request: Request, price: dict):
+        travel_points = request.user.account.travel_points
+
+        if travel_points > 0:
+            (net_cost_after_discount, reward_points, reward_points_remaining) = CheckoutView.deduct_travel_points(
+                price['beforeTax'],
+                travel_points
+            )
+
+            return {
+                'rewards': {
+                    'points': reward_points,
+                    'discount': round(price['beforeTax'] - net_cost_after_discount, 2),
+                    'original': price,
+                    'discounted': {
+                        'beforeTax': round(net_cost_after_discount, 2),
+                        'afterTax': round(net_cost_after_discount * 1.1, 2),
+                        'tax': round(net_cost_after_discount * 0.1, 2),
+                    },
+                    'free': reward_points_remaining > 0,
+                },
+            }
+
+        return {}
 
     @staticmethod
     def deduct_travel_points(net_cost: float, reward_points: int):
@@ -155,31 +195,33 @@ class CheckoutView(viewsets.mixins.CreateModelMixin, viewsets.GenericViewSet):
         check_in_date = parse_date(response['hotel']['checkIn'])
         check_out_date = parse_date(response['hotel']['checkOut'])
 
-        if not params['force']:
-            conflicting_bookings = Booking.objects.filter(
-                user=request.user,
-                check_in__lt=check_out_date,
-                check_out__gt=check_in_date
-            )
+        conflicting_booking_found = Booking.objects.filter(
+            user=request.user,
+            check_in__lt=check_out_date,
+            check_out__gt=check_in_date
+        ).exists()
 
-            if conflicting_bookings.exists():
+        if not params['force']:
+            if conflicting_booking_found:
                 raise serializers.ValidationError(
                     {
                         'date': 'CONFLICTING_BOOKING'
                     }
                 )
 
-        total_net_float = float(response['hotel']['totalNet'])
+        total_net_float_before_tax = float(response['hotel']['totalNet']) / 1.1
         points_used = 0
         if params['apply_point_balance']:
-            (total_net_float, points_used, points_remaining) = self.deduct_travel_points(
-                total_net_float,
-                request.user.travel_points
+            (total_net_float_before_tax, points_used, points_remaining) = self.deduct_travel_points(
+                total_net_float_before_tax,
+                request.user.account.travel_points
             )
 
-            request.user.travel_points = points_remaining
-            request.user.save()
+            # TODO: move this to the webhook
+            request.user.account.travel_points = points_remaining
+            request.user.account.save()
 
+        total_net_float = total_net_float_before_tax * 1.1
         booking = Booking(
             first_name=params['first_name'],
             last_name=params['last_name'],
@@ -197,6 +239,7 @@ class CheckoutView(viewsets.mixins.CreateModelMixin, viewsets.GenericViewSet):
             points_earned=int(total_net_float),
             points_spent=points_used,
             status=Booking.BookingStatus.PENDING,
+            overlapping=conflicting_booking_found,
             stripe_id=None,
         )
 
@@ -216,7 +259,8 @@ class CheckoutView(viewsets.mixins.CreateModelMixin, viewsets.GenericViewSet):
                 response['hotel']['checkIn'],
                 response['hotel']['checkOut'],
                 int(total_net_float * 100),
-                f"https://photos.hotelbeds.com/giata/medium/{hotel_image.path}" if hotel_image else None
+                f"https://photos.hotelbeds.com/giata/medium/{hotel_image.path}" if hotel_image else None,
+                points_remaining
             )
             return Response({
                 'id': checkout_session['id'],

@@ -1,14 +1,38 @@
 import * as fetch from './fetch';
+import { HotelbedsHotel } from './types';
+
+export type PriceBook = {
+  beforeTax: number;
+  afterTax: number;
+  tax: number;
+};
 
 type CheckoutDetailsResponse = {
   hotel: {
+    code: string;
     name: string;
+    checkIn: string;
+    checkOut: string;
     rooms: {
       name: string;
       rates: {
         rateComments: string;
+        rateKey: string;
+        rateType: string;
+        net: string;
+        adults: number;
+        children: number;
       }[];
     }[];
+  };
+  extended: HotelbedsHotel;
+  price: PriceBook;
+  rewards: {
+    original: PriceBook;
+    discounted: PriceBook;
+    points: number;
+    discount: number;
+    free: boolean;
   };
 };
 
@@ -23,6 +47,7 @@ type StripeCheckoutRequest = {
   email: string;
   phone: string;
   force: string;
+  apply_point_balance: string;
 };
 
 type StripeCheckoutResponse = {
