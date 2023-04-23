@@ -217,10 +217,6 @@ class CheckoutView(viewsets.mixins.CreateModelMixin, viewsets.GenericViewSet):
                 request.user.account.travel_points
             )
 
-            # TODO: move this to the webhook
-            request.user.account.travel_points = points_remaining
-            request.user.account.save()
-
         total_net_float = total_net_float_before_tax * 1.1
         booking = Booking(
             first_name=params['first_name'],
@@ -313,6 +309,7 @@ class CheckoutView(viewsets.mixins.CreateModelMixin, viewsets.GenericViewSet):
             booking.status = Booking.BookingStatus.CONFIRMED
 
             booking.user.account.travel_points += booking.points_earned
+            booking.user.account.travel_points -= booking.points_spent
             booking.user.account.save()
 
             booking.save()
