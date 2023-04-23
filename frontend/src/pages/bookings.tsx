@@ -102,6 +102,13 @@ function EditBookingModal({
   );
 }
 
+const statusToText = {
+  PE: 'Pending',
+  CO: 'Confirmed',
+  CA: 'Cancelled',
+  PA: 'Past',
+};
+
 function BookingItem({ booking }: { booking: Booking }) {
   const linkToDetails = `/booking/${booking.id}`;
   const refreshBookings = useRecoilRefresher_UNSTABLE(bookingsSelector);
@@ -165,7 +172,7 @@ function BookingItem({ booking }: { booking: Booking }) {
           <div>
             <div>
               <Typography variant="body2" color="text.primary">
-                Status: {booking.status}
+                Status: {statusToText[booking.status]}
               </Typography>
             </div>
             <div>

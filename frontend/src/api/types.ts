@@ -24,7 +24,7 @@ export type Booking = BookingPutArgs & {
   amount_paid: number;
   points_earned: number;
   points_spent: number;
-  status: string;
+  status: 'PE' | 'CO' | 'CA' | 'PA';
   user: number;
   created_at: string;
   hotel: {
