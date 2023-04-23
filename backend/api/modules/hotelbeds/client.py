@@ -56,7 +56,11 @@ class HotelbedsClient(Session):
 
         # in case of error, retry at most 3 times, waiting
         # at least half a second between each retry
-        retry = Retry(total=3, backoff_factor=0.1)
+        retry = Retry(
+            total=3,
+            backoff_factor=0.5,
+            allowed_methods={*Retry.DEFAULT_ALLOWED_METHODS, 'POST'}
+        )
 
         adapter = HTTPAdapter(max_retries=retry)
         self.mount('http://', adapter)
