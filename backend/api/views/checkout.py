@@ -211,6 +211,7 @@ class CheckoutView(viewsets.mixins.CreateModelMixin, viewsets.GenericViewSet):
 
         total_net_float_before_tax = float(response['hotel']['totalNet']) / 1.1
         points_used = 0
+        points_remaining = request.user.account.travel_points
         if params['apply_point_balance']:
             (total_net_float_before_tax, points_used, points_remaining) = self.deduct_travel_points(
                 total_net_float_before_tax,
