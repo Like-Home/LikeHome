@@ -190,6 +190,8 @@ class CheckoutView(viewsets.mixins.CreateModelMixin, viewsets.GenericViewSet):
         response = hotelbeds.post(
             '/hotel-api/1.0/checkrates', json=payload).json()
 
+        print(response)
+
         hotel = HotelbedsHotel.objects.get(code=response['hotel']['code'])
 
         check_in_date = parse_date(response['hotel']['checkIn'])
@@ -217,6 +219,78 @@ class CheckoutView(viewsets.mixins.CreateModelMixin, viewsets.GenericViewSet):
                 total_net_float_before_tax,
                 request.user.account.travel_points
             )
+
+            # TODO: move this to the webhook
+            request.user.account.travel_points = points_remaining
+            request.user.account.save()
+
+        rate = response['hotel']['rooms'][0]['rates'][0]
+        paxes = []
+        for room in range(1, rate['rooms'] + 1):
+            paxes.append({
+                "roomId": room,
+                "type": "AD",
+                "name": params['first_name'],
+                "surname": params['last_name'],
+            })
+
+        for index in range(rate['adults'] - rate['rooms']):
+            paxes.append({
+                "roomId": 1,
+                "type": "AD",
+                "name": params['first_name'],
+                "surname": params['last_name'],
+            })
+
+        for index in range(rate['children']):
+            paxes.append({
+                "roomId": 1,
+                "type": "CH",
+                "name": params['first_name'],
+                "surname": params['last_name'],
+            })
+
+        payload = {
+            "holder": {
+                "name": params['first_name'],
+                "surname": params['last_name'],
+            },
+            "rooms": [{
+                "rateKey": rate_key,
+                'paxes': paxes
+            }],
+            "voucher": {
+                "email": {
+                    "to": params['email'],
+                    "body": "Voucher body is to be written here."
+                }
+            },
+            "clientReference": f"likehome-{request.user.id}",
+            "creationUser": "likehome",
+            "tolerance": 50,
+            "remark": "Booking remarks are to be written here."
+        }
+
+        response2 = hotelbeds.post('/hotel-api/1.2/bookings', json=payload)
+
+        if response2.status_code == 500:
+            body = response2.json()
+            if body['error']['message'].startswith('Price has changed'):
+                raise serializers.ValidationError(
+                    {
+                        'price': 'PRICE_CHANGED'
+                    }
+                )
+            else:
+                print('error', body)
+                raise serializers.ValidationError(
+                    {
+                        'price': 'UNKNOWN_ERROR'
+                    }
+                )
+
+        print(response2)
+        print(response2.json())
 
         total_net_float = total_net_float_before_tax * 1.1
         booking = Booking(

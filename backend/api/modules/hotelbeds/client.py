@@ -148,6 +148,7 @@ class HotelbedsClient(Session):
 
     def request(self, method, url, **kwargs):
         refresh_cache = kwargs.pop('refresh_cache', False)
+        endpoint = kwargs.pop('endpoint', self.endpoint)
 
         kwargs.setdefault('headers', {})
         kwargs['headers'].update({
@@ -157,7 +158,7 @@ class HotelbedsClient(Session):
         })
 
         if not url.startswith('http'):
-            url = self.endpoint + url
+            url = endpoint + url
 
         cacheable = json.dumps({
             'url': url,
@@ -180,9 +181,9 @@ class HotelbedsClient(Session):
             logger.info('Rate limited for the day. Rotating keys.')
             if not self.key_pool.next_key():
                 raise KeyPoolOverflow('No more keys in pool')
-            self.api_key = self.key_pool.get_key(),
+            self.api_key = self.key_pool.get_key()
             self.secret = self.key_pool.get_secret()
-            self.request(method, url, **kwargs)
+            return self.request(method, url, **kwargs)
 
         if self.cache is not None and res.ok:
             logger.info(f'Adding to cache {url}')

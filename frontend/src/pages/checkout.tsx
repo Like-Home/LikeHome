@@ -41,8 +41,6 @@ export default function CheckoutPage() {
   const [email, setEmail] = useState('noahcardoza@gmail.com');
   const [phone, setPhone] = useState('1234567890');
 
-  // const user = useRecoilValue(userAtom);
-
   const [open, setOpen] = useState(false);
   const handleClose = () => setOpen(false);
   const nights = nightsFromDates(
@@ -84,7 +82,7 @@ export default function CheckoutPage() {
 
       setOpen(false);
 
-      window.open(data.url, '_blank');
+      window.location.href = data.url;
     } catch (e) {
       if (!(e instanceof APIError)) {
         throw e; // Unhandled error

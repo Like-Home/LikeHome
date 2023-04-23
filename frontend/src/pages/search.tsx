@@ -50,7 +50,6 @@ export default function SearchPage() {
     setParams(Object.fromEntries([...pageParams]) as SearchPageParams);
   }, [pageParams]);
   const location = JSON.parse(atob(params.location || ''));
-
   const [offerHotelsArgs, setOfferHotelsArgs] = useState<setOfferHotelsArgsProps>({
     destinationCode: location?.code,
     checkin: params.checkin,
