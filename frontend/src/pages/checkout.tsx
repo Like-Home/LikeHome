@@ -353,10 +353,6 @@ export default function CheckoutPage() {
               </Typography>
             </Stack>
           </Stack>
-          <Stack direction="row" justifyContent="space-between" sx={{ width: '100%' }}>
-            <Typography variant="body1">Nights</Typography>
-            <Typography variant="body1">{nights}</Typography>
-          </Stack>
         </Stack>
       </Stack>
     </Stack>

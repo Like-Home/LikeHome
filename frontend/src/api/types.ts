@@ -1,59 +1,3 @@
-export type BookingPostArgs = {
-  force?: string; // 'true' or 'false'
-};
-
-export type PaginationResponse<T> = {
-  links: {
-    next?: string;
-    previous?: string;
-  };
-  count: number;
-  results: T[];
-};
-
-export type BookingPutArgs = {
-  first_name: string;
-  last_name: string;
-  email: string;
-  phone: string;
-};
-
-export type Booking = BookingPutArgs & {
-  id: number;
-  stripe_id: string;
-  amount_paid: number;
-  points_earned: number;
-  points_spent: number;
-  status: 'PE' | 'CO' | 'CA' | 'PA';
-  user: number;
-  created_at: string;
-  hotel: {
-    name: string;
-  };
-  room_code: string;
-  adults: string;
-  image: string;
-  children: string;
-  check_in: string;
-  check_out: string;
-};
-
-export type User = {
-  username: string;
-  email: string;
-  date_joined: string;
-  first_name: string;
-  groups: string[];
-  id: number;
-  is_active: boolean;
-  is_staff: boolean;
-  is_superuser: boolean;
-  last_login: string;
-  last_name: string;
-  travel_points: number;
-  user_permissions: string[];
-};
-
 export interface HotelbedsHotel {
   code: number;
   accommodationType: {
@@ -114,7 +58,7 @@ export interface HotelbedsHotel {
   phones: {
     id: number;
     phoneNumber: string;
-    phoneType: string;
+    phoneType: 'PHONEBOOKING' | 'PHONEHOTEL' | 'FAXNUMBER';
     hotel: number;
     // ...
   }[];
@@ -142,3 +86,58 @@ export interface HotelbedsHotel {
     // ...
   }[];
 }
+
+export type BookingPostArgs = {
+  force?: string; // 'true' or 'false'
+};
+
+export type PaginationResponse<T> = {
+  links: {
+    next?: string;
+    previous?: string;
+  };
+  count: number;
+  results: T[];
+};
+
+export type BookingPutArgs = {
+  first_name: string;
+  last_name: string;
+  email: string;
+  phone: string;
+};
+
+export type Booking = BookingPutArgs & {
+  id: number;
+  stripe_id: string;
+  amount_paid: number;
+  points_earned: number;
+  points_spent: number;
+  status: 'PE' | 'CO' | 'CA' | 'PA';
+  user: number;
+  created_at: string;
+  hotel: HotelbedsHotel;
+  overlapping: boolean;
+  room_code: string;
+  adults: string;
+  image: string;
+  children: string;
+  check_in: string;
+  check_out: string;
+};
+
+export type User = {
+  username: string;
+  email: string;
+  date_joined: string;
+  first_name: string;
+  groups: string[];
+  id: number;
+  is_active: boolean;
+  is_staff: boolean;
+  is_superuser: boolean;
+  last_login: string;
+  last_name: string;
+  travel_points: number;
+  user_permissions: string[];
+};

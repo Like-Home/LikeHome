@@ -39,14 +39,25 @@ class BookingView(viewsets.ReadOnlyModelViewSet, viewsets.mixins.UpdateModelMixi
 
         booking = self.get_object()
         if booking.status == Booking.BookingStatus.CANCELLED:
-            return Response({'status': 'booking already cancelled'}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({'canceled': False, 'message': 'Booking already cancelled.'}, status=status.HTTP_400_BAD_REQUEST)
 
-        # Dont allow cancellation within 24 hours of start date
-        if booking.check_in < timezone.now().date() + timezone.timedelta(hours=24):
-            return Response({'status': 'booking cannot be cancelled within 24 hours of start date'}, status=status.HTTP_400_BAD_REQUEST)
+        if booking.status == Booking.BookingStatus.PAST:
+            return Response({'canceled': False, 'message': 'Booking has already past.'}, status=status.HTTP_400_BAD_REQUEST)
 
         booking.status = Booking.BookingStatus.CANCELLED
-        booking.user.account.travel_points -= booking.points_earned
         booking.save()
-        booking.user.account.save()
+
+        # don't refund if booking is within 24 hours
+        if booking.check_in < timezone.now().date() + timezone.timedelta(hours=24):
+            return Response({
+                'canceled': True,
+                'refund': False,
+            },
+                status=status.HTTP_200_OK
+            )
+        booking.save()
+
+        # TODO: refund the booking
+        #       if booking.overlapping is True then withhold 10% of the refund
+
         return Response({'status': 'booking cancelled'})

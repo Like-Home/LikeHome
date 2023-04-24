@@ -59,8 +59,7 @@ function AccountMenu({ navbarEl, user }: { navbarEl: React.RefObject<HTMLElement
   return (
     <>
       <IconButton
-        onClick={(e: Event | React.SyntheticEvent) => {
-          // console.log(e.target);
+        onClick={(e) => {
           setAnchorEl(navbarEl.current);
         }}
         sx={{ p: 0.5 }}
