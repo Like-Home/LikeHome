@@ -13,7 +13,7 @@ export default function RewardsPage() {
   );
 
   return (
-    <main className="card push-center" style={{ marginTop: 50, maxWidth: 1200 }}>
+    <main className="card push-center">
       <Stack direction="column" spacing={2} m={1}>
         <Box>
           <Typography variant="h3">Point balance</Typography>

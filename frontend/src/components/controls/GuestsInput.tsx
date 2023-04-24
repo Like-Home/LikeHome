@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import { useState, useRef } from 'react';
 import { Box, InputBase, Menu } from '@mui/material';
 import { Control } from './Control';
 import NumberStepper from './NumberStepper';
@@ -22,11 +22,11 @@ export default function GuestsInput({
   return (
     <>
       <Control
-        sx={{ minWidth: 175 }}
+        sx={{ minWidth: 175, height: '100%' }}
         name="guests"
         label="Guests"
         ref={ref}
-        onClick={(e: Event | React.SyntheticEvent) => {
+        onClick={() => {
           setAnchor(ref.current as HTMLElement);
         }}
       >

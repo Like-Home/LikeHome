@@ -56,7 +56,7 @@ export default function LocationAutocomplete({ value, setValue }) {
   // TODO: match the theme, dropping in TextInput doesn't work
   return (
     <Autocomplete
-      sx={{ width: 300 }}
+      sx={{ width: '100%' }}
       getOptionLabel={(option) => option.name}
       filterOptions={(x) => x}
       options={options}

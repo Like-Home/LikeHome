@@ -34,6 +34,7 @@ class Booking(models.Model):
     check_in = DateField()
     check_out = DateField()
     created_at = DateTimeField(default=now, editable=False)
+    overlapping = models.BooleanField(default=False)
 
     def _str_(self):
         return self.hotel.name

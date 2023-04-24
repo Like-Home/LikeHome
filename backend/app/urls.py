@@ -16,6 +16,14 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import include, path
 
+# default: "Django Administration"
+admin.site.site_header = 'LikeHome'
+# default: "Site administration"
+admin.site.index_title = 'LikeHome Administration'
+# default: "Django site admin"
+admin.site.site_title = 'LikeHome Admin'
+
+
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('accounts/', include('allauth.urls')),

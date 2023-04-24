@@ -97,7 +97,7 @@ class HotelbedsHotelSerializer(HotelbedsHotelSerializerSimple):
     def get_google_map_url(self, instance: HotelbedsHotel):
         if config.MONEY_SAVER_MODE:
             return '/images/placeholders/staticmap.jpeg'
-        return sign_url(f'https://maps.googleapis.com/maps/api/staticmap?maptype=roadmap&format=jpg&zoom=13&scale=&size=375x250&markers=icon:https://a.travel-assets.com/shopping-pwa/images/his-preview-marker.png%7C{instance.latitude},{instance.longitude}&key={config.GOOGLE_MAPS_API_KEY}', config.GGOOGLE_MAPS_API_SECERT)
+        return sign_url(f'https://maps.googleapis.com/maps/api/staticmap?maptype=roadmap&format=jpg&zoom=13&scale=&size=375x250&markers=icon:https://a.travel-assets.com/shopping-pwa/images/his-preview-marker.png%7C{instance.latitude},{instance.longitude}&key={config.GOOGLE_MAPS_API_KEY}', config.GOOGLE_MAPS_API_SECERT)
 
     def get_images(self, instance):
         images = instance.images.all().order_by('order')
@@ -113,7 +113,7 @@ class BookingSerializer(serializers.ModelSerializer):
         fields = '__all__'
         read_only_fields = (
             'image',
-            'hotel', 
+            'hotel',
             'rate_key',
             'stripe_id',
             'hotel',

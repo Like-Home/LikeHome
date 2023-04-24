@@ -3,15 +3,16 @@
 import React from 'react';
 import { useParams, useSearchParams, Link } from 'react-router-dom';
 import { useRecoilValue } from 'recoil';
-import { Grid, List, ListItem, ListItemText, Tab, Tabs, Box, Stack, Typography } from '@mui/material';
+import { List, ListItem, ListItemText, Tab, Tabs, Box, Stack, Typography } from '@mui/material';
+import Grid from '@mui/material/Unstable_Grid2/Grid2';
 import ImageList from '@mui/material/ImageList';
 import ImageListItem from '@mui/material/ImageListItem';
 import Rating from '@mui/material/Rating';
-import userAtom from '../recoil/user';
 import SearchBars from '../components/SearchBars';
 import { hotelById, hotelOffersById } from '../recoil/hotel/atom';
 import HotelRoomCard from '../components/HotelRoomCard';
-import { createHotelbedsSrcSetFromPath } from '../utils';
+import { createHotelbedsSrcSetFromPath, formatAddressFromHotel } from '../utils';
+import { convertCategoryToRatingProps } from '../api/hotel';
 
 function a11yProps(index) {
   return {
@@ -28,21 +29,6 @@ function rowColByIndex(index) {
     return { rows: 2, cols: 2 };
   }
   return { rows: 1, cols: 1 };
-}
-
-function convertCategoryToRatingProps(categoryDescription) {
-  const numbers = categoryDescription.match(/\d/);
-  const props = {};
-
-  if (numbers) {
-    props.value = parseInt(numbers[0], 10);
-  }
-
-  if (categoryDescription.match(/half/i)) {
-    props.precision = 0.5;
-  }
-
-  return props;
 }
 
 export default function HotelPage() {
@@ -63,8 +49,6 @@ export default function HotelPage() {
   const [rawParams] = useSearchParams();
   const params = Object.fromEntries([...rawParams]);
 
-  const user = useRecoilValue(userAtom);
-  console.log(user);
   const hotel = useRecoilValue(hotelById(hotelId));
   const hotelRoomOffers = useRecoilValue(
     hotelOffersById({
@@ -80,23 +64,20 @@ export default function HotelPage() {
   }
 
   return (
-    <main className="card push-center" style={{ marginTop: 50, maxWidth: 1200 }}>
-      <ImageList sx={{ width: '100%', height: 420 }} variant="quilted" cols={8} rowHeight={100} id="overview">
-        {hotel.images.slice(0, 8).map((item, index) => (
-          <ImageListItem key={item.path} {...rowColByIndex(index)}>
-            <img {...createHotelbedsSrcSetFromPath(item.path)} alt={item.title} loading="lazy" />
-          </ImageListItem>
-        ))}
-      </ImageList>
+    <Stack className="card push-center" spacing={2} alignItems={'center'}>
+      <Box>
+        <ImageList sx={{ width: '100%', height: 420 }} variant="quilted" cols={8} rowHeight={100} id="overview">
+          {hotel.images.slice(0, 8).map((item, index) => (
+            <ImageListItem key={item.path} {...rowColByIndex(index)}>
+              <img {...createHotelbedsSrcSetFromPath(item.path)} alt={item.title} loading="lazy" />
+            </ImageListItem>
+          ))}
+        </ImageList>
+      </Box>
       <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
         <Tabs value={value} onChange={handleChange} aria-label="hotel listing section tabs ">
           {tabs.map((tab) => (
-            <Tab
-              key={tab.value}
-              label={tab.label}
-              {...a11yProps(tab.value)}
-              containerElement={<Link to={tab.href} />}
-            />
+            <Tab key={tab.value} label={tab.label} {...a11yProps(tab.value)} container={<Link to={tab.href} />} />
           ))}
         </Tabs>
       </Box>
@@ -110,12 +91,15 @@ export default function HotelPage() {
         </Box>
         <Box sx={{ paddingTop: 3 }}>
           <img src={hotel.google_map_url} alt="Google Maps" style={{ borderRadius: '4px' }} />
-          <p>
-            {hotel.address}, {hotel.city} {hotel.state} {hotel.postalCode}
-          </p>
+          <p>{formatAddressFromHotel(hotel)}</p>
         </Box>
       </Stack>
-      <Stack id="rooms">
+      <Box
+        className="push-center"
+        sx={{
+          width: '100%',
+        }}
+      >
         <SearchBars
           noLocation={true}
           guests={params.guests}
@@ -123,12 +107,19 @@ export default function HotelPage() {
           checkin={params.checkin}
           checkout={params.checkout}
         />
-        <Grid container spacing={2}>
-          {hotelRoomOffers.offers.rooms.map((room) => (
-            <HotelRoomCard key={room.code} room={room} />
-          ))}
-        </Grid>
-      </Stack>
+      </Box>
+      <Grid
+        id="rooms"
+        container
+        spacing={2}
+        sx={{
+          width: '100%',
+        }}
+      >
+        {hotelRoomOffers.offers.rooms.map((room) => (
+          <HotelRoomCard key={room.code} room={room} />
+        ))}
+      </Grid>
       <Stack direction="row" justifyContent="space-between" id="location" sx={{ marginY: 3 }}>
         <Box sx={{ flex: '25%' }}>
           <Typography variant="h5">About this location</Typography>
@@ -151,6 +142,6 @@ export default function HotelPage() {
           </Stack>
         </Stack>
       </Stack>
-    </main>
+    </Stack>
   );
 }

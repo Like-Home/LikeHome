@@ -2,11 +2,11 @@ import * as fetch from './fetch';
 import { Booking, BookingPutArgs } from './types';
 
 export function getBookingHistory() {
-  return fetch.get<Booking[]>('/booking');
+  return fetch.get<Booking[]>('/booking/');
 }
 
 export function getBooking(id: string) {
-  return fetch.get<Booking>(`/booking/${id}`);
+  return fetch.get<Booking>(`/booking/${id}/`);
 }
 
 export function cancelBooking(id: number) {
