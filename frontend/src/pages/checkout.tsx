@@ -1,6 +1,7 @@
 import React, { ChangeEvent, useEffect, useState } from 'react';
 import {
   Divider,
+  Alert,
   Box,
   Button,
   Stack,
@@ -14,7 +15,7 @@ import {
   CircularProgress,
   Backdrop,
 } from '@mui/material';
-import { useParams } from 'react-router-dom';
+import { useParams, useSearchParams } from 'react-router-dom';
 import { useRecoilValue } from 'recoil';
 import Grid from '@mui/material/Unstable_Grid2/Grid2';
 import moment from 'moment';
@@ -28,6 +29,9 @@ import CardModal from '../components/CardModal';
 
 export default function CheckoutPage() {
   const { rateKey } = useParams();
+  const [searchParams] = useSearchParams();
+
+  const stripeCheckoutWasCanceled = searchParams.get('stripe') === 'canceled';
 
   const checkoutDetailsState = useRecoilValue(checkoutDetails(rateKey || ''));
   const [firstName, setFirstName] = useState('Noah');
@@ -111,7 +115,11 @@ export default function CheckoutPage() {
 
   return (
     <Stack spacing={2}>
-      {/* <Typography variant="h4">{checkoutDetailsState.hotel.name}</Typography> */}
+      {stripeCheckoutWasCanceled && (
+        <Alert severity="warning">
+          Having second thoughts? Take time time. We know it&apos;s hard to find a home LikeHome.
+        </Alert>
+      )}
       <Typography variant="h4">{checkoutDetailsState.hotel.rooms[0].name}</Typography>
       <Stack
         className="push-center"

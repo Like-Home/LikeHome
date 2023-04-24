@@ -12,7 +12,7 @@ class Booking(models.Model):
     class BookingStatus(TextChoices):
         PENDING = 'PE', ('Pending')
         CONFIRMED = 'CO', ('Confirmed')
-        CANCELLED = 'CA', ('Cancelled')
+        CANCELED = 'CA', ('Canceled')
         PAST = 'PA', ('Past')
 
     first_name = CharField(max_length=50)

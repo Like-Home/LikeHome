@@ -1,7 +1,7 @@
 // @ts-nocheck
 
 import React from 'react';
-import { useParams, useSearchParams, Link } from 'react-router-dom';
+import { useParams, Link } from 'react-router-dom';
 import { useRecoilValue } from 'recoil';
 import { List, ListItem, ListItemText, Tab, Tabs, Box, Stack, Typography } from '@mui/material';
 import Grid from '@mui/material/Unstable_Grid2/Grid2';
@@ -13,6 +13,7 @@ import { hotelById, hotelOffersById } from '../recoil/hotel/atom';
 import HotelRoomCard from '../components/HotelRoomCard';
 import { createHotelbedsSrcSetFromPath, formatAddressFromHotel } from '../utils';
 import { convertCategoryToRatingProps } from '../api/hotel';
+import { usePageParamsObject } from '../hooks';
 
 function a11yProps(index) {
   return {
@@ -45,9 +46,7 @@ export default function HotelPage() {
   if (!hotelId) {
     return <div>Hotel not found</div>;
   }
-
-  const [rawParams] = useSearchParams();
-  const params = Object.fromEntries([...rawParams]);
+  const [params, setParams] = usePageParamsObject();
 
   const hotel = useRecoilValue(hotelById(hotelId));
   const hotelRoomOffers = useRecoilValue(
@@ -106,6 +105,13 @@ export default function HotelPage() {
           rooms={params.rooms}
           checkin={params.checkin}
           checkout={params.checkout}
+          onSearch={(searchParams) => {
+            console.log(searchParams);
+            setParams({
+              ...searchParams,
+              location: btoa(JSON.stringify(searchParams.location)),
+            });
+          }}
         />
       </Box>
       <Grid

@@ -34,7 +34,7 @@ class CheckoutSerializer(serializers.Serializer):
 
 def stripe_create_checkout(
         booking_id,
-        hotel_name, room_number, check_in, check_out, hotel_price, hotel_image, points_remaining):
+        hotel_name, room_number, check_in, check_out, hotel_price, hotel_image, points_remaining, referrer):
 
     extra_product_data = {}
     if hotel_image:
@@ -42,7 +42,7 @@ def stripe_create_checkout(
 
     return stripe.checkout.Session.create(
         success_url=f"{config.BASE_URL}/booking/{booking_id}/?stripe=success",
-        cancel_url=f"{config.BASE_URL}/checkout/?stripe=cancelled",
+        cancel_url=f"{referrer}?stripe=canceled",
         payment_method_types=['card'],
         mode='payment',
         line_items=[
@@ -332,7 +332,8 @@ class CheckoutView(viewsets.mixins.CreateModelMixin, viewsets.GenericViewSet):
                 response['hotel']['checkOut'],
                 int(total_net_float * 100),
                 f"https://photos.hotelbeds.com/giata/medium/{hotel_image.path}" if hotel_image else None,
-                points_remaining
+                points_remaining,
+                referrer=request.META.get('HTTP_REFERER'),
             )
             return Response({
                 'id': checkout_session['id'],
@@ -373,7 +374,7 @@ class CheckoutView(viewsets.mixins.CreateModelMixin, viewsets.GenericViewSet):
         if event['type'] == 'checkout.session.completed':
             session = event['data']['object']
             metadata = session['metadata']
-
+            print(session)
             booking = Booking.objects.get(id=metadata['booking_id'])
 
             if booking.status != Booking.BookingStatus.PENDING:
@@ -381,7 +382,7 @@ class CheckoutView(viewsets.mixins.CreateModelMixin, viewsets.GenericViewSet):
                     'message': 'Booking has already been processed.'
                 }, status=400)
 
-            booking.stripe_id = session['id']
+            booking.stripe_id = session['payment_intent']
             booking.status = Booking.BookingStatus.CONFIRMED
 
             booking.user.account.travel_points += booking.points_earned

@@ -22,7 +22,7 @@ import { createHotelbedsSrcSetFromPath } from '../utils';
 const statusToText = {
   PE: 'Pending',
   CO: 'Confirmed',
-  CA: 'Cancelled',
+  CA: 'Canceled',
   PA: 'Past',
 };
 
