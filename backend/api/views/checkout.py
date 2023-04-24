@@ -382,7 +382,7 @@ class CheckoutView(viewsets.mixins.CreateModelMixin, viewsets.GenericViewSet):
                     'message': 'Booking has already been processed.'
                 }, status=400)
 
-            booking.stripe_id = session['payment_intent']['id']
+            booking.stripe_id = session['payment_intent']
             booking.status = Booking.BookingStatus.CONFIRMED
 
             booking.user.account.travel_points += booking.points_earned
