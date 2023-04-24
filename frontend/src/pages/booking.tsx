@@ -28,7 +28,7 @@ import CardModal from '../components/CardModal';
 const statusToText = {
   PE: 'Pending',
   CO: 'Confirmed',
-  CA: 'Cancelled',
+  CA: 'Canceled',
   PA: 'Past',
 };
 

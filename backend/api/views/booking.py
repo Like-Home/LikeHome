@@ -1,3 +1,4 @@
+import stripe
 from api.models.Booking import Booking
 from api.serializers import BookingSerializer
 from django.utils import timezone
@@ -37,27 +38,48 @@ class BookingView(viewsets.ReadOnlyModelViewSet, viewsets.mixins.UpdateModelMixi
     def cancel(self, request, pk=None):
         """Cancel a booking"""
 
-        booking = self.get_object()
-        if booking.status == Booking.BookingStatus.CANCELLED:
-            return Response({'canceled': False, 'message': 'Booking already cancelled.'}, status=status.HTTP_400_BAD_REQUEST)
+        booking: Booking = self.get_object()
+
+        if not booking:
+            return Response({'message': 'Booking not found.'}, status=status.HTTP_404_NOT_FOUND)
+
+        if booking.status == Booking.BookingStatus.CANCELED:
+            return Response({'canceled': False, 'message': 'Booking already canceled.'}, status=status.HTTP_400_BAD_REQUEST)
 
         if booking.status == Booking.BookingStatus.PAST:
             return Response({'canceled': False, 'message': 'Booking has already past.'}, status=status.HTTP_400_BAD_REQUEST)
 
-        booking.status = Booking.BookingStatus.CANCELLED
+        booking.status = Booking.BookingStatus.CANCELED
         booking.save()
 
         # don't refund if booking is within 24 hours
-        if booking.check_in < timezone.now().date() + timezone.timedelta(hours=24):
+        if booking.check_in <= timezone.now().date() + timezone.timedelta(hours=24):
             return Response({
+                'message': 'Booking canceled but cannot be refunded within 24 hours before check-in.',
                 'canceled': True,
                 'refund': False,
             },
                 status=status.HTTP_200_OK
             )
-        booking.save()
 
-        # TODO: refund the booking
-        #       if booking.overlapping is True then withhold 10% of the refund
+        refund_amount = booking.amount_paid
+        if booking.overlapping:
+            refund_amount = refund_amount * 0.9
+        refund_amount = int(refund_amount * 100)
 
-        return Response({'status': 'booking cancelled'})
+        stripe.Refund.create(
+            payment_intent=booking.stripe_id,
+            amount=refund_amount,
+            reason='requested_by_customer',
+            metadata={
+                'booking_id': booking.id
+            }
+        )
+
+        return Response({
+            'message': 'Booking canceled.',
+            'canceled': True,
+            'refund': True,
+        },
+            status=status.HTTP_200_OK
+        )

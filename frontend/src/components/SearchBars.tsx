@@ -110,8 +110,8 @@ export default function SearchBars(props: SearchPageParams & SearchBarProps) {
         <Button
           sx={{ fontSize: 20, width: '100%', height: '100%' }}
           onClick={() => {
-            if (!location || !checkin || !checkout) {
-              // TODO: Alert
+            if ((!props.noLocation && !location) || !checkin || !checkout) {
+              console.error('Missing required fields');
               return;
             }
             if (props.onSearch) {

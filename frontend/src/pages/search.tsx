@@ -23,6 +23,7 @@ import { getOffersByLocation, OfferHotel } from '../api/search';
 import Spinner from '../components/Spinner';
 import PriceSlider from '../components/controls/PriceSlider';
 import { nightsFromDates } from '../api/hotel';
+import { usePageParamsObject } from '../hooks';
 
 type ZoneInfo = {
   code: number | string;
@@ -43,12 +44,8 @@ function pageParamsAreInvalid(params: setOfferHotelsArgsProps) {
 }
 
 export default function SearchPage() {
-  const [pageParams, setPageParams] = useSearchParams();
-  const [params, setParams] = useState<SearchPageParams>(Object.fromEntries([...pageParams]) as SearchPageParams);
+  const [params, setParams] = usePageParamsObject<SearchPageParams>();
 
-  useEffect(() => {
-    setParams(Object.fromEntries([...pageParams]) as SearchPageParams);
-  }, [pageParams]);
   const location = JSON.parse(atob(params.location || ''));
   const [offerHotelsArgs, setOfferHotelsArgs] = useState<setOfferHotelsArgsProps>({
     destinationCode: location?.code,
@@ -109,13 +106,19 @@ export default function SearchPage() {
       };
     }
 
-    const searchParams = new URLSearchParams();
-    searchParams.set('location', btoa(JSON.stringify(kwargs.location)));
-    searchParams.set('checkin', kwargs.checkin);
-    searchParams.set('checkout', kwargs.checkout);
-    searchParams.set('guests', kwargs.guests);
-    searchParams.set('rooms', kwargs.rooms);
-    setPageParams(searchParams);
+    // const searchParams = new URLSearchParams();
+    // searchParams.set('location', btoa(JSON.stringify(kwargs.location)));
+    // searchParams.set('checkin', kwargs.checkin);
+    // searchParams.set('checkout', kwargs.checkout);
+    // searchParams.set('guests', kwargs.guests);
+    // searchParams.set('rooms', kwargs.rooms);
+    setParams({
+      location: btoa(JSON.stringify(kwargs.location)),
+      checkin: kwargs.checkin,
+      checkout: kwargs.checkout,
+      guests: kwargs.guests,
+      rooms: kwargs.rooms,
+    });
 
     setNights(nightsFromDates(new Date(kwargs.checkin), new Date(kwargs.checkout)));
     setAdults(parseInt(kwargs.guests, 10));
