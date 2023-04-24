@@ -1,14 +1,32 @@
 import { createRef, useState } from 'react';
 import IconButton from '@mui/material/IconButton';
 import { useTheme } from '@mui/material/styles';
-import { Avatar, Button, ButtonProps, Menu, MenuItem, Stack } from '@mui/material';
+import {
+  CardHeader,
+  CardContent,
+  CardActions,
+  Divider,
+  Box,
+  Avatar,
+  Button,
+  ButtonProps,
+  Menu,
+  MenuItem,
+  Stack,
+  Typography,
+  Chip,
+} from '@mui/material';
 import { useRecoilValue } from 'recoil';
 import { useNavigate } from 'react-router-dom';
+import { Info } from '@mui/icons-material';
 import InputCSRF from '../api/csrf';
 import userAtom from '../recoil/user';
 import './styles.scss';
 import config from '../config';
 import logoSvg from '../assets/logo.svg';
+import { formatCurrency } from '../utils';
+import CardModal from './CardModal';
+import { User } from '../api/types';
 
 function NavButton(props?: ButtonProps) {
   return <Button variant="text" sx={{ color: '#9b99ff' }} {...props} />;
@@ -31,42 +49,107 @@ const makeLink = (Component: ComponentType) => {
 const LinkButton = makeLink(NavButton);
 const LinkMenuItem = makeLink(MenuItem);
 
-function AccountMenu() {
+function AccountMenu({ navbarEl, user }: { navbarEl: React.RefObject<HTMLElement>; user: User }) {
   const theme = useTheme();
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const ref = createRef<HTMLFormElement>();
+  const [open, setOpen] = useState(false);
+  const toggleOpen = () => setOpen((value) => !value);
 
   return (
     <>
       <IconButton
-        onClick={(e: Event | React.SyntheticEvent) => setAnchorEl(e.target as HTMLElement)}
+        onClick={(e: Event | React.SyntheticEvent) => {
+          // console.log(e.target);
+          setAnchorEl(navbarEl.current);
+        }}
         sx={{ p: 0.5 }}
         size="large"
       >
         <Avatar />
       </IconButton>
-      <Menu anchorEl={anchorEl} open={!!anchorEl} onClose={() => setAnchorEl(null)}>
-        <LinkMenuItem to="/bookings">My Bookings</LinkMenuItem>
-        <LinkMenuItem to="/rewards">Rewards</LinkMenuItem>
-        <LinkMenuItem to="/me">Account</LinkMenuItem>
-        <form ref={ref} action="/accounts/logout/" method="post">
-          <InputCSRF />
-          <MenuItem
-            sx={{
-              backgroundColor: theme.palette.error.main,
-            }}
-            onClick={() => ref.current && ref.current.submit()}
-          >
-            Log out
-          </MenuItem>
-        </form>
+      <Menu
+        anchorEl={anchorEl}
+        anchorOrigin={{
+          vertical: 'bottom',
+          horizontal: 'right',
+        }}
+        transformOrigin={{
+          vertical: 'top',
+          horizontal: 'right',
+        }}
+        open={!!anchorEl}
+        onClose={() => setAnchorEl(null)}
+      >
+        <Stack spacing={1}>
+          <Stack alignItems={'center'} spacing={1} sx={{ paddingY: 2, paddingX: 4 }}>
+            <Typography variant="h6">Hi {user.first_name}</Typography>
+            <Typography variant="body1">{user.email}</Typography>
+            <Box>
+              <Chip label="Member" />
+            </Box>
+            {user.travel_points && (
+              <Typography
+                variant="subtitle1"
+                sx={{
+                  fontWeight: 'bold',
+                }}
+              >
+                {formatCurrency(user.travel_points / 1000)}
+              </Typography>
+            )}
+            <Stack direction="row" alignItems={'center'} spacing={1}>
+              <Typography variant="subtitle2">Point value</Typography>
+              <IconButton onClick={toggleOpen}>
+                <Info fontSize="small"></Info>
+              </IconButton>
+            </Stack>
+          </Stack>
+          <Divider />
+          <LinkMenuItem to="/bookings">My Bookings</LinkMenuItem>
+          <LinkMenuItem to="/rewards">Rewards</LinkMenuItem>
+          <LinkMenuItem to="/me">Account</LinkMenuItem>
+          <Divider />
+          <form ref={ref} action="/accounts/logout/" method="post">
+            <InputCSRF />
+            <MenuItem
+              sx={{
+                backgroundColor: theme.palette.error.main,
+              }}
+              onClick={() => ref.current && ref.current.submit()}
+            >
+              Log out
+            </MenuItem>
+          </form>
+        </Stack>
       </Menu>
+      {/* model to explain how reward points work */}
+      <CardModal open={open} onClose={toggleOpen}>
+        <CardHeader title="Reward Points" />
+        <CardContent>
+          <Stack spacing={1}>
+            <Typography variant="body1">
+              Reward points are earned by booking hotels through LikeHome. You can use them to get discounts on future
+              bookings.
+            </Typography>
+            <Typography variant="body1">1 point is worth {formatCurrency(0.01)}.</Typography>
+          </Stack>
+        </CardContent>
+        <CardActions
+          sx={{
+            justifyContent: 'flex-end',
+          }}
+        >
+          <Button onClick={toggleOpen}>Close</Button>
+        </CardActions>
+      </CardModal>
     </>
   );
 }
 
 export default function Navbar() {
   const user = useRecoilValue(userAtom);
+  const navbarEl = createRef<HTMLElement>();
 
   return (
     <nav
@@ -74,6 +157,7 @@ export default function Navbar() {
       style={{
         maxWidth: config.maxWidth,
       }}
+      ref={navbarEl}
     >
       <Stack alignItems="center" direction="row" spacing={1}>
         <img
@@ -89,7 +173,7 @@ export default function Navbar() {
         <LinkButton to="/about">About Us</LinkButton>
         <LinkButton to="/hotels">Hotels</LinkButton>
         {user ? (
-          <AccountMenu />
+          <AccountMenu user={user} navbarEl={navbarEl} />
         ) : (
           <form action="/accounts/google/login/?process=login" method="post">
             <InputCSRF />

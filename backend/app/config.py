@@ -69,7 +69,7 @@ GOOGLE_MAPS_API_KEY = getenv('GOOGLE_MAPS_API_KEY', required=PRODUCTION)
 GOOGLE_MAPS_API_SECERT = getenv('GOOGLE_MAPS_API_SECERT', required=PRODUCTION)
 MONEY_SAVER_MODE = getenv('MONEY_SAVER_MODE', default=True, boolean=True)
 
-BASE_URL = getenv('BASE_URL', default='http://localhost:8000',
+BASE_URL = getenv('BASE_URL', default='http://localhost:8080',
                   required=PRODUCTION)
 
 SECRET_KEY = getenv(

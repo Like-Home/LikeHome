@@ -199,6 +199,7 @@ class CheckoutView(viewsets.mixins.CreateModelMixin, viewsets.GenericViewSet):
 
         conflicting_booking_found = Booking.objects.filter(
             user=request.user,
+            status=Booking.BookingStatus.CONFIRMED,
             check_in__lt=check_out_date,
             check_out__gt=check_in_date
         ).exists()

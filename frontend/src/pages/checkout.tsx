@@ -2,7 +2,6 @@ import React, { ChangeEvent, useEffect, useState } from 'react';
 import {
   Divider,
   Box,
-  Modal,
   Button,
   Stack,
   Typography,
@@ -12,6 +11,8 @@ import {
   CardHeader,
   Popover,
   Checkbox,
+  CircularProgress,
+  Backdrop,
 } from '@mui/material';
 import { useParams } from 'react-router-dom';
 import { useRecoilValue } from 'recoil';
@@ -23,14 +24,7 @@ import { checkoutDetails } from '../recoil/checkout/atom';
 import TextInput from '../components/controls/TextInput';
 import { formatAddressFromHotel, createHotelbedsSrcSetFromPath, formatCurrency } from '../utils';
 import { nightsFromDates } from '../api/hotel';
-
-const style = {
-  position: 'absolute',
-  top: '50%',
-  left: '50%',
-  transform: 'translate(-50%, -50%)',
-  maxWidth: 600,
-};
+import CardModal from '../components/CardModal';
 
 export default function CheckoutPage() {
   const { rateKey } = useParams();
@@ -40,9 +34,13 @@ export default function CheckoutPage() {
   const [lastName, setLastName] = useState('Cardoza');
   const [email, setEmail] = useState('noahcardoza@gmail.com');
   const [phone, setPhone] = useState('1234567890');
+  const [checkoutLoading, setCheckoutLoading] = useState(false);
 
   const [open, setOpen] = useState(false);
-  const handleClose = () => setOpen(false);
+  const handleClose = () => {
+    setOpen(false);
+    setCheckoutLoading(false);
+  };
   const nights = nightsFromDates(
     new Date(checkoutDetailsState.hotel.checkIn),
     new Date(checkoutDetailsState.hotel.checkOut),
@@ -69,6 +67,7 @@ export default function CheckoutPage() {
     try {
       const wasOpen = open;
       setOpen(false);
+      setCheckoutLoading(true);
 
       const data = await createStripeCheckout({
         rate_key: rateKey,
@@ -180,8 +179,6 @@ export default function CheckoutPage() {
                 <Divider></Divider>
               </Grid>
               <Grid xs={12} md={9}>
-                {/* <Card>
-                  <CardContent> */}
                 <Stack direction="row" justifyContent="space-between">
                   {checkoutDetailsState.rewards ? (
                     <Stack>
@@ -215,8 +212,6 @@ export default function CheckoutPage() {
                     <Stack></Stack>
                   )}
                 </Stack>
-                {/* </CardContent>
-                </Card> */}
               </Grid>
               <Grid xs={12} md={3}>
                 <Stack justifyContent="end" alignItems="end" sx={{ height: '100%' }}>
@@ -246,31 +241,29 @@ export default function CheckoutPage() {
                 </Stack>
               </Grid>
             </Grid>
+            <div>
+              <Backdrop sx={{ color: 'primary.main' }} open={checkoutLoading}>
+                <CircularProgress color="inherit" />
+              </Backdrop>
+            </div>
           </Stack>
-          <Modal
-            open={open}
-            onClose={handleClose}
-            aria-labelledby="modal-modal-title"
-            aria-describedby="modal-modal-description"
-          >
-            <Card sx={style}>
-              <CardHeader title="Warning" />
-              <CardContent>
-                <Typography variant="body1">
-                  You already have an existing booking that overlaps with this one. If you are sure you want to make
-                  this booking you can but there is a 10% nonrefundable fee for canceling overlapping bookings.
-                </Typography>
-              </CardContent>
-              <CardActions>
-                <Stack direction="row" justifyContent="space-between" sx={{ width: '100%' }}>
-                  <Button onClick={handleClose} color="error">
-                    Cancel
-                  </Button>
-                  <Button onClick={onCheckout}>Confirm Reservation</Button>
-                </Stack>
-              </CardActions>
-            </Card>
-          </Modal>
+          <CardModal open={open} onClose={handleClose}>
+            <CardHeader title="Warning" />
+            <CardContent>
+              <Typography variant="body1">
+                You already have an existing booking that overlaps with this one. If you are sure you want to make this
+                booking you can but there is a 10% nonrefundable fee for canceling overlapping bookings.
+              </Typography>
+            </CardContent>
+            <CardActions>
+              <Stack direction="row" justifyContent="space-between" sx={{ width: '100%' }}>
+                <Button onClick={handleClose} color="error">
+                  Cancel
+                </Button>
+                <Button onClick={onCheckout}>Confirm Reservation</Button>
+              </Stack>
+            </CardActions>
+          </CardModal>
         </Stack>
         <Stack className="card" direction="column" spacing={2} flex={1}>
           <img

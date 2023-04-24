@@ -11,8 +11,6 @@ import {
   ListItem,
   ListItemAvatar,
   ListItemText,
-  Modal,
-  Card,
   OutlinedInput,
   List,
   Stack,
@@ -26,6 +24,7 @@ import { Booking } from '../api/types';
 import { cancelBooking, editBooking } from '../api/bookings';
 import { bookingsSelector } from '../recoil/bookings/atom';
 import { createHotelbedsSrcSetFromPath } from '../utils';
+import CardModal from '../components/CardModal';
 
 function EditBookingModal({
   booking,
@@ -64,41 +63,31 @@ function EditBookingModal({
   };
 
   return (
-    <Modal open={open} onClose={handleClose}>
-      <Card
-        sx={{
-          position: 'absolute',
-          top: '50%',
-          left: '50%',
-          transform: 'translate(-50%, -50%)',
-          maxWidth: 600,
-        }}
-      >
-        <CardHeader title="Edit Booking" />
-        <CardContent>
-          <Stack spacing={3}>
-            <Typography id="modal-modal-description">Edit your check in information below.</Typography>
-            <Stack direction="row" spacing={2}>
-              <FormControl variant="outlined">
-                <InputLabel htmlFor="firstName">First Name</InputLabel>
-                <OutlinedInput label="firstName" value={firstName} onChange={handleFirstNameChange} />
-              </FormControl>
-              <FormControl variant="outlined">
-                <InputLabel htmlFor="lastName">Last Name</InputLabel>
-                <OutlinedInput label="lastName" value={lastName} onChange={handleLastNameChange} />
-              </FormControl>
-            </Stack>
+    <CardModal open={open} onClose={handleClose}>
+      <CardHeader title="Edit Booking" />
+      <CardContent>
+        <Stack spacing={3}>
+          <Typography id="modal-modal-description">Edit your check in information below.</Typography>
+          <Stack direction="row" spacing={2}>
             <FormControl variant="outlined">
-              <InputLabel htmlFor="phoneNumber">Phone Number</InputLabel>
-              <OutlinedInput label="phoneNumber" value={phone} onChange={handlePhoneChange} />
+              <InputLabel htmlFor="firstName">First Name</InputLabel>
+              <OutlinedInput label="firstName" value={firstName} onChange={handleFirstNameChange} />
             </FormControl>
-            <Stack direction="row-reverse">
-              <Button onClick={handleSubmit}>Submit</Button>
-            </Stack>
+            <FormControl variant="outlined">
+              <InputLabel htmlFor="lastName">Last Name</InputLabel>
+              <OutlinedInput label="lastName" value={lastName} onChange={handleLastNameChange} />
+            </FormControl>
           </Stack>
-        </CardContent>
-      </Card>
-    </Modal>
+          <FormControl variant="outlined">
+            <InputLabel htmlFor="phoneNumber">Phone Number</InputLabel>
+            <OutlinedInput label="phoneNumber" value={phone} onChange={handlePhoneChange} />
+          </FormControl>
+          <Stack direction="row-reverse">
+            <Button onClick={handleSubmit}>Submit</Button>
+          </Stack>
+        </Stack>
+      </CardContent>
+    </CardModal>
   );
 }
 
@@ -127,27 +116,21 @@ function BookingItem({ booking }: { booking: Booking }) {
   return (
     <ListItem
       secondaryAction={
-        <>
-          <Button
-            variant="contained"
-            component={Link}
-            to={linkToDetails}
-            sx={{
-              marginBlockEnd: theme.spacing(1),
-              display: 'block',
-              textAlign: 'center',
-            }}
-          >
+        <Stack spacing={1}>
+          <Button variant="contained" component={Link} to={linkToDetails}>
             View
           </Button>
-          <Button onClick={handleOpen} variant="contained" color="error" disabled={isTooLateToCancel}>
-            Edit
-          </Button>
-          <EditBookingModal booking={booking} open={open} handleClose={handleClose} />
-          <Button variant="contained" color="error" disabled={isTooLateToCancel} onClick={onCancel}>
-            Cancel
-          </Button>
-        </>
+          <Stack direction="row" spacing={1}>
+            <Button onClick={handleOpen} variant="contained" color="error">
+              {/* <Button onClick={handleOpen} variant="contained" color="error" disabled={isTooLateToCancel}> */}
+              Edit
+            </Button>
+            <EditBookingModal booking={booking} open={open} handleClose={handleClose} />
+            <Button variant="contained" color="error" disabled={isTooLateToCancel} onClick={onCancel}>
+              Cancel
+            </Button>
+          </Stack>
+        </Stack>
       }
     >
       <ListItemAvatar>
@@ -164,7 +147,7 @@ function BookingItem({ booking }: { booking: Booking }) {
       </ListItemAvatar>
       <ListItemText
         primary={
-          <Typography variant="h4" color="text.primary">
+          <Typography variant="h6" color="text.primary">
             {booking.hotel.name}
           </Typography>
         }
@@ -218,7 +201,7 @@ function BookingsList() {
 
 export default function BookingsPage() {
   return (
-    <main className="card push-center" style={{ marginTop: 50, maxWidth: 900 }}>
+    <main className="card push">
       <h1>My Bookings</h1>
       <BookingsList />
     </main>
