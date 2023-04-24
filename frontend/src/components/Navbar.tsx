@@ -94,7 +94,7 @@ function AccountMenu({ navbarEl, user }: { navbarEl: React.RefObject<HTMLElement
                   fontWeight: 'bold',
                 }}
               >
-                {formatCurrency(user.travel_points / 1000)}
+                {formatCurrency(user.travel_points / 100)}
               </Typography>
             )}
             <Stack direction="row" alignItems={'center'} spacing={1}>

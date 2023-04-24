@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Link, useParams } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 // eslint-disable-next-line camelcase
 import { useRecoilValue, useRecoilRefresher_UNSTABLE } from 'recoil';
 import {
@@ -289,6 +289,4 @@ export default function BookingPage() {
       </CardModal>
     </>
   );
-
-  return <div>{/* <pre>bookingId: {JSON.stringify(booking, null, 2)} </pre> */}</div>;
 }
