@@ -16,6 +16,10 @@ from .modules.google import sign_url
 class UserSerializer(serializers.ModelSerializer):
     travel_points = serializers.IntegerField(
         read_only=True, source='account.travel_points')
+    image = serializers.SerializerMethodField()
+
+    def get_image(self, instance):
+        return instance.socialaccount_set.first().get_avatar_url()
 
     class Meta:
         exclude = ('password',)

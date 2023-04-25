@@ -292,26 +292,27 @@ class CheckoutView(viewsets.mixins.CreateModelMixin, viewsets.GenericViewSet):
             "remark": "Booking remarks are to be written here."
         }
 
-        response2 = hotelbeds.post('/hotel-api/1.2/bookings', json=payload)
+        # random 500 errors
+        # response2 = hotelbeds.post('/hotel-api/1.2/bookings', json=payload)
 
-        if response2.status_code == 500:
-            body = response2.json()
-            if body['error']['message'].startswith('Price has changed'):
-                raise serializers.ValidationError(
-                    {
-                        'price': 'PRICE_CHANGED'
-                    }
-                )
-            else:
-                print('error', body)
-                raise serializers.ValidationError(
-                    {
-                        'price': 'UNKNOWN_ERROR'
-                    }
-                )
+        # if response2.status_code == 500:
+        #     body = response2.json()
+        #     if body['error']['message'].startswith('Price has changed'):
+        #         raise serializers.ValidationError(
+        #             {
+        #                 'price': 'PRICE_CHANGED'
+        #             }
+        #         )
+        #     else:
+        #         print('error', body)
+        #         raise serializers.ValidationError(
+        #             {
+        #                 'price': 'UNKNOWN_ERROR'
+        #             }
+        #         )
 
-        print(response2)
-        print(response2.json())
+        # print(response2)
+        # print(response2.json())
 
         total_net_float = total_net_float_before_tax * 1.1
         booking = Booking(

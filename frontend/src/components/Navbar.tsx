@@ -65,7 +65,7 @@ function AccountMenu({ navbarEl, user }: { navbarEl: React.RefObject<HTMLElement
         sx={{ p: 0.5 }}
         size="large"
       >
-        <Avatar />
+        <Avatar src={user.image || undefined} />
       </IconButton>
       <Menu
         anchorEl={anchorEl}

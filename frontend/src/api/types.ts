@@ -138,6 +138,7 @@ export type Booking = BookingPutArgs & {
 
 export type User = {
   username: string;
+  image: string;
   email: string;
   date_joined: string;
   first_name: string;
