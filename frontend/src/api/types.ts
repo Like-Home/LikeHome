@@ -131,8 +131,9 @@ export type Booking = BookingPutArgs & {
   check_out: string;
   refund_amount: number;
   cancelation_status: BookingCancelationStatusEnum;
-  rebooked_to: Booking;
-  rebooked_from: Booking;
+  rebooked_to?: number; // Booking;
+  rebooked_from?: number; // Booking;
+  canceled_at?: string; // Booking;
 };
 
 export type User = {

@@ -54,10 +54,11 @@ class Booking(models.Model):
     user = ForeignKey(User, on_delete=models.CASCADE)
     check_in = DateField()
     check_out = DateField()
-    created_at = DateTimeField(default=now, editable=False)
     overlapping = models.BooleanField(default=False)
     rebooked_to = models.OneToOneField(
         'self', on_delete=models.CASCADE, null=True, default=None, related_name='rebooked_from')
+    created_at = DateTimeField(default=now, editable=False)
+    canceled_at = DateTimeField(null=True, default=None)
 
     def cancel(self, full_refund=False, new_status=BookingStatus.CANCELED):
         if self.status == self.BookingStatus.CANCELED:
@@ -107,6 +108,8 @@ class Booking(models.Model):
             )
             self.stripe_refund_id = refund['id']
 
+        self.canceled_at = timezone.now()
+        self.points_earned = 0
         self.save()
 
         return self.cancelation_status

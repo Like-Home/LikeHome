@@ -108,6 +108,8 @@ class BookingSerializer(serializers.ModelSerializer):
     image = serializers.SerializerMethodField()
     hotel = HotelbedsHotelSerializerSimple(read_only=True)
     email = serializers.EmailField()
+    rebooked_from = serializers.IntegerField(
+        read_only=True, allow_null=True, source='rebooked_from.id')
     # room = serializers.SerializerMethodField()
 
     class Meta:
@@ -134,6 +136,7 @@ class BookingSerializer(serializers.ModelSerializer):
             'check_in',
             'check_out',
             'created_at',
+            'canceled_at',
         )
         model = Booking
 
