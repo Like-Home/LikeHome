@@ -28,7 +28,7 @@ import SearchBars, { SearchPageParams, onSearchProps } from '../components/Searc
 import { getOffersByLocation, OfferHotel } from '../api/search';
 import Spinner from '../components/Spinner';
 import PriceSlider from '../components/controls/PriceSlider';
-import { nightsFromDates } from '../api/hotel';
+import { nightsFromDates, priceBreakdown } from '../api/hotel';
 import { usePageParamsObject } from '../hooks';
 
 type ZoneInfo = {
@@ -92,9 +92,15 @@ export default function SearchPage() {
   // update price range based on minRate and maxRate
   useEffect(() => {
     if (!results.length) return;
-    const minRates = results.map((h) => h.minRate);
-    const minRate = Math.min(...minRates);
-    const maxRate = Math.max(...minRates);
+
+    const minRates = results.map((h) => priceBreakdown(h.minRate, nights, adults).perNightPerAdult);
+
+    let minRate = Math.min(...minRates);
+    // round to nearest 10
+    minRate = Math.floor(minRate / 10) * 10;
+    let maxRate = Math.max(...minRates);
+    // round to nearest 10
+    maxRate = Math.ceil(maxRate / 10) * 10;
 
     setPriceRangeMin(minRate);
     setPriceRangeMax(maxRate);
@@ -234,9 +240,10 @@ export default function SearchPage() {
     let filteredList = sorted;
 
     // Filter by price
-    filteredList = filteredList.filter(
-      (hotel) => Number(hotel.minRate) >= priceRange[0] && Number(hotel.minRate) <= priceRange[1],
-    );
+    filteredList = filteredList.filter((hotel) => {
+      const { perNightPerAdult } = priceBreakdown(hotel.minRate, nights, adults);
+      return perNightPerAdult >= priceRange[0] && perNightPerAdult <= priceRange[1];
+    });
 
     // Filter by zone
     if (zone) filteredList = filteredList.filter((hotel) => hotel.zoneName === zone);
