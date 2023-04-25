@@ -108,14 +108,21 @@ class BookingSerializer(serializers.ModelSerializer):
     image = serializers.SerializerMethodField()
     hotel = HotelbedsHotelSerializerSimple(read_only=True)
     email = serializers.EmailField()
+    # room = serializers.SerializerMethodField()
 
     class Meta:
         fields = '__all__'
         read_only_fields = (
             'image',
+            'refund_amount',
+            'rooms',
+            'room_name',
+            'cancelation_status',
+            'rebooked_to',
+            'rebooked_from',
             'hotel',
             'rate_key',
-            'stripe_id',
+            'stripe_payment_intent_id',
             'hotel',
             'room_code',
             'amount_paid',
@@ -129,6 +136,13 @@ class BookingSerializer(serializers.ModelSerializer):
             'created_at',
         )
         model = Booking
+
+    # def get_room(self, instance):
+    #     room = HotelbedsHotelRoom.objects.filter(
+    #         hotel=instance.hotel, roomCode=instance.room_code
+    #     ).first()
+
+    #     return HotelbedsHotelRoomSerializer(room).data
 
     def get_image(self, instance):
         image = HotelbedsHotelImage.objects.filter(

@@ -76,7 +76,9 @@ function jsonToFormData(body: JsonFormData): FormData {
 
   // eslint-disable-next-line no-restricted-syntax
   for (const key in body) {
-    formData.append(key, body[key]);
+    if (body[key] !== undefined) {
+      formData.append(key, body[key]);
+    }
   }
 
   return formData;

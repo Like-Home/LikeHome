@@ -18,13 +18,7 @@ import { useRecoilValue, useRecoilRefresher_UNSTABLE } from 'recoil';
 import { Booking } from '../api/types';
 import { bookingsSelector } from '../recoil/bookings/atom';
 import { createHotelbedsSrcSetFromPath } from '../utils';
-
-const statusToText = {
-  PE: 'Pending',
-  CO: 'Confirmed',
-  CA: 'Canceled',
-  PA: 'Past',
-};
+import { statusToText } from '../enums';
 
 function BookingItem({ booking }: { booking: Booking }) {
   const linkToDetails = `/booking/${booking.id}`;

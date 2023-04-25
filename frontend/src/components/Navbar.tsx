@@ -59,7 +59,7 @@ function AccountMenu({ navbarEl, user }: { navbarEl: React.RefObject<HTMLElement
   return (
     <>
       <IconButton
-        onClick={(e) => {
+        onClick={() => {
           setAnchorEl(navbarEl.current);
         }}
         sx={{ p: 0.5 }}
@@ -132,6 +132,7 @@ function AccountMenu({ navbarEl, user }: { navbarEl: React.RefObject<HTMLElement
               bookings.
             </Typography>
             <Typography variant="body1">1 point is worth {formatCurrency(0.01)}.</Typography>
+            <Typography variant="body1">When spent, points are nonrefundable.</Typography>
           </Stack>
         </CardContent>
         <CardActions

@@ -26,6 +26,7 @@ import TextInput from '../components/controls/TextInput';
 import { formatAddressFromHotel, createHotelbedsSrcSetFromPath, formatCurrency } from '../utils';
 import { nightsFromDates } from '../api/hotel';
 import CardModal from '../components/CardModal';
+import { bookingById } from '../recoil/bookings/atom';
 
 export default function CheckoutPage() {
   const { rateKey } = useParams();
@@ -34,11 +35,28 @@ export default function CheckoutPage() {
   const stripeCheckoutWasCanceled = searchParams.get('stripe') === 'canceled';
 
   const checkoutDetailsState = useRecoilValue(checkoutDetails(rateKey || ''));
-  const [firstName, setFirstName] = useState('Noah');
-  const [lastName, setLastName] = useState('Cardoza');
-  const [email, setEmail] = useState('noahcardoza@gmail.com');
-  const [phone, setPhone] = useState('1234567890');
+  const [firstName, setFirstName] = useState('');
+  // const [firstName, setFirstName] = useState('Noah');
+  const [lastName, setLastName] = useState('');
+  // const [lastName, setLastName] = useState('Cardoza');
+  const [email, setEmail] = useState('');
+  // const [email, setEmail] = useState('noahcardoza@gmail.com');
+  const [phone, setPhone] = useState('');
+  // const [phone, setPhone] = useState('1234567890');
   const [checkoutLoading, setCheckoutLoading] = useState(false);
+
+  const rebookingId = searchParams.get('rebooking');
+  const rebookingSelector = bookingById(rebookingId !== null ? rebookingId : null);
+  const rebooking = useRecoilValue(rebookingSelector);
+
+  useEffect(() => {
+    if (rebooking !== null) {
+      setFirstName(rebooking.first_name);
+      setLastName(rebooking.last_name);
+      setEmail(rebooking.email);
+      setPhone(rebooking.phone);
+    }
+  }, [rebooking]);
 
   const [open, setOpen] = useState(false);
   const handleClose = () => {
@@ -73,6 +91,10 @@ export default function CheckoutPage() {
       setOpen(false);
       setCheckoutLoading(true);
 
+      if (!termsAccepted) {
+        return;
+      }
+
       const data = await createStripeCheckout({
         rate_key: rateKey,
         first_name: firstName,
@@ -81,6 +103,7 @@ export default function CheckoutPage() {
         phone,
         force: wasOpen ? 'true' : 'false',
         apply_point_balance: applyDiscount ? 'true' : 'false',
+        rebooking_id: rebookingId || undefined,
       });
 
       setOpen(false);
@@ -225,7 +248,7 @@ export default function CheckoutPage() {
                 <Stack justifyContent="end" alignItems="end" sx={{ height: '100%' }}>
                   <Box onMouseEnter={handlePopoverOpen} onMouseLeave={handlePopoverClose}>
                     <Button onClick={onCheckout} disabled={!termsAccepted}>
-                      Checkout
+                      {rebooking ? 'Rebook' : 'Checkout'}
                     </Button>
                   </Box>
                   <Popover
@@ -322,8 +345,9 @@ export default function CheckoutPage() {
               </Stack>
             </CardContent>
           </Card>
-          <Typography variant="h6">Breakdown</Typography>
           <Divider></Divider>
+          <Typography variant="h6">Breakdown</Typography>
+
           <Stack spacing={1}>
             <Stack direction="row" justifyContent="space-between" sx={{ width: '100%' }}>
               <Typography variant="body1">
@@ -361,6 +385,21 @@ export default function CheckoutPage() {
               </Typography>
             </Stack>
           </Stack>
+          {rebooking && (
+            <>
+              <Divider></Divider>
+              <Typography variant="h6">Refund</Typography>
+              <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ width: '100%' }}>
+                <Stack>
+                  <Typography variant="body1">Rebooking Refund</Typography>
+                  <Typography variant="body2">xxxx xxxx xxxx 4242</Typography>
+                </Stack>
+                <Typography variant="body1" component="span" color="success.main">
+                  {formatCurrency(rebooking.amount_paid)}
+                </Typography>
+              </Stack>
+            </>
+          )}
         </Stack>
       </Stack>
     </Stack>

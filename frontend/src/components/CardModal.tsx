@@ -10,10 +10,10 @@ const style: SxProps<Theme> = {
   maxWidth: '600px',
   boxSizing: 'border-box',
   width: 'calc(100% - 4em)', // simulate margin
+  '&:focus': {
+    outline: 'none',
+  },
 };
-// const { children }: ModalProps = {
-//   children: null,
-// };
 function CardModal({
   children,
   cardSx = {},

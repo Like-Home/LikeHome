@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, Link } from 'react-router-dom';
 // eslint-disable-next-line camelcase
 import { useRecoilValue, useRecoilRefresher_UNSTABLE } from 'recoil';
 import {
@@ -18,25 +18,14 @@ import {
   List,
 } from '@mui/material';
 import moment from 'moment';
+import slugify from 'slugify';
 import { bookingById } from '../recoil/bookings/atom';
 import { createHotelbedsSrcSetFromPath, formatAddressFromHotel, formatCurrency } from '../utils';
 import { nightsFromDates } from '../api/hotel';
 import { Booking } from '../api/types';
 import { cancelBooking, editBooking } from '../api/bookings';
 import CardModal from '../components/CardModal';
-
-const statusToText = {
-  PE: 'Pending',
-  CO: 'Confirmed',
-  CA: 'Canceled',
-  PA: 'Past',
-};
-
-const phoneTypeToText = {
-  PHONEBOOKING: 'Booking',
-  PHONEHOTEL: 'Hotel Lobby',
-  FAXNUMBER: 'Fax',
-};
+import { statusToText, phoneTypeToText } from '../enums';
 
 function EditBookingModal({
   booking,
@@ -109,9 +98,10 @@ export default function BookingPage() {
   if (!bookingId) {
     return <div>Booking not found!</div>;
   }
+
   const bookingSelector = bookingById(bookingId);
   const refreshBookingAtom = useRecoilRefresher_UNSTABLE(bookingSelector);
-  const booking = useRecoilValue(bookingSelector);
+  const booking = useRecoilValue(bookingSelector) as unknown as Booking;
 
   const [editBookingOpen, setEditBookingOpen] = useState(false);
   const handleEditBookingOpen = () => setEditBookingOpen(true);
@@ -265,7 +255,17 @@ export default function BookingPage() {
             {!hasBeenCanceled && (
               <>
                 <Divider />
-                <Button onClick={onRebooking}>Re-book</Button>
+                <Button
+                  onClick={onRebooking}
+                  component={Link}
+                  to={`/hotel/${booking.hotel.code}/${slugify(booking.hotel.name).toLowerCase()}/?checkin=${
+                    booking.check_in
+                  }&checkout=${booking.check_out}&guests=${booking.adults}&rooms=${booking.rooms}&rebooking=${
+                    booking.id
+                  }`}
+                >
+                  Re-book
+                </Button>
                 <Button color="error" onClick={handleCancelBookingOpen}>
                   Cancel
                 </Button>
