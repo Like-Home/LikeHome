@@ -1,5 +1,6 @@
 import { Card, Stack, Button, Typography, Box } from '@mui/material';
 import { CalendarMonth, Discount, ShieldMoon } from '@mui/icons-material';
+import { Link } from 'react-router-dom';
 import SearchBars from '../components/SearchBars';
 
 const iconStyle = {
@@ -13,7 +14,7 @@ const cards = [
     icon: <CalendarMonth sx={iconStyle} />,
     footer: () => (
       <Box>
-        <Button variant="contained" color="primary">
+        <Button variant="contained" color="primary" component={Link} to="/auth">
           Unlock instant savings
         </Button>
       </Box>
@@ -26,10 +27,10 @@ const cards = [
     icon: <Discount sx={iconStyle} />,
     footer: () => (
       <Stack direction="row" spacing={2}>
-        <Button variant="contained" color="primary">
+        <Button variant="contained" color="primary" component={Link} to="/auth">
           Sign up, it&lsquo;s free
         </Button>
-        <Button variant="contained" color="primary">
+        <Button variant="contained" color="primary" component={Link} to="/auth">
           Sign in
         </Button>
       </Stack>
@@ -77,7 +78,9 @@ export default function HomePage() {
                 <Typography variant="body1">
                   As a member, you save an average of 10% on thousands of hotels, so take that spontaneous trip.
                 </Typography>
-                <Button>Access Member Prices</Button>
+                <Button component={Link} to="/auth">
+                  Access Member Prices
+                </Button>
               </Stack>
             </Stack>
           </Stack>
