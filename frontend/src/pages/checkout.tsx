@@ -27,22 +27,20 @@ import { formatAddressFromHotel, createHotelbedsSrcSetFromPath, formatCurrency }
 import { nightsFromDates } from '../api/hotel';
 import CardModal from '../components/CardModal';
 import { bookingById } from '../recoil/bookings/atom';
+import userAtom from '../recoil/user';
 
 export default function CheckoutPage() {
   const { rateKey } = useParams();
   const [searchParams] = useSearchParams();
+  const user = useRecoilValue(userAtom);
 
   const stripeCheckoutWasCanceled = searchParams.get('stripe') === 'canceled';
 
   const checkoutDetailsState = useRecoilValue(checkoutDetails(rateKey || ''));
   const [firstName, setFirstName] = useState('');
-  // const [firstName, setFirstName] = useState('Noah');
   const [lastName, setLastName] = useState('');
-  // const [lastName, setLastName] = useState('Cardoza');
   const [email, setEmail] = useState('');
-  // const [email, setEmail] = useState('noahcardoza@gmail.com');
   const [phone, setPhone] = useState('');
-  // const [phone, setPhone] = useState('1234567890');
   const [checkoutLoading, setCheckoutLoading] = useState(false);
 
   const rebookingId = searchParams.get('rebooking');
@@ -55,6 +53,11 @@ export default function CheckoutPage() {
       setLastName(rebooking.last_name);
       setEmail(rebooking.email);
       setPhone(rebooking.phone);
+    } else if (user?.autofill_booking_info) {
+      setFirstName(user?.first_name || '');
+      setLastName(user?.last_name || '');
+      setEmail(user?.email || '');
+      setPhone(user?.phone_number || '');
     }
   }, [rebooking]);
 
@@ -162,7 +165,15 @@ export default function CheckoutPage() {
           </Stack>
           <Stack className="card" spacing={1}>
             <Typography variant="h4">Your details</Typography>
-            <Grid container spacing={2}>
+            <Grid
+              container
+              columnSpacing={2}
+              rowSpacing={{
+                sm: 3,
+                md: 5,
+                lg: 3,
+              }}
+            >
               <Grid xs={12} md={6}>
                 <TextInput
                   helperText="The name of one of the people checking in."
