@@ -327,7 +327,7 @@ export default function BookingPage() {
                     booking.id
                   }`}
                 >
-                  Re-book
+                  Rebook
                 </Button>
                 <Button color="error" onClick={handleCancelBookingOpen}>
                   Cancel

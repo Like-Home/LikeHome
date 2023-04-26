@@ -34,39 +34,76 @@ class CheckoutSerializer(serializers.Serializer):
     rebooking_id = serializers.IntegerField(required=False)
 
 
-def stripe_create_checkout(
-        booking_id,
-        hotel_name, room_number, check_in, check_out, hotel_price, hotel_image, points_remaining, referrer):
+def book_on_hotelbeds(request, rate_key, checkrate, params):
+    rate = checkrate['hotel']['rooms'][0]['rates'][0]
+    paxes = []
+    for room in range(1, rate['rooms'] + 1):
+        paxes.append({
+            "roomId": room,
+            "type": "AD",
+            "name": params['first_name'],
+            "surname": params['last_name'],
+        })
 
-    extra_product_data = {}
-    if hotel_image:
-        extra_product_data['images'] = [hotel_image]
+    for _ in range(rate['adults'] - rate['rooms']):
+        paxes.append({
+            "roomId": 1,
+            "type": "AD",
+            "name": params['first_name'],
+            "surname": params['last_name'],
+        })
 
-    return stripe.checkout.Session.create(
-        success_url=f"{config.BASE_URL}/booking/{booking_id}/?stripe=success",
-        cancel_url=f"{referrer}?stripe=canceled",
-        payment_method_types=['card'],
-        mode='payment',
-        line_items=[
-            {
-                "price_data": {
-                    "currency": "usd",
-                    "tax_behavior": "exclusive",
-                    "unit_amount": hotel_price,
-                    "product_data": {
-                        "name": hotel_name,
-                        "description": f"{room_number} from {check_in} to {check_out}",
-                        **extra_product_data
-                    },
-                },
-                "quantity": 1,
+    for _ in range(rate['children']):
+        paxes.append({
+            "roomId": 1,
+            "type": "CH",
+            "name": params['first_name'],
+            "surname": params['last_name'],
+        })
+
+    payload = {
+        "holder": {
+            "name": params['first_name'],
+            "surname": params['last_name'],
+        },
+        "rooms": [{
+            "rateKey": rate_key,
+            'paxes': paxes
+        }],
+        "voucher": {
+            "email": {
+                "to": params['email'],
+                "body": "Voucher body is to be written here."
             }
-        ],
-        metadata={
-            "booking_id": booking_id,
-            "points_remaining": points_remaining,
-        }
-    )
+        },
+        "clientReference": f"likehome-{request.user.id}",
+        "creationUser": "likehome",
+        "tolerance": 50,
+        "remark": "Booking remarks are to be written here."
+    }
+
+    # random 500 errors
+    response2 = hotelbeds.post('/hotel-api/1.2/bookings', json=payload)
+
+    if response2.status_code == 500:
+        body = response2.json()
+        if body['error']['message'].startswith('Price has changed'):
+            raise serializers.ValidationError(
+                {
+                    'price': 'PRICE_CHANGED'
+                }
+            )
+        else:
+            print('error', body)
+            raise serializers.ValidationError(
+                {
+                    'price': 'UNKNOWN_ERROR'
+                }
+            )
+
+    # print(response2)
+    # print(response2.json())
+    return response2.json()
 
 
 class CheckoutView(viewsets.mixins.CreateModelMixin, viewsets.GenericViewSet):
@@ -224,13 +261,14 @@ class CheckoutView(viewsets.mixins.CreateModelMixin, viewsets.GenericViewSet):
 
         conflicting_booking_found = conflicting_booking_found.exists()
 
-        if not params['force']:
-            if conflicting_booking_found:
-                raise serializers.ValidationError(
-                    {
-                        'date': 'CONFLICTING_BOOKING'
-                    }
-                )
+        print('conflicting_booking_found', conflicting_booking_found)
+
+        if not params['force'] and conflicting_booking_found:
+            raise serializers.ValidationError(
+                {
+                    'date': 'CONFLICTING_BOOKING'
+                }
+            )
 
         total_net_float_before_tax = float(response['hotel']['totalNet']) / 1.1
         points_used = 0
@@ -241,78 +279,8 @@ class CheckoutView(viewsets.mixins.CreateModelMixin, viewsets.GenericViewSet):
                 request.user.account.travel_points
             )
 
-            # TODO: move this to the webhook
-            request.user.account.travel_points = points_remaining
-            request.user.account.save()
-
-        rate = response['hotel']['rooms'][0]['rates'][0]
-        paxes = []
-        for room in range(1, rate['rooms'] + 1):
-            paxes.append({
-                "roomId": room,
-                "type": "AD",
-                "name": params['first_name'],
-                "surname": params['last_name'],
-            })
-
-        for index in range(rate['adults'] - rate['rooms']):
-            paxes.append({
-                "roomId": 1,
-                "type": "AD",
-                "name": params['first_name'],
-                "surname": params['last_name'],
-            })
-
-        for index in range(rate['children']):
-            paxes.append({
-                "roomId": 1,
-                "type": "CH",
-                "name": params['first_name'],
-                "surname": params['last_name'],
-            })
-
-        payload = {
-            "holder": {
-                "name": params['first_name'],
-                "surname": params['last_name'],
-            },
-            "rooms": [{
-                "rateKey": rate_key,
-                'paxes': paxes
-            }],
-            "voucher": {
-                "email": {
-                    "to": params['email'],
-                    "body": "Voucher body is to be written here."
-                }
-            },
-            "clientReference": f"likehome-{request.user.id}",
-            "creationUser": "likehome",
-            "tolerance": 50,
-            "remark": "Booking remarks are to be written here."
-        }
-
-        # random 500 errors
-        # response2 = hotelbeds.post('/hotel-api/1.2/bookings', json=payload)
-
-        # if response2.status_code == 500:
-        #     body = response2.json()
-        #     if body['error']['message'].startswith('Price has changed'):
-        #         raise serializers.ValidationError(
-        #             {
-        #                 'price': 'PRICE_CHANGED'
-        #             }
-        #         )
-        #     else:
-        #         print('error', body)
-        #         raise serializers.ValidationError(
-        #             {
-        #                 'price': 'UNKNOWN_ERROR'
-        #             }
-        #         )
-
-        # print(response2)
-        # print(response2.json())
+        # TODO: figure out random 500 errors before enabling this
+        # book_on_hotelbeds(request, rate_key, response, params)
 
         total_net_float = total_net_float_before_tax * 1.1
         booking = Booking(
@@ -331,39 +299,62 @@ class CheckoutView(viewsets.mixins.CreateModelMixin, viewsets.GenericViewSet):
             check_in=check_in_date,
             check_out=check_out_date,
             amount_paid=total_net_float,
-            points_earned=int(total_net_float),
-            points_spent=points_used,
+            # START: finalized in webhook
             status=Booking.BookingStatus.PENDING,
-            rebooked_from=previous_booking,
+            points_earned=0,
+            points_spent=0,
+            rebooked_from=None,
             rebooked_to=None,
-            overlapping=conflicting_booking_found,
             stripe_payment_intent_id=None,
+            # END: finalized in webhook
+            overlapping=conflicting_booking_found,
         )
 
         booking.save()
-
-        if previous_booking:
-            previous_booking.rebooked_to = booking
-            previous_booking.save()
 
         hotel_image = HotelbedsHotelImage.objects.filter(
             hotel=hotel, roomCode=response['hotel']['rooms'][0]['code']
         ).order_by('visualOrder').first()
 
+        extra_product_data = {}
+        if hotel_image:
+            extra_product_data['images'] = [
+                f"https://photos.hotelbeds.com/giata/medium/{hotel_image.path}"
+            ]
+
+        referrer = request.META.get('HTTP_REFERER')
+
         try:
             # TODO: indicate the discount in the stripe checkout
             #       we might need to create a custom checkout page with elements
-            checkout_session = stripe_create_checkout(
-                booking.id,
-                response['hotel']['name'],
-                response['hotel']['rooms'][0]['name'],
-                response['hotel']['checkIn'],
-                response['hotel']['checkOut'],
-                int(total_net_float * 100),
-                f"https://photos.hotelbeds.com/giata/medium/{hotel_image.path}" if hotel_image else None,
-                points_remaining,
-                referrer=request.META.get('HTTP_REFERER'),
+            checkout_session = stripe.checkout.Session.create(
+                success_url=f"{config.BASE_URL}/booking/{booking.id}/?stripe=success",
+                cancel_url=f"{referrer}?stripe=canceled",
+                payment_method_types=['card'],
+                mode='payment',
+                line_items=[
+                    {
+                        "price_data": {
+                            "currency": "usd",
+                            "tax_behavior": "exclusive",
+                            "unit_amount": int(total_net_float * 100),
+                            "product_data": {
+                                "name": response['hotel']['name'],
+                                "description": f"{response['hotel']['rooms'][0]['name']} from {response['hotel']['checkIn']} to {response['hotel']['checkOut']}",
+                                **extra_product_data
+                            },
+                        },
+                        "quantity": 1,
+                    }
+                ],
+                metadata={
+                    "booking_id": booking.id,
+                    "points_earned": int(total_net_float),
+                    "points_spent": points_used,
+                    "rebooked_from": previous_booking.id if previous_booking else None,
+                }
             )
+
             return Response({
                 'id': checkout_session['id'],
                 'url': checkout_session['url']
@@ -411,13 +402,23 @@ class CheckoutView(viewsets.mixins.CreateModelMixin, viewsets.GenericViewSet):
                     'message': 'Booking has already been processed.'
                 }, status=400)
 
+            booking.points_earned = int(metadata['points_earned'])
+            booking.points_spent = int(metadata['points_spent'])
+
             booking.stripe_payment_intent_id = session['payment_intent']
             booking.status = Booking.BookingStatus.CONFIRMED
 
+            rebooked_from_id = metadata.get('rebooked_from')
+            if rebooked_from_id:
+                previous_booking = Booking.objects.get(id=rebooked_from_id)
+                previous_booking.rebooked_to = booking
+                booking.rebooked_from = previous_booking
+                previous_booking.save()
+
             booking.user.account.travel_points += booking.points_earned
             booking.user.account.travel_points -= booking.points_spent
-            booking.user.account.save()
 
+            booking.user.account.save()
             booking.save()
 
         return Response(status=200)

@@ -1,4 +1,5 @@
 /backend/db
+/backend/sqlite-2-pg.history
 
 # Docker Things
 postgres

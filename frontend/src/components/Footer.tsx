@@ -218,7 +218,7 @@ function Footer() {
               {section.links.map((link) => (
                 <ListItem key={link.text}>
                   <Link to={link.to}>
-                    <Typography variant="caption">{link.text}</Typography>
+                    <Typography variant="subtitle2">{link.text}</Typography>
                   </Link>
                 </ListItem>
               ))}
