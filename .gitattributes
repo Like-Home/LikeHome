@@ -3,6 +3,7 @@
 # ===
 # Binary Files (don't diff, don't fix line endings)
 # ===
+*.exe binary
 
 # Images
 *.png binary
