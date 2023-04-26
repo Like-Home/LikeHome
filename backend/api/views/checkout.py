@@ -3,13 +3,13 @@ import base64
 import traceback
 
 import stripe
-from api.models.Booking import Booking
+from api.models.Booking import Booking, BookingCancelException
 from api.models.hotelbeds.HotelbedsHotel import (HotelbedsHotel,
                                                  HotelbedsHotelImage)
 from api.modules.hotelbeds import hotelbeds
 from app import config
 from django.utils.dateparse import parse_date
-from rest_framework import serializers, viewsets
+from rest_framework import serializers, status, viewsets
 from rest_framework.decorators import action
 from rest_framework.request import Request
 from rest_framework.response import Response
@@ -30,6 +30,8 @@ class CheckoutSerializer(serializers.Serializer):
     # apply travel points to booking
     apply_point_balance = serializers.BooleanField(
         default=False, write_only=True)
+
+    rebooking_id = serializers.IntegerField(required=False)
 
 
 def stripe_create_checkout(
@@ -177,6 +179,20 @@ class CheckoutView(viewsets.mixins.CreateModelMixin, viewsets.GenericViewSet):
         params.is_valid(raise_exception=True)
         params = params.validated_data
 
+        rebooking_id = params.get('rebooking_id')
+        previous_booking = None
+
+        if rebooking_id is not None:
+            previous_booking = Booking.objects.get(
+                id=rebooking_id, user=request.user, status=Booking.BookingStatus.CONFIRMED)
+            try:
+                previous_booking.cancel(
+                    full_refund=True,
+                    new_status=Booking.BookingStatus.REBOOKED,
+                )
+            except BookingCancelException as e:
+                return Response({'canceled': False, 'message': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
         rate_key = base64.b64decode(params['rate_key']).decode('utf-8')
 
         payload = {
@@ -190,8 +206,6 @@ class CheckoutView(viewsets.mixins.CreateModelMixin, viewsets.GenericViewSet):
         response = hotelbeds.post(
             '/hotel-api/1.0/checkrates', json=payload).json()
 
-        print(response)
-
         hotel = HotelbedsHotel.objects.get(code=response['hotel']['code'])
 
         check_in_date = parse_date(response['hotel']['checkIn'])
@@ -202,7 +216,13 @@ class CheckoutView(viewsets.mixins.CreateModelMixin, viewsets.GenericViewSet):
             status=Booking.BookingStatus.CONFIRMED,
             check_in__lt=check_out_date,
             check_out__gt=check_in_date
-        ).exists()
+        )
+        if previous_booking:
+            conflicting_booking_found = conflicting_booking_found.exclude(
+                id=previous_booking.id
+            )
+
+        conflicting_booking_found = conflicting_booking_found.exists()
 
         if not params['force']:
             if conflicting_booking_found:
@@ -272,26 +292,27 @@ class CheckoutView(viewsets.mixins.CreateModelMixin, viewsets.GenericViewSet):
             "remark": "Booking remarks are to be written here."
         }
 
-        response2 = hotelbeds.post('/hotel-api/1.2/bookings', json=payload)
+        # random 500 errors
+        # response2 = hotelbeds.post('/hotel-api/1.2/bookings', json=payload)
 
-        if response2.status_code == 500:
-            body = response2.json()
-            if body['error']['message'].startswith('Price has changed'):
-                raise serializers.ValidationError(
-                    {
-                        'price': 'PRICE_CHANGED'
-                    }
-                )
-            else:
-                print('error', body)
-                raise serializers.ValidationError(
-                    {
-                        'price': 'UNKNOWN_ERROR'
-                    }
-                )
+        # if response2.status_code == 500:
+        #     body = response2.json()
+        #     if body['error']['message'].startswith('Price has changed'):
+        #         raise serializers.ValidationError(
+        #             {
+        #                 'price': 'PRICE_CHANGED'
+        #             }
+        #         )
+        #     else:
+        #         print('error', body)
+        #         raise serializers.ValidationError(
+        #             {
+        #                 'price': 'UNKNOWN_ERROR'
+        #             }
+        #         )
 
-        print(response2)
-        print(response2.json())
+        # print(response2)
+        # print(response2.json())
 
         total_net_float = total_net_float_before_tax * 1.1
         booking = Booking(
@@ -305,17 +326,25 @@ class CheckoutView(viewsets.mixins.CreateModelMixin, viewsets.GenericViewSet):
             room_code=response['hotel']['rooms'][0]['code'],
             adults=response['hotel']['rooms'][0]['rates'][0]['adults'],
             children=response['hotel']['rooms'][0]['rates'][0]['children'],
+            rooms=response['hotel']['rooms'][0]['rates'][0]['rooms'],
+            room_name=response['hotel']['rooms'][0]['name'],
             check_in=check_in_date,
             check_out=check_out_date,
             amount_paid=total_net_float,
             points_earned=int(total_net_float),
             points_spent=points_used,
             status=Booking.BookingStatus.PENDING,
+            rebooked_from=previous_booking,
+            rebooked_to=None,
             overlapping=conflicting_booking_found,
-            stripe_id=None,
+            stripe_payment_intent_id=None,
         )
 
         booking.save()
+
+        if previous_booking:
+            previous_booking.rebooked_to = booking
+            previous_booking.save()
 
         hotel_image = HotelbedsHotelImage.objects.filter(
             hotel=hotel, roomCode=response['hotel']['rooms'][0]['code']
@@ -382,7 +411,7 @@ class CheckoutView(viewsets.mixins.CreateModelMixin, viewsets.GenericViewSet):
                     'message': 'Booking has already been processed.'
                 }, status=400)
 
-            booking.stripe_id = session['payment_intent']
+            booking.stripe_payment_intent_id = session['payment_intent']
             booking.status = Booking.BookingStatus.CONFIRMED
 
             booking.user.account.travel_points += booking.points_earned

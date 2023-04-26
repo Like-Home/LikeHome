@@ -48,6 +48,7 @@ type StripeCheckoutRequest = {
   phone: string;
   force: string;
   apply_point_balance: string;
+  rebooking_id?: string;
 };
 
 type StripeCheckoutResponse = {

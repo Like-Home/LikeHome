@@ -1,7 +1,6 @@
 import stripe
-from api.models.Booking import Booking
+from api.models.Booking import Booking, BookingCancelException
 from api.serializers import BookingSerializer
-from django.utils import timezone
 from rest_framework import status, viewsets
 from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated
@@ -49,37 +48,34 @@ class BookingView(viewsets.ReadOnlyModelViewSet, viewsets.mixins.UpdateModelMixi
         if booking.status == Booking.BookingStatus.PAST:
             return Response({'canceled': False, 'message': 'Booking has already past.'}, status=status.HTTP_400_BAD_REQUEST)
 
-        booking.status = Booking.BookingStatus.CANCELED
-        booking.save()
+        try:
+            cancelation_status = booking.cancel()
+        except BookingCancelException as e:
+            return Response({'canceled': False, 'message': str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
-        # don't refund if booking is within 24 hours
-        if booking.check_in <= timezone.now().date() + timezone.timedelta(hours=24):
+        if cancelation_status == Booking.BookingCancelationStatus.NONE:
             return Response({
                 'message': 'Booking canceled but cannot be refunded within 24 hours before check-in.',
                 'canceled': True,
-                'refund': False,
+                'refund': cancelation_status,
             },
                 status=status.HTTP_200_OK
             )
-
-        refund_amount = booking.amount_paid
-        if booking.overlapping:
-            refund_amount = refund_amount * 0.9
-        refund_amount = int(refund_amount * 100)
-
-        stripe.Refund.create(
-            payment_intent=booking.stripe_id,
-            amount=refund_amount,
-            reason='requested_by_customer',
-            metadata={
-                'booking_id': booking.id
-            }
-        )
-
-        return Response({
-            'message': 'Booking canceled.',
-            'canceled': True,
-            'refund': True,
-        },
-            status=status.HTTP_200_OK
-        )
+        elif cancelation_status == Booking.BookingCancelationStatus.FULL:
+            return Response({
+                'message': 'Booking canceled and fully refunded.',
+                'canceled': True,
+                'status': cancelation_status,
+            },
+                status=status.HTTP_200_OK
+            )
+        elif cancelation_status == Booking.BookingCancelationStatus.PARTIAL:
+            return Response({
+                'message': 'Booking canceled and partially refunded.',
+                'canceled': True,
+                'refund': cancelation_status,
+            },
+                status=status.HTTP_200_OK
+            )
+        else:
+            return Response({'message': 'Something went wrong.'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)

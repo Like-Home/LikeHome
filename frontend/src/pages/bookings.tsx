@@ -1,37 +1,16 @@
-import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import {
-  Avatar,
-  Button,
-  Divider,
-  ListItem,
-  ListItemAvatar,
-  ListItemText,
-  List,
-  Stack,
-  Typography,
-} from '@mui/material';
+import { Avatar, Button, Divider, ListItem, ListItemAvatar, ListItemText, List, Typography } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import moment from 'moment';
-// eslint-disable-next-line camelcase
-import { useRecoilValue, useRecoilRefresher_UNSTABLE } from 'recoil';
+import { useRecoilValue } from 'recoil';
 import { Booking } from '../api/types';
 import { bookingsSelector } from '../recoil/bookings/atom';
 import { createHotelbedsSrcSetFromPath } from '../utils';
-
-const statusToText = {
-  PE: 'Pending',
-  CO: 'Confirmed',
-  CA: 'Canceled',
-  PA: 'Past',
-};
+import { statusToText } from '../enums';
 
 function BookingItem({ booking }: { booking: Booking }) {
   const linkToDetails = `/booking/${booking.id}`;
-  const refreshBookings = useRecoilRefresher_UNSTABLE(bookingsSelector);
   const theme = useTheme();
-
-  const isTooLateToCancel = booking.status === 'CA' || moment(booking.check_in).isBefore(moment().add(1, 'day'));
 
   return (
     <ListItem

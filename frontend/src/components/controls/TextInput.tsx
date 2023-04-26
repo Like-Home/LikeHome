@@ -1,7 +1,7 @@
-import { InputBase, FormHelperText } from '@mui/material';
+import { InputBase, FormHelperText, InputBaseProps } from '@mui/material';
 import { Control, ControlProps } from './Control';
 
-export default function TextInput({ label, icon, helperText, ...props }: ControlProps) {
+export default function TextInput({ label, icon, helperText, ...props }: ControlProps & InputBaseProps) {
   return (
     <Control
       label={label}

@@ -88,13 +88,14 @@ export default function HotelCard({ stay, hotel, onBookNow }: HotelCardProps) {
                   variant="body1"
                   sx={{
                     color: theme.palette.success.main,
+                    typography: { sm: 'body1', xs: 'body2' },
                   }}
                 >
                   Fully refundable*
                 </Typography>
                 <Stack direction="row" spacing={1} alignItems={'center'}>
                   <Discount color="primary" />
-                  <Typography variant="body1">Reward Point Eligible</Typography>
+                  <Typography sx={{ typography: { sm: 'body1', xs: 'body2' } }}>Reward Point Eligible</Typography>
                 </Stack>
               </Stack>
               <Stack

@@ -1,51 +1,59 @@
 import { Card, Stack, Button, Typography, Box } from '@mui/material';
 import { CalendarMonth, Discount, ShieldMoon } from '@mui/icons-material';
+import { Link } from 'react-router-dom';
+import { useRecoilValue } from 'recoil';
 import SearchBars from '../components/SearchBars';
+import userAtom from '../recoil/user';
 
 const iconStyle = {
   fontSize: 80,
 };
-const cards = [
-  {
-    id: 1,
-    title: 'Reward yourself your way',
-    body: 'Stay where you want, when you want, and get rewarded',
-    icon: <CalendarMonth sx={iconStyle} />,
-    footer: () => (
-      <Box>
-        <Button variant="contained" color="primary">
-          Unlock instant savings
-        </Button>
-      </Box>
-    ),
-  },
-  {
-    id: 2,
-    title: 'Unlock instant savings',
-    body: 'Earn reward points and redeem them for discounted stays!',
-    icon: <Discount sx={iconStyle} />,
-    footer: () => (
-      <Stack direction="row" spacing={2}>
-        <Button variant="contained" color="primary">
-          Sign up, it&lsquo;s free
-        </Button>
-        <Button variant="contained" color="primary">
-          Sign in
-        </Button>
-      </Stack>
-    ),
-  },
-  {
-    id: 3,
-    title: 'Free cancellations',
-    // TODO: foot note about 24 hour cancellation
-    body: 'Flexible bookings at most hotels*',
-    icon: <ShieldMoon sx={iconStyle} />,
-    footer: null,
-  },
-];
 
 export default function HomePage() {
+  const user = useRecoilValue(userAtom);
+  const cards = [
+    {
+      id: 1,
+      title: 'Reward yourself your way',
+      body: 'Stay where you want, when you want, and get rewarded',
+      icon: <CalendarMonth sx={iconStyle} />,
+      footer: !user
+        ? () => (
+            <Box>
+              <Button variant="contained" color="primary" component={Link} to="/auth">
+                Unlock instant savings
+              </Button>
+            </Box>
+          )
+        : null,
+    },
+    {
+      id: 2,
+      title: 'Unlock instant savings',
+      body: 'Earn reward points and redeem them for discounted stays!',
+      icon: <Discount sx={iconStyle} />,
+      footer: !user
+        ? () => (
+            <Stack direction="row" spacing={2}>
+              <Button variant="contained" color="primary" component={Link} to="/auth">
+                Sign up, it&lsquo;s free
+              </Button>
+              <Button variant="contained" color="primary" component={Link} to="/auth">
+                Sign in
+              </Button>
+            </Stack>
+          )
+        : null,
+    },
+    {
+      id: 3,
+      title: 'Free cancellations',
+      // TODO: foot note about 24 hour cancellation
+      body: 'Flexible bookings at most hotels*',
+      icon: <ShieldMoon sx={iconStyle} />,
+      footer: null,
+    },
+  ];
   return (
     <>
       <main className="card push-center">
@@ -77,7 +85,11 @@ export default function HomePage() {
                 <Typography variant="body1">
                   As a member, you save an average of 10% on thousands of hotels, so take that spontaneous trip.
                 </Typography>
-                <Button>Access Member Prices</Button>
+                {!user && (
+                  <Button component={Link} to="/auth">
+                    Access Member Prices
+                  </Button>
+                )}
               </Stack>
             </Stack>
           </Stack>

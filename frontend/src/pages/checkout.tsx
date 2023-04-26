@@ -26,19 +26,40 @@ import TextInput from '../components/controls/TextInput';
 import { formatAddressFromHotel, createHotelbedsSrcSetFromPath, formatCurrency } from '../utils';
 import { nightsFromDates } from '../api/hotel';
 import CardModal from '../components/CardModal';
+import { bookingById } from '../recoil/bookings/atom';
+import userAtom from '../recoil/user';
 
 export default function CheckoutPage() {
   const { rateKey } = useParams();
   const [searchParams] = useSearchParams();
+  const user = useRecoilValue(userAtom);
 
   const stripeCheckoutWasCanceled = searchParams.get('stripe') === 'canceled';
 
   const checkoutDetailsState = useRecoilValue(checkoutDetails(rateKey || ''));
-  const [firstName, setFirstName] = useState('Noah');
-  const [lastName, setLastName] = useState('Cardoza');
-  const [email, setEmail] = useState('noahcardoza@gmail.com');
-  const [phone, setPhone] = useState('1234567890');
+  const [firstName, setFirstName] = useState('');
+  const [lastName, setLastName] = useState('');
+  const [email, setEmail] = useState('');
+  const [phone, setPhone] = useState('');
   const [checkoutLoading, setCheckoutLoading] = useState(false);
+
+  const rebookingId = searchParams.get('rebooking');
+  const rebookingSelector = bookingById(rebookingId !== null ? rebookingId : null);
+  const rebooking = useRecoilValue(rebookingSelector);
+
+  useEffect(() => {
+    if (rebooking !== null) {
+      setFirstName(rebooking.first_name);
+      setLastName(rebooking.last_name);
+      setEmail(rebooking.email);
+      setPhone(rebooking.phone);
+    } else if (user?.autofill_booking_info) {
+      setFirstName(user?.first_name || '');
+      setLastName(user?.last_name || '');
+      setEmail(user?.email || '');
+      setPhone(user?.phone_number || '');
+    }
+  }, [rebooking]);
 
   const [open, setOpen] = useState(false);
   const handleClose = () => {
@@ -73,6 +94,10 @@ export default function CheckoutPage() {
       setOpen(false);
       setCheckoutLoading(true);
 
+      if (!termsAccepted) {
+        return;
+      }
+
       const data = await createStripeCheckout({
         rate_key: rateKey,
         first_name: firstName,
@@ -81,6 +106,7 @@ export default function CheckoutPage() {
         phone,
         force: wasOpen ? 'true' : 'false',
         apply_point_balance: applyDiscount ? 'true' : 'false',
+        rebooking_id: rebookingId || undefined,
       });
 
       setOpen(false);
@@ -139,7 +165,15 @@ export default function CheckoutPage() {
           </Stack>
           <Stack className="card" spacing={1}>
             <Typography variant="h4">Your details</Typography>
-            <Grid container spacing={2}>
+            <Grid
+              container
+              columnSpacing={2}
+              rowSpacing={{
+                sm: 3,
+                md: 5,
+                lg: 3,
+              }}
+            >
               <Grid xs={12} md={6}>
                 <TextInput
                   helperText="The name of one of the people checking in."
@@ -175,7 +209,7 @@ export default function CheckoutPage() {
               <Grid xs={12}>
                 <Stack direction="row" alignItems="center">
                   <Checkbox
-                    value={termsAccepted}
+                    checked={termsAccepted}
                     onChange={() => {
                       setTermsAccepted((value) => !value);
                     }}
@@ -206,7 +240,7 @@ export default function CheckoutPage() {
                           </Typography>
                           <Stack direction="row" alignItems="center">
                             <Checkbox
-                              value={applyDiscount}
+                              checked={applyDiscount}
                               onChange={() => {
                                 setApplyDiscount((value) => !value);
                               }}
@@ -225,7 +259,7 @@ export default function CheckoutPage() {
                 <Stack justifyContent="end" alignItems="end" sx={{ height: '100%' }}>
                   <Box onMouseEnter={handlePopoverOpen} onMouseLeave={handlePopoverClose}>
                     <Button onClick={onCheckout} disabled={!termsAccepted}>
-                      Checkout
+                      {rebooking ? 'Rebook' : 'Checkout'}
                     </Button>
                   </Box>
                   <Popover
@@ -322,8 +356,9 @@ export default function CheckoutPage() {
               </Stack>
             </CardContent>
           </Card>
-          <Typography variant="h6">Breakdown</Typography>
           <Divider></Divider>
+          <Typography variant="h6">Breakdown</Typography>
+
           <Stack spacing={1}>
             <Stack direction="row" justifyContent="space-between" sx={{ width: '100%' }}>
               <Typography variant="body1">
@@ -361,6 +396,21 @@ export default function CheckoutPage() {
               </Typography>
             </Stack>
           </Stack>
+          {rebooking && (
+            <>
+              <Divider></Divider>
+              <Typography variant="h6">Refund</Typography>
+              <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ width: '100%' }}>
+                <Stack>
+                  <Typography variant="body1">Rebooking Refund</Typography>
+                  <Typography variant="body2">xxxx xxxx xxxx 4242</Typography>
+                </Stack>
+                <Typography variant="body1" component="span" color="success.main">
+                  {formatCurrency(rebooking.amount_paid)}
+                </Typography>
+              </Stack>
+            </>
+          )}
         </Stack>
       </Stack>
     </Stack>

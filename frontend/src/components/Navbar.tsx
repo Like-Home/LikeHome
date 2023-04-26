@@ -49,23 +49,75 @@ const makeLink = (Component: ComponentType) => {
 const LinkButton = makeLink(NavButton);
 const LinkMenuItem = makeLink(MenuItem);
 
-function AccountMenu({ navbarEl, user }: { navbarEl: React.RefObject<HTMLElement>; user: User }) {
-  const theme = useTheme();
-  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
-  const ref = createRef<HTMLFormElement>();
+export function AccountOverview({ user }: { user: User }) {
   const [open, setOpen] = useState(false);
   const toggleOpen = () => setOpen((value) => !value);
 
   return (
     <>
+      <Stack alignItems={'center'} spacing={1} sx={{ paddingY: 2, paddingX: 4 }}>
+        <Typography variant="h6">Hi {user.first_name}</Typography>
+        <Typography variant="body1">{user.email}</Typography>
+        <Box>
+          <Chip label="Member" />
+        </Box>
+        {user.travel_points && (
+          <Typography
+            variant="subtitle1"
+            sx={{
+              fontWeight: 'bold',
+            }}
+          >
+            {formatCurrency(user.travel_points / 100)}
+          </Typography>
+        )}
+        <Stack direction="row" alignItems={'center'} spacing={1}>
+          <Typography variant="subtitle2">Point value</Typography>
+          <IconButton onClick={toggleOpen}>
+            <Info fontSize="small"></Info>
+          </IconButton>
+        </Stack>
+      </Stack>
+      {/* model to explain how reward points work */}
+      <CardModal open={open} onClose={toggleOpen}>
+        <CardHeader title="Reward Points" />
+        <CardContent>
+          <Stack spacing={1}>
+            <Typography variant="body1">
+              Reward points are earned by booking hotels through LikeHome. You can use them to get discounts on future
+              bookings.
+            </Typography>
+            <Typography variant="body1">1 point is worth {formatCurrency(0.01)}.</Typography>
+            <Typography variant="body1">When spent, points are nonrefundable.</Typography>
+          </Stack>
+        </CardContent>
+        <CardActions
+          sx={{
+            justifyContent: 'flex-end',
+          }}
+        >
+          <Button onClick={toggleOpen}>Close</Button>
+        </CardActions>
+      </CardModal>
+    </>
+  );
+}
+
+function AccountMenu({ navbarEl, user }: { navbarEl: React.RefObject<HTMLElement>; user: User }) {
+  const theme = useTheme();
+  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+  const ref = createRef<HTMLFormElement>();
+
+  return (
+    <>
       <IconButton
-        onClick={(e) => {
+        onClick={() => {
           setAnchorEl(navbarEl.current);
         }}
         sx={{ p: 0.5 }}
         size="large"
       >
-        <Avatar />
+        <Avatar src={user.image || undefined} />
       </IconButton>
       <Menu
         anchorEl={anchorEl}
@@ -81,33 +133,11 @@ function AccountMenu({ navbarEl, user }: { navbarEl: React.RefObject<HTMLElement
         onClose={() => setAnchorEl(null)}
       >
         <Stack spacing={1}>
-          <Stack alignItems={'center'} spacing={1} sx={{ paddingY: 2, paddingX: 4 }}>
-            <Typography variant="h6">Hi {user.first_name}</Typography>
-            <Typography variant="body1">{user.email}</Typography>
-            <Box>
-              <Chip label="Member" />
-            </Box>
-            {user.travel_points && (
-              <Typography
-                variant="subtitle1"
-                sx={{
-                  fontWeight: 'bold',
-                }}
-              >
-                {formatCurrency(user.travel_points / 100)}
-              </Typography>
-            )}
-            <Stack direction="row" alignItems={'center'} spacing={1}>
-              <Typography variant="subtitle2">Point value</Typography>
-              <IconButton onClick={toggleOpen}>
-                <Info fontSize="small"></Info>
-              </IconButton>
-            </Stack>
-          </Stack>
+          <AccountOverview user={user} />
           <Divider />
           <LinkMenuItem to="/bookings">My Bookings</LinkMenuItem>
           <LinkMenuItem to="/rewards">Rewards</LinkMenuItem>
-          <LinkMenuItem to="/me">Account</LinkMenuItem>
+          <LinkMenuItem to="/account">Account</LinkMenuItem>
           <Divider />
           <form ref={ref} action="/accounts/logout/" method="post">
             <InputCSRF />
@@ -122,26 +152,6 @@ function AccountMenu({ navbarEl, user }: { navbarEl: React.RefObject<HTMLElement
           </form>
         </Stack>
       </Menu>
-      {/* model to explain how reward points work */}
-      <CardModal open={open} onClose={toggleOpen}>
-        <CardHeader title="Reward Points" />
-        <CardContent>
-          <Stack spacing={1}>
-            <Typography variant="body1">
-              Reward points are earned by booking hotels through LikeHome. You can use them to get discounts on future
-              bookings.
-            </Typography>
-            <Typography variant="body1">1 point is worth {formatCurrency(0.01)}.</Typography>
-          </Stack>
-        </CardContent>
-        <CardActions
-          sx={{
-            justifyContent: 'flex-end',
-          }}
-        >
-          <Button onClick={toggleOpen}>Close</Button>
-        </CardActions>
-      </CardModal>
     </>
   );
 }
