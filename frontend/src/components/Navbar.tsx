@@ -49,34 +49,27 @@ const makeLink = (Component: ComponentType) => {
 const LinkButton = makeLink(NavButton);
 const LinkMenuItem = makeLink(MenuItem);
 
-export function AccountOverview({ user }: { user: User }) {
+export function PointOverview({ user }: { user: User }) {
   const [open, setOpen] = useState(false);
   const toggleOpen = () => setOpen((value) => !value);
 
   return (
     <>
-      <Stack alignItems={'center'} spacing={1} sx={{ paddingY: 2, paddingX: 4 }}>
-        <Typography variant="h6">Hi {user.first_name}</Typography>
-        <Typography variant="body1">{user.email}</Typography>
-        <Box>
-          <Chip label="Member" />
-        </Box>
-        {user.travel_points && (
-          <Typography
-            variant="subtitle1"
-            sx={{
-              fontWeight: 'bold',
-            }}
-          >
-            {formatCurrency(user.travel_points / 100)}
-          </Typography>
-        )}
-        <Stack direction="row" alignItems={'center'} spacing={1}>
-          <Typography variant="subtitle2">Point value</Typography>
-          <IconButton onClick={toggleOpen}>
-            <Info fontSize="small"></Info>
-          </IconButton>
-        </Stack>
+      {user.travel_points && (
+        <Typography
+          variant="subtitle1"
+          sx={{
+            fontWeight: 'bold',
+          }}
+        >
+          {formatCurrency(user.travel_points / 100)}
+        </Typography>
+      )}
+      <Stack direction="row" alignItems={'center'} spacing={1}>
+        <Typography variant="subtitle2">Point value</Typography>
+        <IconButton onClick={toggleOpen}>
+          <Info fontSize="small"></Info>
+        </IconButton>
       </Stack>
       {/* model to explain how reward points work */}
       <CardModal open={open} onClose={toggleOpen}>
@@ -100,6 +93,19 @@ export function AccountOverview({ user }: { user: User }) {
         </CardActions>
       </CardModal>
     </>
+  );
+}
+
+export function AccountOverview({ user }: { user: User }) {
+  return (
+    <Stack alignItems={'center'} spacing={1} sx={{ paddingY: 2, paddingX: 4 }}>
+      <Typography variant="h6">Hi {user.first_name}</Typography>
+      <Typography variant="body1">{user.email}</Typography>
+      <Box>
+        <Chip label="Member" sx={{ my: 1 }} />
+      </Box>
+      <PointOverview user={user} />
+    </Stack>
   );
 }
 

@@ -1,41 +1,121 @@
 import { useRecoilValue } from 'recoil';
-import { Stack, Typography } from '@mui/material';
+import {
+  ListItemButton,
+  Avatar,
+  List,
+  ListItem,
+  ListItemAvatar,
+  ListItemText,
+  Stack,
+  Typography,
+  Chip,
+} from '@mui/material';
 import { Box } from '@mui/system';
 import moment from 'moment';
+import { Link } from 'react-router-dom';
 import { bookingsSelector } from '../recoil/bookings/atom';
+import { createHotelbedsSrcSetFromPath } from '../utils';
+import userAtom from '../recoil/user/atom';
+import { PointOverview } from '../components/Navbar';
+import { User } from '../api/types';
 
 export default function RewardsPage() {
   const bookings = useRecoilValue(bookingsSelector);
-
-  const pointBalance = bookings.reduce<number>(
-    (points, booking) => points + booking.points_earned - booking.points_spent,
-    0,
-  );
+  const user = useRecoilValue(userAtom) as User;
 
   return (
-    <main className="card push-center">
-      <Stack direction="column" spacing={2} m={1}>
-        <Box>
-          <Typography variant="h3">Point balance</Typography>
-          <Typography variant="body1">{pointBalance}</Typography>
-        </Box>
-        {bookings.map((booking) => (
-          <Box key={booking.id}>
-            <Typography variant="h4">{moment(booking.created_at).format('ll')}</Typography>
-
-            {booking.points_spent > 0 && (
-              <Typography variant="body1" color="red">
-                {`-${booking.points_spent}`}
-              </Typography>
-            )}
-            {booking.points_earned > 0 && (
-              <Typography variant="body1" color="green">
-                {`+${booking.points_earned}`}
-              </Typography>
-            )}
-          </Box>
-        ))}
+    <Stack spacing={2}>
+      <Typography
+        variant="h4"
+        sx={{
+          marginLeft: 4,
+        }}
+      >
+        Rewards
+      </Typography>
+      <Stack className="card" direction="column" alignItems={'center'} spacing={2} m={1}>
+        <Stack alignItems={'center'}>
+          <Typography
+            variant="h6"
+            sx={{
+              marginBottom: 1,
+            }}
+          >
+            {user.travel_points} points
+          </Typography>
+          <PointOverview user={user} />
+        </Stack>
+        <List sx={{ width: '100%' }}>
+          {bookings.map((booking) => (
+            <ListItem key={booking.id}>
+              <ListItemButton component={Link} to={`/booking/${booking.id}`}>
+                <Stack
+                  width={'100%'}
+                  direction={{
+                    xs: 'column',
+                    sm: 'row',
+                  }}
+                  justifyContent="space-between"
+                  spacing={1}
+                >
+                  <Stack direction={'row'} spacing={1}>
+                    <ListItemAvatar>
+                      <Avatar
+                        {...createHotelbedsSrcSetFromPath(booking.image)}
+                        variant="rounded"
+                        sx={{
+                          width: 100,
+                          height: 100,
+                          marginRight: 3,
+                        }}
+                      />
+                    </ListItemAvatar>
+                    <Stack>
+                      <ListItemText primary={booking.hotel.name} secondary={moment(booking.created_at).format('ll')} />
+                      <ListItemText
+                        primary={booking.points_earned > 0 ? `+${booking.points_earned} points` : undefined}
+                        primaryTypographyProps={{
+                          sx: {
+                            color: 'success.main',
+                          },
+                        }}
+                        secondaryTypographyProps={{
+                          sx: {
+                            color: 'error.main',
+                          },
+                        }}
+                        secondary={booking.points_spent > 0 ? `-${booking.points_spent} points` : undefined}
+                      />
+                    </Stack>
+                  </Stack>
+                  <Stack
+                    direction={{
+                      xs: 'column',
+                      sm: 'row',
+                    }}
+                    alignItems={{
+                      xs: 'end',
+                      sm: 'center',
+                    }}
+                    spacing={1}
+                  >
+                    <ListItemText>
+                      <Stack direction="row" justifyContent={'end'} spacing={1}>
+                        {booking.status === 'CO' && <Chip label="Confirmed" color="success" size="small" />}
+                        {(booking.status === 'CA' || booking.status === 'RE') && (
+                          <Chip label="Canceled" color="warning" size="small" />
+                        )}
+                        {booking.status === 'RE' && <Chip label="Rebooked" color="info" size="small" />}
+                        {booking.status === 'PE' && <Chip label="Pending" color="info" size="small" />}
+                      </Stack>
+                    </ListItemText>
+                  </Stack>
+                </Stack>
+              </ListItemButton>
+            </ListItem>
+          ))}
+        </List>
       </Stack>
-    </main>
+    </Stack>
   );
 }

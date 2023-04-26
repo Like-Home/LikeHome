@@ -109,7 +109,10 @@ class Booking(models.Model):
             self.stripe_refund_id = refund['id']
 
         self.canceled_at = timezone.now()
+        self.user.account.travel_points -= self.points_earned
         self.points_earned = 0
+
+        self.user.account.save()
         self.save()
 
         return self.cancelation_status
