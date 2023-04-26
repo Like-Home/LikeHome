@@ -1,3 +1,5 @@
+from typing import Any
+
 from app import config
 from django.contrib.auth.models import User
 from rest_framework import serializers
@@ -16,7 +18,24 @@ from .modules.google import sign_url
 class UserSerializer(serializers.ModelSerializer):
     travel_points = serializers.IntegerField(
         read_only=True, source='account.travel_points')
+    autofill_booking_info = serializers.BooleanField(
+        source='account.autofill_booking_info')
+    phone_number = serializers.CharField(
+        source='account.phone_number', allow_blank=True)
+
     image = serializers.SerializerMethodField()
+
+    def update(self, instance: Any, validated_data: Any) -> Any:
+        print('updating', validated_data)
+        account = instance.account
+        validated_account_data = validated_data.pop('account', {})
+        account.autofill_booking_info = validated_account_data.pop(
+            'autofill_booking_info', account.autofill_booking_info)
+        account.phone_number = validated_account_data.pop(
+            'phone_number', account.phone_number)
+        account.save()
+
+        return super().update(instance, validated_data)
 
     def get_image(self, instance):
         return instance.socialaccount_set.first().get_avatar_url()

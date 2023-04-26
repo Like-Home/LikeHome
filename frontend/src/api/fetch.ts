@@ -69,7 +69,7 @@ export function get<T>(path: string, config?: RequestInit): Promise<T> {
   return http<T>(path, init);
 }
 
-type JsonFormData = { [arbitrary: string]: string };
+type JsonFormData = { [arbitrary: string]: string | boolean };
 
 function jsonToFormData(body: JsonFormData): FormData {
   const formData = new FormData();
@@ -77,7 +77,11 @@ function jsonToFormData(body: JsonFormData): FormData {
   // eslint-disable-next-line no-restricted-syntax
   for (const key in body) {
     if (body[key] !== undefined) {
-      formData.append(key, body[key]);
+      if (typeof body[key] === 'boolean') {
+        formData.append(key, body[key] ? 'true' : 'false');
+      } else {
+        formData.append(key, body[key] as string);
+      }
     }
   }
 

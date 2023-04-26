@@ -198,7 +198,7 @@ export default function CheckoutPage() {
               <Grid xs={12}>
                 <Stack direction="row" alignItems="center">
                   <Checkbox
-                    value={termsAccepted}
+                    checked={termsAccepted}
                     onChange={() => {
                       setTermsAccepted((value) => !value);
                     }}
@@ -229,7 +229,7 @@ export default function CheckoutPage() {
                           </Typography>
                           <Stack direction="row" alignItems="center">
                             <Checkbox
-                              value={applyDiscount}
+                              checked={applyDiscount}
                               onChange={() => {
                                 setApplyDiscount((value) => !value);
                               }}

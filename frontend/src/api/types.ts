@@ -136,19 +136,24 @@ export type Booking = BookingPutArgs & {
   canceled_at?: string; // Booking;
 };
 
+export type UserPutArgs = {
+  first_name: string;
+  email: string;
+  last_name: string;
+  phone_number: string;
+  autofill_booking_info: boolean;
+};
+
 export type User = {
   username: string;
   image: string;
-  email: string;
   date_joined: string;
-  first_name: string;
   groups: string[];
   id: number;
   is_active: boolean;
   is_staff: boolean;
   is_superuser: boolean;
   last_login: string;
-  last_name: string;
   travel_points: number;
   user_permissions: string[];
-};
+} & UserPutArgs;

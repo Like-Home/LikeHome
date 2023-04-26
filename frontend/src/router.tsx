@@ -8,6 +8,7 @@ import BookingPage from './pages/booking';
 import SearchPage from './pages/search';
 import CheckoutPage from './pages/checkout';
 import BookingsPage from './pages/bookings';
+import AccountPage from './pages/account';
 import AboutPage from './pages/about';
 import RewardsPage from './pages/rewards';
 
@@ -35,6 +36,10 @@ const router = createBrowserRouter([
       {
         path: '/auth',
         element: <AuthPage />,
+      },
+      {
+        path: '/account',
+        element: <AccountPage />,
       },
       {
         path: '/hotel/:hotelId/:hotelName',
