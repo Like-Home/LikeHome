@@ -54,8 +54,8 @@ export default function HotelPage() {
     { label: 'Overview', href: '#overview', value: 0 },
     { label: 'Rooms', href: '#rooms', value: 1 },
     { label: 'Location', href: '#location', value: 2 },
-    { label: 'Amenities', href: '#amenities', value: 3 },
-    { label: 'Policies', href: '#policies', value: 4 },
+    { label: 'Amenities', disabled: true, href: '#amenities', value: 3 },
+    { label: 'Policies', disabled: true, href: '#policies', value: 4 },
   ];
 
   if (!hotelId) {
@@ -156,13 +156,19 @@ export default function HotelPage() {
           </CardActions>
         </CardModal>
       )}
-      <Stack alignItems={'center'}>
+      <Stack alignItems={'stretch'} spacing={2}>
         {rebooking && <Card sx={{ width: '100%' }}></Card>}
-        <Stack className="card" spacing={2} alignItems={'center'}>
+        <Stack className="card" spacing={0} alignItems={'start'}>
           {!rebooking && (
             <>
               <Box>
-                <ImageList sx={{ width: '100%', height: 420 }} variant="quilted" cols={8} rowHeight={100} id="overview">
+                <ImageList
+                  sx={{ width: '100%', height: 420, mb: 0 }}
+                  variant="quilted"
+                  cols={8}
+                  rowHeight={100}
+                  id="overview"
+                >
                   {hotel.images.slice(0, 8).map((item, index) => (
                     <ImageListItem key={item.path} {...rowColByIndex(index)}>
                       <img {...createHotelbedsSrcSetFromPath(item.path)} alt={item.title} loading="lazy" />
@@ -170,12 +176,13 @@ export default function HotelPage() {
                   ))}
                 </ImageList>
               </Box>
-              <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
+              <Box sx={{ borderBottom: 1, borderColor: 'divider', width: '100%', mb: 2 }}>
                 <Tabs value={value} onChange={handleChange} aria-label="hotel listing section tabs ">
                   {tabs.map((tab) => (
                     <Tab
                       key={tab.value}
                       label={tab.label}
+                      disabled={tab.disabled}
                       {...a11yProps(tab.value)}
                       container={<Link to={tab.href} />}
                     />
@@ -184,19 +191,27 @@ export default function HotelPage() {
               </Box>
             </>
           )}
-          <Stack direction="row" justifyContent="space-between" spacing={4}>
-            <Stack spacing={1}>
+          <Grid container spacing={4} p={1} mx={{ maxWidth: '100%' }}>
+            <Grid item spacing={1} md={6} mb={1}>
               <Typography variant="h4">{hotel.name}</Typography>
               {hotel?.category?.description && (
                 <Rating name="rating" readOnly {...convertCategoryToRatingProps(hotel?.category?.description)} />
               )}
               <Typography variant="body1">{hotel.description}</Typography>
-            </Stack>
-            <Stack spacing={2}>
-              <img src={hotel.google_map_url} alt="Google Maps" style={{ borderRadius: '4px' }} />
-              <Typography variant="body1">{formatAddressFromHotel(hotel)}</Typography>
-            </Stack>
-          </Stack>
+            </Grid>
+            <Grid item md={2} p={0} />
+            <Grid item md={4}>
+              <Stack spacing={1}>
+                <img src={hotel.google_map_url} alt="Google Maps" style={{ maxWidth: 350, borderRadius: '4px' }} />
+                <Typography variant="body1">{formatAddressFromHotel(hotel)}</Typography>
+              </Stack>
+            </Grid>
+          </Grid>
+        </Stack>
+        <Stack className="card" spacing={2} alignItems={'start'}>
+          <Typography variant="h4" id="rooms">
+            Choose your room
+          </Typography>
           <Box
             className="push-center"
             sx={{
@@ -222,9 +237,7 @@ export default function HotelPage() {
             />
           </Box>
           <Grid
-            id="rooms"
             container
-            spacing={2}
             sx={{
               width: '100%',
             }}
@@ -244,33 +257,31 @@ export default function HotelPage() {
               />
             ))}
           </Grid>
-          {!rebooking && (
-            <>
-              <Stack direction="row" justifyContent="space-between" id="location" sx={{ marginY: 3 }}>
-                <Box sx={{ flex: '25%' }}>
-                  <Typography variant="h5">About this location</Typography>
-                </Box>
-                <Stack sx={{ flex: '75%' }}>
-                  <Box justifyContent="center">
-                    <img src={hotel.google_map_url} alt="Google Maps" style={{ borderRadius: '4px', width: '80%' }} />
-                  </Box>
-                  <Stack direction="row" justifyContent="space-between" id="location" sx={{ marginY: 3 }}>
-                    <Stack sx={{ flex: '50%' }}>
-                      <Typography variant="h6">What&apos;s nearby</Typography>
-                      <List>
-                        {hotel.interestPoints.map((point) => (
-                          <ListItem key={point.id}>
-                            <ListItemText primary={point.poiName} secondary={`${point.distance / 1000} mi`} />
-                          </ListItem>
-                        ))}
-                      </List>
-                    </Stack>
-                  </Stack>
-                </Stack>
-              </Stack>
-            </>
-          )}
         </Stack>
+        {!rebooking && (
+          <Grid container className="card" spacing={2} p={2} alignItems={'start'}>
+            <Grid item md={3}>
+              <Typography variant="h5">About this location</Typography>
+            </Grid>
+            <Grid item md={9}>
+              <Box justifyContent="center">
+                <img src={hotel.google_map_url} alt="Google Maps" style={{ borderRadius: '4px', width: 275 }} />
+              </Box>
+              <Stack direction="column" justifyContent="space-between" id="location" sx={{ mt: 3 }}>
+                <Typography variant="h6">What&apos;s nearby</Typography>
+                <Grid container flexWrap="wrap" sx={{ ml: 2, mt: 1 }}>
+                  {hotel.interestPoints.map((point) => (
+                    <Grid item xs={12} md={6} lg={4} xl={3} key={point.id}>
+                      <ListItem sx={{ flex: 1, p: 0 }}>
+                        <ListItemText primary={point.poiName} secondary={`${point.distance / 1000} mi`} />
+                      </ListItem>
+                    </Grid>
+                  ))}
+                </Grid>
+              </Stack>
+            </Grid>
+          </Grid>
+        )}
       </Stack>
     </>
   );

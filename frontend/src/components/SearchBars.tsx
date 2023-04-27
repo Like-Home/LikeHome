@@ -62,17 +62,17 @@ export default function SearchBars(props: SearchPageParams & SearchBarProps) {
 
   const gridLayouts = {
     withLocation: {
-      location: { xs: 24, sm: 4, md: 3 },
-      checkin: { xs: 12, sm: 4, md: 2 },
-      checkout: { xs: 12, sm: 4, md: 2 },
-      guests: { xs: 12, sm: 6, md: 3 },
+      location: { xs: 24, sm: 4, md: 3.25 },
+      checkin: { xs: 12, sm: 4, md: 2.25 },
+      checkout: { xs: 12, sm: 4, md: 2.25 },
+      guests: { xs: 12, sm: 6, md: 2.25 },
       search: { xs: 12, sm: 6, md: 2 },
     },
     withoutLocation: {
       location: { xs: 0, sm: 0, md: 0 },
-      checkin: { xs: 12, sm: 4, md: 4 },
-      checkout: { xs: 12, sm: 4, md: 4 },
-      guests: { xs: 12, sm: 4, md: 2 },
+      checkin: { xs: 12, sm: 4, md: 3 },
+      checkout: { xs: 12, sm: 4, md: 3 },
+      guests: { xs: 12, sm: 4, md: 3 },
       search: { xs: 12, sm: 12, md: 2 },
     },
   };
