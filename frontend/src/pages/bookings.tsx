@@ -89,7 +89,7 @@ function BookingsList() {
 export default function BookingsPage() {
   return (
     <main className="card push">
-      <h1>My Bookings</h1>
+      <Typography variant="h4">My Bookings</Typography>
       <BookingsList />
     </main>
   );

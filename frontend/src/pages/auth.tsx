@@ -2,6 +2,7 @@ import { Button, Stack, Typography } from '@mui/material';
 import InputCSRF from '../api/csrf';
 
 export default function AuthPage() {
+  // TODO: Redirect to previous path
   return (
     <Stack className="card push-center" spacing={3}>
       <Typography variant="h4">Sign in</Typography>
