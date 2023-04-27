@@ -227,10 +227,10 @@ function Footer() {
         ))}
       </Stack>
       <Divider />
-      <List>
+      <List dense sx={{ p: 0 }}>
         {...footnotes.map((footnote, index) => (
-          <ListItem key={footnote}>
-            <Typography variant="caption">{`${'*'.repeat(index + 1)} ${footnote}`}</Typography>
+          <ListItem key={footnote} sx={{ py: 0 }}>
+            <Typography color="gray" variant="caption">{`${'*'.repeat(index + 1)} ${footnote}`}</Typography>
           </ListItem>
         ))}
       </List>

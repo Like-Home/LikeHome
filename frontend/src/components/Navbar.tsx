@@ -15,6 +15,12 @@ import {
   Stack,
   Typography,
   Chip,
+  ListItem,
+  ListItemAvatar,
+  ListItemText,
+  ListItemSecondaryAction,
+  List,
+  ListItemButton,
 } from '@mui/material';
 import { useRecoilValue } from 'recoil';
 import { useNavigate } from 'react-router-dom';
@@ -48,6 +54,7 @@ const makeLink = (Component: ComponentType) => {
 
 const LinkButton = makeLink(NavButton);
 const LinkMenuItem = makeLink(MenuItem);
+const LinkListItem = makeLink(ListItemButton);
 
 export function PointOverview({ user }: { user: User }) {
   const [open, setOpen] = useState(false);
@@ -55,23 +62,18 @@ export function PointOverview({ user }: { user: User }) {
 
   return (
     <>
-      {user.travel_points && (
-        <Typography
-          variant="subtitle1"
-          sx={{
-            fontWeight: 'bold',
-          }}
-        >
-          {formatCurrency(user.travel_points / 100)}
-        </Typography>
+      {user.travel_points !== undefined && (
+        <Stack direction="row" alignItems={'center'} spacing={1}>
+          <Typography variant="h4">{user.travel_points / 100}</Typography>
+          <Typography variant="h6" sx={{ pt: 0.5 }}>
+            points
+          </Typography>
+          <IconButton sx={{ pt: 1.5 }} onClick={toggleOpen}>
+            <Info fontSize="small"></Info>
+          </IconButton>
+        </Stack>
       )}
-      <Stack direction="row" alignItems={'center'} spacing={1}>
-        <Typography variant="subtitle2">Point value</Typography>
-        <IconButton onClick={toggleOpen}>
-          <Info fontSize="small"></Info>
-        </IconButton>
-      </Stack>
-      {/* model to explain how reward points work */}
+      {/* Modal to explain how reward points work */}
       <CardModal open={open} onClose={toggleOpen}>
         <CardHeader title="Reward Points" />
         <CardContent>
@@ -96,14 +98,23 @@ export function PointOverview({ user }: { user: User }) {
   );
 }
 
-export function AccountOverview({ user }: { user: User }) {
+export function AccountOverview({ user, link = false }: { user: User; link?: boolean }) {
+  const ListItemComponent = link ? LinkListItem : ListItem;
   return (
-    <Stack alignItems={'center'} spacing={1} sx={{ paddingY: 2, paddingX: 4 }}>
-      <Typography variant="h6">Hi {user.first_name}</Typography>
-      <Typography variant="body1">{user.email}</Typography>
-      <Box>
-        <Chip label="Member" sx={{ my: 1 }} />
-      </Box>
+    <Stack alignItems={'center'} spacing={1} sx={{ pb: 1 }}>
+      <List sx={{ pt: 0 }}>
+        <ListItemComponent to="/account" sx={{ minWidth: 325 }}>
+          <ListItemAvatar>
+            <Avatar src={user.image || undefined} />
+          </ListItemAvatar>
+          <ListItemText primary={`Hi, ${user.first_name}`} secondary={user.email}>
+            <Typography variant="h6">Hi, {user.first_name}</Typography>
+          </ListItemText>
+          <ListItemSecondaryAction>
+            <Chip label="Member" sx={{ mt: 2 }} />
+          </ListItemSecondaryAction>
+        </ListItemComponent>
+      </List>
       <PointOverview user={user} />
     </Stack>
   );
@@ -138,8 +149,8 @@ function AccountMenu({ navbarEl, user }: { navbarEl: React.RefObject<HTMLElement
         open={!!anchorEl}
         onClose={() => setAnchorEl(null)}
       >
-        <Stack spacing={1}>
-          <AccountOverview user={user} />
+        <Stack spacing={0.5}>
+          <AccountOverview user={user} link />
           <Divider />
           <LinkMenuItem to="/bookings">My Bookings</LinkMenuItem>
           <LinkMenuItem to="/rewards">Rewards</LinkMenuItem>
@@ -149,7 +160,9 @@ function AccountMenu({ navbarEl, user }: { navbarEl: React.RefObject<HTMLElement
             <InputCSRF />
             <MenuItem
               sx={{
-                backgroundColor: theme.palette.error.main,
+                '&:hover': {
+                  backgroundColor: theme.palette.error.main,
+                },
               }}
               onClick={() => ref.current && ref.current.submit()}
             >
