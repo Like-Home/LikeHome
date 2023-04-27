@@ -12,7 +12,8 @@ class SPAMiddleware(WhiteNoiseMiddleware):
     """
 
     index_name = 'static/index.html'
-    non_static_prefixes = ('/api', '/admin', '/static', '/accounts')
+    non_static_prefixes = ('/api', '/admin', '/static',
+                           '/accounts', '/email')
 
     def request_is_spq(self, request):
         return not any(request.path_info.startswith(prefix) for prefix in self.non_static_prefixes)

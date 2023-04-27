@@ -26,7 +26,6 @@ class UserSerializer(serializers.ModelSerializer):
     image = serializers.SerializerMethodField()
 
     def update(self, instance: Any, validated_data: Any) -> Any:
-        print('updating', validated_data)
         account = instance.account
         validated_account_data = validated_data.pop('account', {})
         account.autofill_booking_info = validated_account_data.pop(
@@ -171,9 +170,7 @@ class BookingSerializer(serializers.ModelSerializer):
     #     return HotelbedsHotelRoomSerializer(room).data
 
     def get_image(self, instance):
-        image = HotelbedsHotelImage.objects.filter(
-            hotel=instance.hotel, roomCode=instance.room_code
-        ).order_by('visualOrder').first()
+        image = instance.get_image()
 
         if image:
             return image.path

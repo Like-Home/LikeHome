@@ -15,7 +15,7 @@ export default defineConfig({
     VitePWA({
       workbox: {
         inlineWorkboxRuntime: true,
-        navigateFallbackDenylist: [/^\/admin/, /^\/api/, /^\/account/],
+        navigateFallbackDenylist: [/^\/admin/, /^\/api/, /^\/account/, /^\/email/],
         modifyURLPrefix: {
           assets: PRODUCTION ? 'static/assets' : 'assets',
         },
