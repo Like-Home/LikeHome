@@ -60,7 +60,7 @@ POSTGRES_USER = getenv('POSTGRES_USER', required=PRODUCTION)
 POSTGRES_HOST = getenv('POSTGRES_HOST', required=PRODUCTION)
 POSTGRES_DB = getenv('POSTGRES_DB', required=PRODUCTION)
 POSTGRES_PASSWORD = getenv('POSTGRES_PASSWORD', required=PRODUCTION)
-POSTGRES_PORT = int(getenv('POSTGRES_PASSWORD',
+POSTGRES_PORT = int(getenv('POSTGRES_PORT',
                            default='5432',
                            required=PRODUCTION
                            ))
