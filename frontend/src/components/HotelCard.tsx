@@ -1,5 +1,5 @@
 import { Box, Stack, Typography, CardActionArea, Skeleton, Rating } from '@mui/material';
-import { Discount } from '@mui/icons-material';
+import Discount from '@mui/icons-material/Discount';
 import { useTheme } from '@mui/material/styles';
 import { OfferHotel } from '../api/search';
 import { convertCategoryToRatingProps, priceBreakdown } from '../api/hotel';

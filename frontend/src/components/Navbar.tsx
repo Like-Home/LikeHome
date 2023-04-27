@@ -18,7 +18,7 @@ import {
 } from '@mui/material';
 import { useRecoilValue } from 'recoil';
 import { useNavigate } from 'react-router-dom';
-import { Info } from '@mui/icons-material';
+import Info from '@mui/icons-material/Info';
 import InputCSRF from '../api/csrf';
 import userAtom from '../recoil/user';
 import './styles.scss';

@@ -1,5 +1,7 @@
 import { Card, Stack, Button, Typography, Box } from '@mui/material';
-import { CalendarMonth, Discount, ShieldMoon } from '@mui/icons-material';
+import CalendarMonth from '@mui/icons-material/CalendarMonth';
+import Discount from '@mui/icons-material/Discount';
+import ShieldMoon from '@mui/icons-material/ShieldMoon';
 import { Link } from 'react-router-dom';
 import { useRecoilValue } from 'recoil';
 import SearchBars from '../components/SearchBars';
