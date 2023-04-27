@@ -271,6 +271,7 @@ export default function SearchPage() {
     >
       <Box width={'100%'}>
         <PriceSlider
+          adults={adults}
           loading={filterLoading}
           priceRange={priceRange}
           setPriceRange={setPriceRange}
@@ -389,7 +390,7 @@ export default function SearchPage() {
                   }}
                 />
               ))}
-            {loading && (
+            {(loading || filterLoading) && (
               <>
                 <HotelCardSkeleton />
                 <HotelCardSkeleton />

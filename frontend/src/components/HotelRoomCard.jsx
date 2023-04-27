@@ -27,6 +27,7 @@ const FacilityIcons = {
 };
 
 export default function HotelRoomCard({ room, reserveText, onClick }) {
+  // TODO: Price per night
   return (
     <Grid item sm={12} md={6} lg={3.5} mr={2} mb={2} key={room.code}>
       <Card sx={{ height: '100%', width: '100%' }}>
