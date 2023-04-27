@@ -1,17 +1,34 @@
 // @ts-nocheck
 
-import React from 'react';
-import { useParams, useSearchParams, Link } from 'react-router-dom';
+import React, { useEffect } from 'react';
+import { useParams, Link, useNavigate } from 'react-router-dom';
 import { useRecoilValue } from 'recoil';
-import { Grid, List, ListItem, ListItemText, Tab, Tabs, Box, Stack, Typography } from '@mui/material';
+import {
+  Button,
+  Card,
+  CardContent,
+  CardActions,
+  List,
+  ListItem,
+  ListItemText,
+  Tab,
+  Tabs,
+  Box,
+  Stack,
+  Typography,
+} from '@mui/material';
+import Grid from '@mui/material/Unstable_Grid2/Grid2';
 import ImageList from '@mui/material/ImageList';
 import ImageListItem from '@mui/material/ImageListItem';
 import Rating from '@mui/material/Rating';
-import userAtom from '../recoil/user';
 import SearchBars from '../components/SearchBars';
 import { hotelById, hotelOffersById } from '../recoil/hotel/atom';
 import HotelRoomCard from '../components/HotelRoomCard';
-import { createHotelbedsSrcSetFromPath } from '../utils';
+import { createHotelbedsSrcSetFromPath, formatAddressFromHotel } from '../utils';
+import { convertCategoryToRatingProps } from '../api/hotel';
+import { usePageParamsObject } from '../hooks';
+import { bookingById } from '../recoil/bookings/atom';
+import CardModal from '../components/CardModal';
 
 function a11yProps(index) {
   return {
@@ -30,21 +47,6 @@ function rowColByIndex(index) {
   return { rows: 1, cols: 1 };
 }
 
-function convertCategoryToRatingProps(categoryDescription) {
-  const numbers = categoryDescription.match(/\d/);
-  const props = {};
-
-  if (numbers) {
-    props.value = parseInt(numbers[0], 10);
-  }
-
-  if (categoryDescription.match(/half/i)) {
-    props.precision = 0.5;
-  }
-
-  return props;
-}
-
 export default function HotelPage() {
   const { hotelId } = useParams();
 
@@ -59,12 +61,13 @@ export default function HotelPage() {
   if (!hotelId) {
     return <div>Hotel not found</div>;
   }
+  const [params, setParams] = usePageParamsObject();
 
-  const [rawParams] = useSearchParams();
-  const params = Object.fromEntries([...rawParams]);
+  const [showRebookingModal, setShowRebookingModal] = React.useState(false);
 
-  const user = useRecoilValue(userAtom);
-  console.log(user);
+  const rebookingSelector = bookingById(params.rebooking !== undefined ? params.rebooking : null);
+  const rebooking = useRecoilValue(rebookingSelector);
+
   const hotel = useRecoilValue(hotelById(hotelId));
   const hotelRoomOffers = useRecoilValue(
     hotelOffersById({
@@ -72,6 +75,13 @@ export default function HotelPage() {
       ...params,
     }),
   );
+
+  useEffect(() => {
+    if (rebooking) {
+      setShowRebookingModal(true);
+    }
+  }, []);
+
   const [value, setValue] = React.useState(0);
   function handleChange(event, newValue) {
     // eslint-disable-next-line no-undef
@@ -79,78 +89,189 @@ export default function HotelPage() {
     setValue(newValue);
   }
 
+  const navigate = useNavigate();
+
   return (
-    <main className="card push-center" style={{ marginTop: 50, maxWidth: 1200 }}>
-      <ImageList sx={{ width: '100%', height: 420 }} variant="quilted" cols={8} rowHeight={100} id="overview">
-        {hotel.images.slice(0, 8).map((item, index) => (
-          <ImageListItem key={item.path} {...rowColByIndex(index)}>
-            <img {...createHotelbedsSrcSetFromPath(item.path)} alt={item.title} loading="lazy" />
-          </ImageListItem>
-        ))}
-      </ImageList>
-      <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
-        <Tabs value={value} onChange={handleChange} aria-label="hotel listing section tabs ">
-          {tabs.map((tab) => (
-            <Tab
-              key={tab.value}
-              label={tab.label}
-              {...a11yProps(tab.value)}
-              containerElement={<Link to={tab.href} />}
-            />
-          ))}
-        </Tabs>
-      </Box>
-      <Stack direction="row" justifyContent="space-between">
-        <Box sx={{ paddingRight: 3 }}>
-          <h1>{hotel.name}</h1>
-          {hotel?.category?.description && (
-            <Rating name="rating" readOnly {...convertCategoryToRatingProps(hotel?.category?.description)} />
+    <>
+      {rebooking && (
+        <CardModal open={showRebookingModal}>
+          <CardContent>
+            <Stack spacing={2}>
+              <Typography variant="h3">Rebooking</Typography>
+              <Typography variant="body1">
+                You are rebooking your stay at{' '}
+                <Typography component="span" sx={{ fontWeight: 'bold' }}>
+                  {hotel.name}
+                </Typography>
+                .
+              </Typography>
+              <Typography variant="body1">
+                Your previous booking was for{' '}
+                <Typography component="span" sx={{ fontWeight: 'bold' }}>
+                  {rebooking.rooms} {rebooking.rooms > 1 ? 'rooms' : 'room'}
+                </Typography>{' '}
+                and{' '}
+                <Typography component="span" sx={{ fontWeight: 'bold' }}>
+                  {rebooking.adults} {rebooking.adults > 1 ? 'guests' : 'guest'}
+                </Typography>{' '}
+                from{' '}
+                <Typography component="span" sx={{ fontWeight: 'bold' }}>
+                  {rebooking.check_in}
+                </Typography>{' '}
+                to{' '}
+                <Typography component="span" sx={{ fontWeight: 'bold' }}>
+                  {rebooking.check_out}
+                </Typography>
+                .
+              </Typography>
+              <Typography variant="body1">
+                You can change your booking details below. If you want to change your hotel, please cancel your booking
+                and place a new one.
+              </Typography>
+              <Typography variant="body1">
+                This is a rebooking, will effectively cancel your previous booking and create a new one. You will be
+                refunded for your previous booking which may take 5-7 days and charged for the new one immediately.
+              </Typography>
+            </Stack>
+          </CardContent>
+          <CardActions>
+            <Stack direction="row" justifyContent="space-between" sx={{ width: '100%' }}>
+              <Button
+                onClick={() => {
+                  setShowRebookingModal(false);
+                  navigate(-1);
+                }}
+                color="error"
+              >
+                Back
+              </Button>
+              <Button
+                onClick={() => {
+                  setShowRebookingModal(false);
+                }}
+              >
+                Continue
+              </Button>
+            </Stack>
+          </CardActions>
+        </CardModal>
+      )}
+      <Stack alignItems={'center'}>
+        {rebooking && <Card sx={{ width: '100%' }}></Card>}
+        <Stack className="card" spacing={2} alignItems={'center'}>
+          {!rebooking && (
+            <>
+              <Box>
+                <ImageList sx={{ width: '100%', height: 420 }} variant="quilted" cols={8} rowHeight={100} id="overview">
+                  {hotel.images.slice(0, 8).map((item, index) => (
+                    <ImageListItem key={item.path} {...rowColByIndex(index)}>
+                      <img {...createHotelbedsSrcSetFromPath(item.path)} alt={item.title} loading="lazy" />
+                    </ImageListItem>
+                  ))}
+                </ImageList>
+              </Box>
+              <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
+                <Tabs value={value} onChange={handleChange} aria-label="hotel listing section tabs ">
+                  {tabs.map((tab) => (
+                    <Tab
+                      key={tab.value}
+                      label={tab.label}
+                      {...a11yProps(tab.value)}
+                      container={<Link to={tab.href} />}
+                    />
+                  ))}
+                </Tabs>
+              </Box>
+            </>
           )}
-          <p>{hotel.description}</p>
-        </Box>
-        <Box sx={{ paddingTop: 3 }}>
-          <img src={hotel.google_map_url} alt="Google Maps" style={{ borderRadius: '4px' }} />
-          <p>
-            {hotel.address}, {hotel.city} {hotel.state} {hotel.postalCode}
-          </p>
-        </Box>
-      </Stack>
-      <Stack id="rooms">
-        <SearchBars
-          noLocation={true}
-          guests={params.guests}
-          rooms={params.rooms}
-          checkin={params.checkin}
-          checkout={params.checkout}
-        />
-        <Grid container spacing={2}>
-          {hotelRoomOffers.offers.rooms.map((room) => (
-            <HotelRoomCard key={room.code} room={room} />
-          ))}
-        </Grid>
-      </Stack>
-      <Stack direction="row" justifyContent="space-between" id="location" sx={{ marginY: 3 }}>
-        <Box sx={{ flex: '25%' }}>
-          <Typography variant="h5">About this location</Typography>
-        </Box>
-        <Stack sx={{ flex: '75%' }}>
-          <Box justifyContent="center">
-            <img src={hotel.google_map_url} alt="Google Maps" style={{ borderRadius: '4px', width: '80%' }} />
-          </Box>
-          <Stack direction="row" justifyContent="space-between" id="location" sx={{ marginY: 3 }}>
-            <Stack sx={{ flex: '50%' }}>
-              <Typography variant="h6">What&apos;s nearby</Typography>
-              <List>
-                {hotel.interestPoints.map((point) => (
-                  <ListItem key={point.id}>
-                    <ListItemText primary={point.poiName} secondary={`${point.distance / 1000} mi`} />
-                  </ListItem>
-                ))}
-              </List>
+          <Stack direction="row" justifyContent="space-between" spacing={4}>
+            <Stack spacing={1}>
+              <Typography variant="h4">{hotel.name}</Typography>
+              {hotel?.category?.description && (
+                <Rating name="rating" readOnly {...convertCategoryToRatingProps(hotel?.category?.description)} />
+              )}
+              <Typography variant="body1">{hotel.description}</Typography>
+            </Stack>
+            <Stack spacing={2}>
+              <img src={hotel.google_map_url} alt="Google Maps" style={{ borderRadius: '4px' }} />
+              <Typography variant="body1">{formatAddressFromHotel(hotel)}</Typography>
             </Stack>
           </Stack>
+          <Box
+            className="push-center"
+            sx={{
+              width: '100%',
+            }}
+          >
+            <SearchBars
+              noLocation={true}
+              guests={params.guests}
+              rooms={params.rooms}
+              checkin={params.checkin}
+              checkout={params.checkout}
+              onSearch={(searchParams) => {
+                const newParams = {
+                  ...searchParams,
+                  location: btoa(JSON.stringify(searchParams.location)),
+                };
+                if (rebooking) {
+                  newParams.rebooking = params.rebooking;
+                }
+                setParams(newParams);
+              }}
+            />
+          </Box>
+          <Grid
+            id="rooms"
+            container
+            spacing={2}
+            sx={{
+              width: '100%',
+            }}
+          >
+            {hotelRoomOffers.offers.rooms.map((room) => (
+              <HotelRoomCard
+                key={room.code}
+                room={room}
+                reserveText={rebooking ? 'Rebook' : 'Reserve'}
+                onClick={() => {
+                  let href = `/checkout/${btoa(room.rates[0].rateKey)}`;
+                  if (rebooking) {
+                    href += `?rebooking=${params.rebooking}`;
+                  }
+                  navigate(href);
+                }}
+              />
+            ))}
+          </Grid>
+          {!rebooking && (
+            <>
+              <Stack direction="row" justifyContent="space-between" id="location" sx={{ marginY: 3 }}>
+                <Box sx={{ flex: '25%' }}>
+                  <Typography variant="h5">About this location</Typography>
+                </Box>
+                <Stack sx={{ flex: '75%' }}>
+                  <Box justifyContent="center">
+                    <img src={hotel.google_map_url} alt="Google Maps" style={{ borderRadius: '4px', width: '80%' }} />
+                  </Box>
+                  <Stack direction="row" justifyContent="space-between" id="location" sx={{ marginY: 3 }}>
+                    <Stack sx={{ flex: '50%' }}>
+                      <Typography variant="h6">What&apos;s nearby</Typography>
+                      <List>
+                        {hotel.interestPoints.map((point) => (
+                          <ListItem key={point.id}>
+                            <ListItemText primary={point.poiName} secondary={`${point.distance / 1000} mi`} />
+                          </ListItem>
+                        ))}
+                      </List>
+                    </Stack>
+                  </Stack>
+                </Stack>
+              </Stack>
+            </>
+          )}
         </Stack>
       </Stack>
-    </main>
+    </>
   );
 }

@@ -1,19 +1,126 @@
+import { Card, Stack, Button, Typography, Box } from '@mui/material';
+import { CalendarMonth, Discount, ShieldMoon } from '@mui/icons-material';
+import { Link } from 'react-router-dom';
+import { useRecoilValue } from 'recoil';
 import SearchBars from '../components/SearchBars';
+import userAtom from '../recoil/user';
+
+const iconStyle = {
+  fontSize: 80,
+};
 
 export default function HomePage() {
+  const user = useRecoilValue(userAtom);
+  const cards = [
+    {
+      id: 1,
+      title: 'Reward yourself your way',
+      body: 'Stay where you want, when you want, and get rewarded',
+      icon: <CalendarMonth sx={iconStyle} />,
+      footer: !user
+        ? () => (
+            <Box>
+              <Button variant="contained" color="primary" component={Link} to="/auth">
+                Unlock instant savings
+              </Button>
+            </Box>
+          )
+        : null,
+    },
+    {
+      id: 2,
+      title: 'Unlock instant savings',
+      body: 'Earn reward points and redeem them for discounted stays!',
+      icon: <Discount sx={iconStyle} />,
+      footer: !user
+        ? () => (
+            <Stack direction="row" spacing={2}>
+              <Button variant="contained" color="primary" component={Link} to="/auth">
+                Sign up, it&lsquo;s free
+              </Button>
+              <Button variant="contained" color="primary" component={Link} to="/auth">
+                Sign in
+              </Button>
+            </Stack>
+          )
+        : null,
+    },
+    {
+      id: 3,
+      title: 'Free cancellations',
+      // TODO: foot note about 24 hour cancellation
+      body: 'Flexible bookings at most hotels*',
+      icon: <ShieldMoon sx={iconStyle} />,
+      footer: null,
+    },
+  ];
   return (
     <>
-      <main className="card push-center" style={{ marginTop: 200, maxWidth: 900 }}>
-        <div style={{ margin: '20px 100px' }}>
+      <main className="card push-center">
+        <Stack spacing={2}>
           <h1 className="text-center">Every hotel, simple pricing.</h1>
-
-          <p>
-            {
-              "Lorem ipsum, or lipsum as it is sometimes known, is dummy text used in laying out print, graphic or web designs. The passage is attributed to an unknown typesetter in the 15th century who is thought to have scrambled parts of Cicero's De Finibus Bonorum et Malorum for use in a type specimen book. It usually begins with: Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua."
-            }
-          </p>
-        </div>
-        <SearchBars />
+          <SearchBars />
+          <Stack
+            sx={{
+              background:
+                "url('https://a.travel-assets.com/travel-assets-manager/cread-1037/HCOM_WeekendMOD_hero_1856x796_20230308.jpg?impolicy=fcrop&w=1400&h=600&q=mediumHigh')",
+              backgroundSize: 'cover',
+              borderRadius: '4px',
+              overflow: 'hidden',
+            }}
+          >
+            <Stack
+              sx={{
+                background: 'rgba(0, 0, 0, 0.7)',
+              }}
+            >
+              <Stack
+                sx={{
+                  maxWidth: 300,
+                  padding: 5,
+                }}
+                spacing={3}
+              >
+                <Typography variant="h4">Your weekend escape plan</Typography>
+                <Typography variant="body1">
+                  As a member, you save an average of 10% on thousands of hotels, so take that spontaneous trip.
+                </Typography>
+                {!user && (
+                  <Button component={Link} to="/auth">
+                    Access Member Prices
+                  </Button>
+                )}
+              </Stack>
+            </Stack>
+          </Stack>
+          <Stack
+            direction={{ md: 'column', lg: 'row' }}
+            spacing={{
+              xs: 1,
+              lg: 2,
+            }}
+          >
+            {...cards.map((card) => (
+              <Card key={card.id} sx={{ flex: 1, padding: 1 }}>
+                <Stack
+                  direction="row"
+                  alignItems="center"
+                  spacing={1}
+                  sx={{
+                    height: '100%',
+                  }}
+                >
+                  {card.icon}
+                  <Stack>
+                    <h3>{card.title}</h3>
+                    <p>{card.body}</p>
+                    {card.footer && card.footer()}
+                  </Stack>
+                </Stack>
+              </Card>
+            ))}
+          </Stack>
+        </Stack>
       </main>
     </>
   );

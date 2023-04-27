@@ -1,0 +1,23 @@
+{% extends "admin/base_site.html" %}
+
+{% block extrahead %}
+<link rel="shortcut icon" href="/static/favicon.png" />
+<style>
+  #header {
+    background-color: #333;
+  }
+
+  #branding {
+    display: flex;
+    align-items: center;
+  }
+</style>
+{% endblock %}
+
+{% block branding %}
+<div style="margin: auto;">
+  <img src="/static/favicon.png" style="max-width: 40px; margin-right: 0.5rem;" alt="logo">
+</div>
+
+{{ block.super }}
+{% endblock %}

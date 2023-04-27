@@ -2,16 +2,18 @@ import { createBrowserRouter, Outlet, Navigate } from 'react-router-dom';
 
 import { useRecoilValue } from 'recoil';
 import HomePage from './pages/home';
+import AuthPage from './pages/auth';
 import HotelPage from './pages/hotel';
 import BookingPage from './pages/booking';
 import SearchPage from './pages/search';
 import CheckoutPage from './pages/checkout';
 import BookingsPage from './pages/bookings';
+import AccountPage from './pages/account';
 import AboutPage from './pages/about';
 import RewardsPage from './pages/rewards';
 
 import ErrorLayout from './layouts/error';
-import RootLayout from './layouts/root';
+import DefaultRouterLayout from './layouts/default';
 
 import userAtom from './recoil/user';
 
@@ -24,12 +26,20 @@ const AuthGuard = () => {
 const router = createBrowserRouter([
   {
     path: '/',
-    element: <RootLayout />,
+    element: <DefaultRouterLayout />,
     errorElement: <ErrorLayout />,
     children: [
       {
         path: '/',
         element: <HomePage />,
+      },
+      {
+        path: '/auth',
+        element: <AuthPage />,
+      },
+      {
+        path: '/account',
+        element: <AccountPage />,
       },
       {
         path: '/hotel/:hotelId/:hotelName',

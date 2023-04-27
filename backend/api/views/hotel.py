@@ -54,14 +54,17 @@ class HotelbedsHotelView(viewsets.mixins.RetrieveModelMixin, viewsets.GenericVie
         }
 
         offers = hotelbeds.post('/hotel-api/1.0/hotels', json=payload).json()
+        hotels = offers['hotels'].get('hotels', [])
 
         return Response({
             "offers": {
-                "rooms": HotelbedsAPIOfferHotelRoomSerializer(
-                    offers['hotels']['hotels'][0]['rooms'],
-                    context={
-                        'hotel': self.get_object()
-                    },
-                    many=True).data
+                "rooms": [
+                    room for room in HotelbedsAPIOfferHotelRoomSerializer(
+                        hotels[0]['rooms'],
+                        context={
+                            'hotel': self.get_object()
+                        },
+                        many=True).data if room['details']
+                ] if hotels else []
             }
         })

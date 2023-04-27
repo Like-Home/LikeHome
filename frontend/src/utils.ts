@@ -1,9 +1,11 @@
-export function test() {
-  return null;
-}
+import { HotelbedsHotel } from './api/types';
+
+export const formatCurrency = (value: number) => {
+  return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(value);
+};
 
 export function createHotelbedsSrcSetFromPath(path: string) {
-  const baseImageUrl = 'http://photos.hotelbeds.com/giata/';
+  const baseImageUrl = 'https://photos.hotelbeds.com/giata/';
   const imageSizes = [
     { width: 320, suffix: '' },
     { width: 74, suffix: 'small/' },
@@ -25,4 +27,8 @@ export function createHotelbedsSrcSetFromPath(path: string) {
     src: `${baseImageUrl}${path}`,
     srcSet: srcset,
   };
+}
+
+export function formatAddressFromHotel(hotel: HotelbedsHotel) {
+  return `${hotel.address}, ${hotel.city} ${hotel.stateCode} ${hotel.postalCode}`;
 }

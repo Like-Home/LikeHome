@@ -1,6 +1,6 @@
 import { ChangeEvent, useState } from 'react';
-import { Stack, Button } from '@mui/material';
-import { useNavigate, Form } from 'react-router-dom';
+import { Stack, Button, Grid } from '@mui/material';
+import { useNavigate } from 'react-router-dom';
 
 import TextInput from './controls/TextInput';
 import GuestsInput from './controls/GuestsInput';
@@ -35,7 +35,7 @@ type SearchBarProps = SearchPageParams & {
 };
 
 /**
- * Renders the hotel search bar
+ * Renders the hotel search bars
  * @param query
  * @param onSearch redirect to /search if not set
  * @returns
@@ -43,34 +43,86 @@ type SearchBarProps = SearchPageParams & {
 export default function SearchBars(props: SearchPageParams & SearchBarProps) {
   const navigate = useNavigate();
 
+  // default to setting the checkin/checkout date to the next weekend
+  const today = new Date();
+  const nextWeekend = new Date();
+  nextWeekend.setDate(today.getDate() + ((6 - today.getDay() + 7) % 7) + 1);
+  const nextWeekendStr = nextWeekend.toISOString().split('T')[0];
+  const nextWeekendPlusOne = new Date(nextWeekend);
+  nextWeekendPlusOne.setDate(nextWeekendPlusOne.getDate() + 2);
+  const nextWeekendPlusOneStr = nextWeekendPlusOne.toISOString().split('T')[0];
+
   const [location, setLocation] = useState(props.location);
-  const [checkin, setCheckin] = useState(props.checkin);
-  const [checkout, setCheckout] = useState(props.checkout);
-  const [guests, setGuests] = useState(props.guests || '1');
+  const [checkin, setCheckin] = useState(props.checkin || nextWeekendStr);
+  const [checkout, setCheckout] = useState(props.checkout || nextWeekendPlusOneStr);
+  const [guests, setGuests] = useState(props.guests || '2');
   const [rooms, setRooms] = useState(props.rooms || '1');
 
+  const gridLayouts = {
+    withLocation: {
+      location: { xs: 24, sm: 4, md: 3 },
+      checkin: { xs: 12, sm: 4, md: 2 },
+      checkout: { xs: 12, sm: 4, md: 2 },
+      guests: { xs: 12, sm: 6, md: 3 },
+      search: { xs: 12, sm: 6, md: 2 },
+    },
+    withoutLocation: {
+      location: { xs: 0, sm: 0, md: 0 },
+      checkin: { xs: 12, sm: 4, md: 4 },
+      checkout: { xs: 12, sm: 4, md: 4 },
+      guests: { xs: 12, sm: 4, md: 2 },
+      search: { xs: 12, sm: 12, md: 2 },
+    },
+  };
+
+  const layout = props.noLocation ? gridLayouts.withoutLocation : gridLayouts.withLocation;
+
   return (
-    <Form method="get">
-      <Stack direction="row" justifyContent="center" spacing={2} m={1}>
-        {!props.noLocation && <LocationAutocomplete value={location} setValue={setLocation} />}
-        <TextInput
-          name="date"
-          type="date"
-          label="Check-in Date"
-          value={checkin}
-          onChange={(e: ChangeEvent<HTMLInputElement>) => setCheckin(e.target.value)}
-        />
-        <TextInput
-          name="date"
-          type="date"
-          label="Checkout Date"
-          value={checkout}
-          onChange={(e: ChangeEvent<HTMLInputElement>) => setCheckout(e.target.value)}
-        />
+    <Grid container spacing={1}>
+      {!props.noLocation && (
+        <Grid item {...layout.location}>
+          <LocationAutocomplete value={location} setValue={setLocation} />
+        </Grid>
+      )}
+      <Grid item {...layout.checkin}>
+        <Stack justifyContent="center">
+          <TextInput
+            name="date"
+            type="date"
+            label="Check-in Date"
+            value={checkin}
+            onChange={(e: ChangeEvent<HTMLInputElement>) => setCheckin(e.target.value)}
+            sx={{
+              height: '100%',
+            }}
+          />
+        </Stack>
+      </Grid>
+      <Grid item {...layout.checkout}>
+        <Stack justifyContent="center">
+          <TextInput
+            name="date"
+            type="date"
+            label="Checkout Date"
+            value={checkout}
+            onChange={(e: ChangeEvent<HTMLInputElement>) => setCheckout(e.target.value)}
+            sx={{
+              height: '100%',
+            }}
+          />
+        </Stack>
+      </Grid>
+      <Grid item {...layout.guests}>
         <GuestsInput guests={guests} setGuests={setGuests} rooms={rooms} setRooms={setRooms} />
+      </Grid>
+      <Grid item {...layout.search}>
         <Button
-          sx={{ px: 5, fontSize: 20 }}
+          sx={{ fontSize: 20, width: '100%', height: '100%' }}
           onClick={() => {
+            if ((!props.noLocation && !location) || !checkin || !checkout) {
+              console.error('Missing required fields');
+              return;
+            }
             if (props.onSearch) {
               props.onSearch({
                 location,
@@ -91,7 +143,7 @@ export default function SearchBars(props: SearchPageParams & SearchBarProps) {
         >
           Search
         </Button>
-      </Stack>
-    </Form>
+      </Grid>
+    </Grid>
   );
 }

@@ -54,15 +54,21 @@ class HotelbedsAPIOfferHotelRoomSerializer(serializers.Serializer):
         return HotelbedsHotelImageSerializer(images, many=True).data
 
     def get_facilities(self, obj):
-        room = HotelbedsHotelRoom.objects.get(
-            roomCode=obj['code'], hotel=self.context['hotel'])
-        facilities = HotelbedsHotelRoomFacility.objects.filter(room=room)
-        return HotelbedsHotelRoomFacilitySerializer(facilities, many=True).data
+        try:
+            room = HotelbedsHotelRoom.objects.get(
+                roomCode=obj['code'], hotel=self.context['hotel'])
+            facilities = HotelbedsHotelRoomFacility.objects.filter(room=room)
+            return HotelbedsHotelRoomFacilitySerializer(facilities, many=True).data
+        except HotelbedsHotelRoom.DoesNotExist:
+            return None
 
     def get_details(self, obj):
-        room = HotelbedsHotelRoom.objects.get(
-            roomCode=obj['code'], hotel=self.context['hotel'])
-        return HotelbedsHotelRoomSerializer(room).data
+        try:
+            room = HotelbedsHotelRoom.objects.get(
+                roomCode=obj['code'], hotel=self.context['hotel'])
+            return HotelbedsHotelRoomSerializer(room).data
+        except HotelbedsHotelRoom.DoesNotExist:
+            return None
 
 
 class HotelbedsAPIOfferHotelSerializer(serializers.Serializer):

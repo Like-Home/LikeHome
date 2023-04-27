@@ -4,6 +4,7 @@ import { Paper, Stack, SxProps } from '@mui/material';
 type Icon = (props: { color?: string }) => JSX.Element;
 
 export interface ControlProps {
+  helperText?: string;
   onClick?: React.MouseEventHandler<HTMLDivElement>;
   icon?: Icon;
   label?: string;
@@ -12,7 +13,10 @@ export interface ControlProps {
   [arbitrary: string]: unknown;
 }
 
-export function Control({ sx = {}, icon, label, onClick, children = [], ...props }: ControlProps) {
+export const Control = React.forwardRef(function Control(
+  { sx = {}, icon, label, onClick, children = [], ...props }: ControlProps,
+  ref: React.Ref<HTMLDivElement>,
+) {
   return (
     <Paper
       sx={{
@@ -32,6 +36,7 @@ export function Control({ sx = {}, icon, label, onClick, children = [], ...props
         },
         ...sx,
       }}
+      ref={ref}
       onClick={onClick}
       {...props}
     >
@@ -46,4 +51,4 @@ export function Control({ sx = {}, icon, label, onClick, children = [], ...props
       </Stack>
     </Paper>
   );
-}
+});

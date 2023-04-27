@@ -33,7 +33,7 @@ def convert_category_to_rating_props(category_description):
 class CustomPagination(pagination.PageNumberPagination):
     page_size = 5
     page_size_query_param = 'size'
-    max_page_size = 10
+    max_page_size = 100
 
     def get_paginated_response(self, data):
         return Response({
@@ -106,6 +106,9 @@ class DestinationView(viewsets.mixins.RetrieveModelMixin, viewsets.GenericViewSe
     queryset = HotelbedsDestinationLocation.objects.all()
     pagination_class = CustomPagination
 
+    class Meta:
+        ordering = ['-code']
+
     @action(detail=False, methods=['get'])
     def search(self, request: Request):
         """Search for a destination location by name."""
@@ -146,11 +149,8 @@ class DestinationView(viewsets.mixins.RetrieveModelMixin, viewsets.GenericViewSe
         }
 
         offers = hotelbeds.post('/hotel-api/1.0/hotels', json=payload).json()
-        hotels = offers['hotels']['hotels']
-        hotels = cast(List[Dict[str, Any]], HotelbedsAPIOfferHotelSerializer(
-            hotels,
-            many=True
-        ).data)
+
+        hotels = offers['hotels'].get('hotels', [])
 
         if params.get('sort_by') == 'price':
             hotels.sort(
@@ -158,9 +158,12 @@ class DestinationView(viewsets.mixins.RetrieveModelMixin, viewsets.GenericViewSe
         elif params.get('sort_by') == 'rating':
             hotels.sort(
                 key=lambda hotel: convert_category_to_rating_props(hotel['categoryName']))
+        else:
+            # to ensure that the hotels are sorted for the pagination
+            hotels.sort(key=lambda hotel: hotel['code'])
 
         page = self.paginate_queryset(
-            [] if offers['hotels']['total'] == 0 else offers['hotels']['hotels'],  # type: ignore
+            hotels  # type: ignore
         )
 
         return self.get_paginated_response([

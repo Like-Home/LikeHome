@@ -2,13 +2,12 @@ name: Frontend build test
 
 on:
   push:
-    branches: [ main ]
+    branches: [main]
   pull_request:
-    branches: [ main ]
+    branches: [main]
 
 jobs:
   build:
-
     runs-on: ubuntu-latest
 
     strategy:
@@ -29,6 +28,8 @@ jobs:
 
       - name: Compile typescript
         working-directory: ./frontend
+        env:
+          NODE_OPTIONS: --max_old_space_size=8192
         run: npx tsc
 
       - name: Check file linting

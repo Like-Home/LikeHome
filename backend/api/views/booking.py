@@ -1,6 +1,6 @@
-from api.models.Booking import Booking
+import stripe
+from api.models.Booking import Booking, BookingCancelException
 from api.serializers import BookingSerializer
-from django.utils import timezone
 from rest_framework import status, viewsets
 from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated
@@ -16,7 +16,9 @@ class BookingView(viewsets.ReadOnlyModelViewSet, viewsets.mixins.UpdateModelMixi
         This view should return a list of all the purchases
         for the currently authenticated user.
         """
-        return Booking.objects.filter(user=self.request.user)
+
+        # filter the bookings by the request.user and order them by check_in date descending
+        return Booking.objects.filter(user=self.request.user).order_by('check_in').exclude(status=Booking.BookingStatus.PENDING)
 
     def get_object(self):
         """Get a single booking object by pk
@@ -35,16 +37,45 @@ class BookingView(viewsets.ReadOnlyModelViewSet, viewsets.mixins.UpdateModelMixi
     def cancel(self, request, pk=None):
         """Cancel a booking"""
 
-        booking = self.get_object()
-        if booking.status == Booking.BookingStatus.CANCELLED:
-            return Response({'status': 'booking already cancelled'}, status=status.HTTP_400_BAD_REQUEST)
+        booking: Booking = self.get_object()
 
-        # Dont allow cancellation within 24 hours of start date
-        if booking.check_in < timezone.now().date() + timezone.timedelta(hours=24):
-            return Response({'status': 'booking cannot be cancelled within 24 hours of start date'}, status=status.HTTP_400_BAD_REQUEST)
+        if not booking:
+            return Response({'message': 'Booking not found.'}, status=status.HTTP_404_NOT_FOUND)
 
-        booking.status = Booking.BookingStatus.CANCELLED
-        booking.user.account.travel_points -= booking.points_earned
-        booking.save()
-        booking.user.account.save()
-        return Response({'status': 'booking cancelled'})
+        if booking.status == Booking.BookingStatus.CANCELED:
+            return Response({'canceled': False, 'message': 'Booking already canceled.'}, status=status.HTTP_400_BAD_REQUEST)
+
+        if booking.status == Booking.BookingStatus.PAST:
+            return Response({'canceled': False, 'message': 'Booking has already past.'}, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            cancelation_status = booking.cancel()
+        except BookingCancelException as e:
+            return Response({'canceled': False, 'message': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
+        if cancelation_status == Booking.BookingCancelationStatus.NONE:
+            return Response({
+                'message': 'Booking canceled but cannot be refunded within 24 hours before check-in.',
+                'canceled': True,
+                'refund': cancelation_status,
+            },
+                status=status.HTTP_200_OK
+            )
+        elif cancelation_status == Booking.BookingCancelationStatus.FULL:
+            return Response({
+                'message': 'Booking canceled and fully refunded.',
+                'canceled': True,
+                'status': cancelation_status,
+            },
+                status=status.HTTP_200_OK
+            )
+        elif cancelation_status == Booking.BookingCancelationStatus.PARTIAL:
+            return Response({
+                'message': 'Booking canceled and partially refunded.',
+                'canceled': True,
+                'refund': cancelation_status,
+            },
+                status=status.HTTP_200_OK
+            )
+        else:
+            return Response({'message': 'Something went wrong.'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)

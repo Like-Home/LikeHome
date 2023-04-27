@@ -1,56 +1,24 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 
-import { RouterProvider } from 'react-router-dom';
-
 import { RecoilRoot } from 'recoil';
 import { CssBaseline } from '@mui/material';
+import { ThemeProvider } from '@mui/material/styles';
 
-import { createTheme, ThemeProvider } from '@mui/material/styles';
+import RootAppLayout from './layouts/root';
+import theme from './theme';
 
-import router from './router';
-import AppLoadingSpinner from './components/AppLoadingSpinner';
 import './index.scss';
-
-const darkTheme = createTheme({
-  palette: {
-    primary: { main: '#615EFF' },
-    mode: 'dark',
-  },
-  components: {
-    MuiButton: {
-      defaultProps: {
-        variant: 'contained',
-      },
-      styleOverrides: {
-        root: {
-          borderRadius: '6px',
-          textTransform: 'none',
-          lineHeight: '1.5',
-        },
-      },
-    },
-    MuiMenu: {
-      styleOverrides: {
-        paper: {
-          borderRadius: '8px',
-        },
-      },
-    },
-  },
-});
 
 // ensures a CSRF token is set in the cookies
 fetch('/api/csrf');
 
 ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
   <React.StrictMode>
-    <ThemeProvider theme={darkTheme}>
+    <ThemeProvider theme={theme}>
       <CssBaseline />
       <RecoilRoot>
-        <React.Suspense fallback={<AppLoadingSpinner />}>
-          <RouterProvider router={router} />
-        </React.Suspense>
+        <RootAppLayout />
       </RecoilRoot>
     </ThemeProvider>
   </React.StrictMode>,

@@ -1,10 +1,18 @@
 body {
   margin: 0;
-  padding: 2em;
+  padding: 0;
   display: flex;
   justify-content: center;
   min-width: 320px;
   min-height: 100vh;
+  background: linear-gradient(180deg, #568d7e 0%, #56818e 100%) !important;
+}
+
+// Prevent scrollbar from moving content
+html {
+  overflow-x: hidden;
+  margin-right: calc(-1 * (100vw - 100%));
+  scroll-behavior: smooth;
 }
 
 // Background is separate element to allow for multiple layered blurs
@@ -12,7 +20,7 @@ body::after {
   content: ' ';
   position: absolute;
   left: 0;
-  right: 0;
+  right: calc(-1 * (100vw - 100%)); // Prevent scrollbar moving background
   top: 0;
   bottom: 0;
   z-index: -1000;

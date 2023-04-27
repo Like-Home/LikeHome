@@ -36,7 +36,17 @@ function getRandomMemeWaitingMessage() {
   return MEME_WAITING_MESSAGES[randomIndex];
 }
 
-function Spinner() {
+function Spinner({ message = true }: { message?: boolean }) {
+  if (!message) {
+    return (
+      <div className="spinner">
+        <div className="bounce1" />
+        <div className="bounce2" />
+        <div className="bounce3" />
+      </div>
+    );
+  }
+
   const memeWaitingMessage = getRandomMemeWaitingMessage();
   return (
     <div className="spinner-container">

@@ -1,6 +1,7 @@
 import os
 
 from django.conf import settings
+from django.http import HttpResponsePermanentRedirect
 from django.urls import is_valid_path
 from whitenoise.middleware import WhiteNoiseMiddleware
 
@@ -105,3 +106,17 @@ class SPAMiddleware(WhiteNoiseMiddleware):
             if (not url.startswith(settings.STATIC_URL)):
                 url = os.path.join(settings.STATIC_URL, url[1:])
             return super(SPAMiddleware, self).find_file(url)
+
+
+class WwwRedirectMiddleware:
+    def __init__(self, get_response):
+        self.get_response = get_response
+
+    def __call__(self, request):
+        host = request.get_host().partition(":")[0]
+        if host.startswith("www."):
+            return HttpResponsePermanentRedirect(
+                request.build_absolute_uri().replace("www.", "", 1)
+            )
+        else:
+            return self.get_response(request)
