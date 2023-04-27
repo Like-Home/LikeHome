@@ -187,7 +187,7 @@ const footnotes = ['Some hotels require you to cancel more than 24 hours before 
 function Footer() {
   const theme = useTheme();
   return (
-    <Stack className="card footer" spacing={2}>
+    <Stack className="card card-root footer" spacing={2}>
       <Typography variant="h5">LikeHome Group</Typography>
       <Stack
         direction={{

@@ -181,7 +181,7 @@ export default function Navbar() {
 
   return (
     <nav
-      className="card navbar"
+      className="card card-root navbar"
       style={{
         maxWidth: config.maxWidth,
       }}

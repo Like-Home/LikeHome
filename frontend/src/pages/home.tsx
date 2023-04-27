@@ -61,7 +61,7 @@ export default function HomePage() {
   ];
   return (
     <>
-      <main className="card push-center" style={{ padding: 24, paddingBottom: 30 }}>
+      <main className="card card-root push-center" style={{ padding: 24, paddingBottom: 30 }}>
         <Stack spacing={2}>
           <h1 className="text-center">Every hotel, simple pricing.</h1>
           <SearchBars />

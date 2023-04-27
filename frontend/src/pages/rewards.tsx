@@ -24,7 +24,7 @@ export default function RewardsPage() {
   const user = useRecoilValue(userAtom) as User;
 
   return (
-    <Stack className="card" direction="column" alignItems={'center'} spacing={2}>
+    <Stack className="card card-root" direction="column" alignItems={'center'} spacing={2}>
       <Stack direction="row" sx={{ width: '100%' }} spacing={4}>
         <Typography variant="h4">Rewards</Typography>
         <Stack alignItems={'center'}>

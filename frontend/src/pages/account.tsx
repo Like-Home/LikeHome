@@ -72,7 +72,7 @@ export default function AboutPage() {
 
   return (
     <Stack spacing={3}>
-      <Stack className="card" spacing={3}>
+      <Stack className="card card-root" spacing={3}>
         <Typography variant="h4">Account</Typography>
         <Stack
           direction={{

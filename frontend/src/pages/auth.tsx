@@ -4,7 +4,7 @@ import InputCSRF from '../api/csrf';
 export default function AuthPage() {
   // TODO: Redirect to previous path
   return (
-    <Stack className="card push-center" spacing={3}>
+    <Stack className="card card-root push-center" spacing={3}>
       <Typography variant="h4">Sign in</Typography>
       <Typography variant="body1">To access your bookings and rewards, please sign in.</Typography>
       <Stack spacing={3} direction="row">
