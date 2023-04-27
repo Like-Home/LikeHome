@@ -1,0 +1,54 @@
+{% extends 'email/base.email' %}
+
+{% block content %}
+  <table class="Section Copy"
+    style="border: 0;border-collapse: collapse;margin: 0;padding: 0;background-color: #ffffff;">
+    <tbody>
+      <tr>
+        <td class="Spacer Spacer--gutter" width="64"
+          style="border: 0;border-collapse: collapse;margin: 0;padding: 0;-webkit-font-smoothing: antialiased;-moz-osx-font-smoothing: grayscale;color: #ffffff;font-size: 1px;line-height: 1px;mso-line-height-rule: exactly;">
+        </td>
+        <td class="Content Footer-legal Font Font--caption Font--mute"
+          style="border: 0; margin: 0; padding: 0; color: #525F7f !important; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Ubuntu, sans-serif; font-size: 16px; line-height: 24px;">
+            <p>
+            Dear esteemed guest,
+            </p>
+ 
+            <p>Welcome to LikeHome - the hotel booking site that promises to provide you with a home away from home, as long as your home isn't too fancy!</p>
+
+            <p>We understand that you have many options when it comes to booking hotels, but we guarantee that our hotels are at least 50% less likely to have bed bugs than the average budget motel (Disclaimer: this claim is not scientifically proven and is based purely on hearsay).</p>
+
+            <p>We also promise not to steal your towels, unless they're really soft and fluffy and we just can't resist (just kidding, we promise we won't steal your towels).</p>
+
+            <p>We may not always have a pool or a spa, but we sometimes have a bathtub and a few rubber ducks to make up for it. And if you're feeling adventurous, we'll even throw in a complimentary bar of soap!</p>
+
+            <p>So sit back, relax, and enjoy your stay at LikeHome - where our motto is "at least it's not a hostel".</p>
+            <p>
+            Best regards,<br>
+            The LikeHome Team
+            </p>
+        </td>
+        <td class="Spacer Spacer--gutter" width="64"
+          style="border: 0;border-collapse: collapse;margin: 0;padding: 0;-webkit-font-smoothing: antialiased;-moz-osx-font-smoothing: grayscale;color: #ffffff;font-size: 1px;line-height: 1px;mso-line-height-rule: exactly;">
+        </td>
+      </tr>
+    </tbody>
+  </table>
+{% endblock %}
+
+{% block disclaimer %}
+<p>
+  Thanks for reading this far down in the email. Here's a little secret for you - the
+  "LikeHome"
+  company doesn't actually exist in the real world. It's all just a figment of our
+  collective
+  imagination for the purposes of Meng's Spring of 2023 CMPE-165 class. So, if you were
+  planning
+  on investing all your
+  life savings into our non-existent company, you might want to think twice!
+</p>
+{% endblock %}
+{% block reason %}
+You're receiving this email because you registered for an account on 
+<a style="border: 0; margin: 0; padding: 0; color: #556cd6; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Ubuntu, sans-serif; text-decoration: none;" target="_blank" rel="noreferrer" href="https://likehome.dev/">LikeHome</a>, a hotel booking website.
+{% endblock %}

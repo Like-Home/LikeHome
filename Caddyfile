@@ -4,5 +4,5 @@
 reverse_proxy localhost:5173
 
 # Forward certain paths to Django
-@django path /api/* /admin /admin/* /static/* /accounts/*
+@django path /api/* /admin /admin/* /static/* /accounts/* /email/*
 reverse_proxy @django localhost:8000

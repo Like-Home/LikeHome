@@ -1,7 +1,8 @@
 from enum import Enum
 
 import stripe
-from api.models.hotelbeds.HotelbedsHotel import HotelbedsHotel
+from api.models.hotelbeds.HotelbedsHotel import (HotelbedsHotel,
+                                                 HotelbedsHotelImage)
 from django.contrib.auth.models import User
 from django.db import models
 from django.db.models import (CharField, DateField, DateTimeField, FloatField,
@@ -37,9 +38,17 @@ class Booking(models.Model):
     rate_key = CharField(max_length=400)
     stripe_payment_intent_id = CharField(max_length=200, null=True)
     stripe_refund_id = CharField(max_length=200, null=True, default=None)
+    stripe_customer_name = CharField(max_length=200, null=True, default=None)
+    stripe_customer_email = CharField(max_length=200, null=True, default=None)
     hotel = ForeignKey(HotelbedsHotel, on_delete=models.CASCADE)
     room_code = CharField(max_length=20, null=True)
-    amount_paid = FloatField()
+    amount_paid = FloatField()  # total
+
+    amount_before_fees_tax_and_discount = FloatField()
+    amount_discount = FloatField()
+    amount_before_fees_tax = FloatField()
+    amount_fees_taxes = FloatField()
+
     refund_amount = FloatField(default=0)
     adults = IntegerField()
     children = IntegerField()
@@ -57,6 +66,8 @@ class Booking(models.Model):
     overlapping = models.BooleanField(default=False)
     rebooked_to = models.OneToOneField(
         'self', on_delete=models.CASCADE, null=True, default=None, related_name='rebooked_from')
+    card_last_four = CharField(max_length=4)
+    card_network = CharField(max_length=20)
     created_at = DateTimeField(default=now, editable=False)
     canceled_at = DateTimeField(null=True, default=None)
 
@@ -116,6 +127,13 @@ class Booking(models.Model):
         self.save()
 
         return self.cancelation_status
+
+    def get_image(self):
+        image = HotelbedsHotelImage.objects.filter(
+            hotel=self.hotel, roomCode=self.room_code
+        ).order_by('visualOrder').first()
+
+        return image
 
     def _str_(self):
         return self.hotel.name

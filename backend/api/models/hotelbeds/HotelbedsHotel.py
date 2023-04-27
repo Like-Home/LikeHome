@@ -19,8 +19,6 @@ class HotelbedsHotel(models.Model):
     name = models.CharField(max_length=255)
     email = models.CharField(max_length=255, null=True)
     description = models.CharField(max_length=500)
-    countryCode = models.CharField(max_length=3)
-    stateCode = models.CharField(max_length=3)
     destinationCode = models.CharField(max_length=5)
     longitude = models.FloatField()
     latitude = models.FloatField()
@@ -40,8 +38,10 @@ class HotelbedsHotel(models.Model):
     ranking = models.IntegerField()
 
     address = models.CharField(max_length=255, null=True)
-    postalCode = models.CharField(max_length=10, null=True)
     city = models.CharField(max_length=255, null=True)
+    stateCode = models.CharField(max_length=3)
+    postalCode = models.CharField(max_length=10, null=True)
+    countryCode = models.CharField(max_length=3)
 
     def _str_(self):
         return self.name

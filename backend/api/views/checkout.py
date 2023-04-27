@@ -1,18 +1,21 @@
 
 import base64
 import traceback
+from typing import Optional
 
 import stripe
 from api.models.Booking import Booking, BookingCancelException
 from api.models.hotelbeds.HotelbedsHotel import (HotelbedsHotel,
                                                  HotelbedsHotelImage)
 from api.modules.hotelbeds import hotelbeds
+from api.utils import format_currency
 from app import config
 from django.utils.dateparse import parse_date
 from rest_framework import serializers, status, viewsets
 from rest_framework.decorators import action
 from rest_framework.request import Request
 from rest_framework.response import Response
+from templated_email import send_templated_mail
 
 from ..serializers import HotelbedsHotelSerializer
 
@@ -100,9 +103,6 @@ def book_on_hotelbeds(request, rate_key, checkrate, params):
                     'price': 'UNKNOWN_ERROR'
                 }
             )
-
-    # print(response2)
-    # print(response2.json())
     return response2.json()
 
 
@@ -222,13 +222,6 @@ class CheckoutView(viewsets.mixins.CreateModelMixin, viewsets.GenericViewSet):
         if rebooking_id is not None:
             previous_booking = Booking.objects.get(
                 id=rebooking_id, user=request.user, status=Booking.BookingStatus.CONFIRMED)
-            try:
-                previous_booking.cancel(
-                    full_refund=True,
-                    new_status=Booking.BookingStatus.REBOOKED,
-                )
-            except BookingCancelException as e:
-                return Response({'canceled': False, 'message': str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
         rate_key = base64.b64decode(params['rate_key']).decode('utf-8')
 
@@ -261,8 +254,6 @@ class CheckoutView(viewsets.mixins.CreateModelMixin, viewsets.GenericViewSet):
 
         conflicting_booking_found = conflicting_booking_found.exists()
 
-        print('conflicting_booking_found', conflicting_booking_found)
-
         if not params['force'] and conflicting_booking_found:
             raise serializers.ValidationError(
                 {
@@ -270,14 +261,17 @@ class CheckoutView(viewsets.mixins.CreateModelMixin, viewsets.GenericViewSet):
                 }
             )
 
-        total_net_float_before_tax = float(response['hotel']['totalNet']) / 1.1
+        total_net_float_before_tax_discount = float(
+            response['hotel']['totalNet']) / 1.1
         points_used = 0
         points_remaining = request.user.account.travel_points
         if params['apply_point_balance']:
             (total_net_float_before_tax, points_used, points_remaining) = self.deduct_travel_points(
-                total_net_float_before_tax,
+                total_net_float_before_tax_discount,
                 request.user.account.travel_points
             )
+        else:
+            total_net_float_before_tax = total_net_float_before_tax_discount
 
         # TODO: figure out random 500 errors before enabling this
         # book_on_hotelbeds(request, rate_key, response, params)
@@ -298,6 +292,11 @@ class CheckoutView(viewsets.mixins.CreateModelMixin, viewsets.GenericViewSet):
             room_name=response['hotel']['rooms'][0]['name'],
             check_in=check_in_date,
             check_out=check_out_date,
+            amount_before_fees_tax_and_discount=total_net_float_before_tax_discount,
+            amount_discount=round(float(points_used / 100), 2),
+            amount_before_fees_tax=total_net_float_before_tax,
+            amount_fees_taxes=round(
+                total_net_float - total_net_float_before_tax, 2),
             amount_paid=total_net_float,
             # START: finalized in webhook
             status=Booking.BookingStatus.PENDING,
@@ -394,7 +393,6 @@ class CheckoutView(viewsets.mixins.CreateModelMixin, viewsets.GenericViewSet):
         if event['type'] == 'checkout.session.completed':
             session = event['data']['object']
             metadata = session['metadata']
-            print(session)
             booking = Booking.objects.get(id=metadata['booking_id'])
 
             if booking.status != Booking.BookingStatus.PENDING:
@@ -402,17 +400,35 @@ class CheckoutView(viewsets.mixins.CreateModelMixin, viewsets.GenericViewSet):
                     'message': 'Booking has already been processed.'
                 }, status=400)
 
+            booking.stripe_customer_name = session['customer_details']['name']
+            booking.stripe_customer_email = session['customer_details']['email']
+
             booking.points_earned = int(metadata['points_earned'])
             booking.points_spent = int(metadata['points_spent'])
 
-            booking.stripe_payment_intent_id = session['payment_intent']
+            payment_intent_id = session['payment_intent']
+            booking.stripe_payment_intent_id = payment_intent_id
             booking.status = Booking.BookingStatus.CONFIRMED
 
+            payment_intent = stripe.PaymentIntent.retrieve(
+                payment_intent_id, expand=['payment_method'])
+
+            booking.card_last_four = payment_intent['payment_method']['card']['last4']
+            booking.card_network = payment_intent['payment_method']['card']['brand']
+
+            previous_booking = None
             rebooked_from_id = metadata.get('rebooked_from')
             if rebooked_from_id:
                 previous_booking = Booking.objects.get(id=rebooked_from_id)
                 previous_booking.rebooked_to = booking
                 booking.rebooked_from = previous_booking
+                try:
+                    previous_booking.cancel(
+                        full_refund=True,
+                        new_status=Booking.BookingStatus.REBOOKED,
+                    )
+                except BookingCancelException as e:
+                    return Response({'canceled': False, 'message': str(e)}, status=status.HTTP_400_BAD_REQUEST)
                 previous_booking.save()
 
             booking.user.account.travel_points += booking.points_earned
@@ -421,7 +437,167 @@ class CheckoutView(viewsets.mixins.CreateModelMixin, viewsets.GenericViewSet):
             booking.user.account.save()
             booking.save()
 
+            try:
+                send_booking_confirmation_email(
+                    session['customer_details']['email'],
+                    session['customer_details']['name'],
+                    booking,
+                    previous_booking=previous_booking,
+                )
+            except Exception as e:
+                print(e)
+
         return Response(status=200)
+
+
+def create_booking_confirmation_email_section(title: str, booking: Booking, include_room: bool = False):
+    return {
+        'title': title,
+        'line_items': [
+            {
+                'description': 'Booking',
+                'amount': f'#{booking.id}',
+                'href': f'{config.BASE_URL}/booking/{booking.id}',
+            },
+            *([{
+                'description': 'Room',
+                'amount': booking.room_name,
+            }] if include_room else []),
+            {
+                'description': 'First Name',
+                'amount': booking.first_name,
+            },
+            {
+                'description': 'Last Name',
+                'amount': booking.last_name,
+            },
+            {
+                'description': 'Email',
+                'amount': booking.email,
+            },
+            {
+                'description': 'Phone Number',
+                'amount': booking.phone,
+            },
+            *([{
+                'description': 'Cancellation Fee',
+                'amount': '10%',
+                'subitems': [
+                    {
+                        'description': 'Reason',
+                        'amount': 'Overlapping Booking',
+                    }
+                ]
+            }] if (booking.overlapping) else []),
+        ],
+    }
+
+
+def send_booking_confirmation_email(to_email: str, to_name: str, booking: Booking, previous_booking: Optional[Booking] = None):
+    formatted_check_in = booking.check_in.strftime('%a, %b %d')
+
+    booking_image = booking.get_image()
+
+    if previous_booking:
+        email_image_context = {
+            'src': 'https://media.tenor.com/rs0O3XIvgCIAAAAd/no-refund-refund.gif',
+            'alt': 'Angry chipmunk going balistic.',
+            'subtitle1': 'Thank god you didn\'t ask for a refund!',
+            'subtitle2': 'We\'re working hard to calm the chipmunk down.',
+        }
+    else:
+        email_image_context = {
+            'subtitle1': f'{booking.hotel.address}',
+            'subtitle2': f'{booking.hotel.city}, {booking.hotel.stateCode} {booking.hotel.postalCode} {booking.hotel.countryCode}',
+        }
+
+        if booking_image:
+            email_image_context['src'] = f'https://photos.hotelbeds.com/giata/{booking_image.path}'
+            email_image_context['alt'] = booking.room_name
+
+    confirmation_type = 'rebooking ' if previous_booking else 'travel'
+    email_context = {
+        'subject': f'LikeHome {confirmation_type} confirmation - {formatted_check_in} - Itin #{booking.id}',
+        'email_title': 'Thank you for your rebooking! ' if previous_booking else 'Thank you for your reservation!',
+        'content_title': 'Rebooking Confirmation' if previous_booking else booking.hotel.name,
+        'image': email_image_context,
+        'card': {
+            'last_four': booking.card_last_four,
+            'network': booking.card_network.lower(),
+            'capitalized_network': booking.card_network,
+        },
+        'thank_you_tag': 'Thank you for your business!',
+        'sections': [
+            *([create_booking_confirmation_email_section(
+                title='Old Itinerary',
+                booking=previous_booking,
+                include_room=True
+            )] if previous_booking else []),
+            create_booking_confirmation_email_section(
+                title='New Itinerary' if previous_booking else 'Itinerary',
+                booking=booking,
+                include_room=bool(previous_booking)
+            ),
+            {
+                'title': 'Summary',
+                'line_items': [
+                    {
+                        'description': booking.room_name,
+                        'amount': format_currency(booking.amount_before_fees_tax_and_discount),
+                        'subitems': [
+                            *([{
+                                'description': 'Reward Points Used',
+                                'amount': f'-{format_currency(booking.amount_discount)}',
+                            }] if (booking.amount_discount > 0) else []),
+                            {
+                                'description': 'Tax & Fees',
+                                'amount': format_currency(booking.amount_fees_taxes),
+                            },
+                        ]
+                    },
+                    {
+                        'description': 'Total',
+                        'amount': format_currency(booking.amount_paid),
+                    },
+                    *([{
+                        'spacer': True
+                    },
+                        {
+                        'bold': True,
+                        'description': 'Points Earned',
+                        'amount': booking.points_earned,
+                    },] if not previous_booking else [
+                        {
+                            'description': 'Refund',
+                            'amount': format_currency(previous_booking.refund_amount),
+                            'subitems': [
+                                {
+                                    'description': 'From',
+                                    'amount': f'Booking #{previous_booking.id}',
+                                    'href': f'{config.BASE_URL}/booking/{previous_booking.id}',
+                                }
+                            ]
+                        },
+                    ])
+                ],
+            }
+        ],
+        'check_in': booking.check_in.strftime('%Y-%m-%d'),
+        'check_out': booking.check_out.strftime('%Y-%m-%d'),
+        'contact_us_email': 'bookings@likehome.dev',
+        'header_logo_url': 'https://raw.githubusercontent.com/Like-Home/LikeHome/main/frontend/static/favicon.png',
+        'rendered_online': True,
+        'base_url': config.BASE_URL,
+    }
+
+    send_templated_mail(
+        recipient_list=[to_email],
+        to=[f'{to_name} <{to_email}>'],
+        template_name='booking_confirmation',
+        from_email='LikeHome <bookings@likehome.dev>',
+        context=email_context,
+        create_link=True,
+    )
 
 
 if __name__ == '__main__':
