@@ -1,7 +1,7 @@
 import { ChangeEvent, useState } from 'react';
-import { Stack, Button, Grid } from '@mui/material';
+import { Stack, Button, Alert } from '@mui/material';
+import Grid from '@mui/material/Unstable_Grid2';
 import { useNavigate } from 'react-router-dom';
-
 import TextInput from './controls/TextInput';
 import GuestsInput from './controls/GuestsInput';
 import LocationAutocomplete from './LocationAutocomplete';
@@ -58,6 +58,8 @@ export default function SearchBars(props: SearchPageParams & SearchBarProps) {
   const [guests, setGuests] = useState(props.guests || '2');
   const [rooms, setRooms] = useState(props.rooms || '1');
 
+  const [alert, setAlert] = useState('');
+
   const gridLayouts = {
     withLocation: {
       location: { xs: 24, sm: 4, md: 3 },
@@ -78,72 +80,83 @@ export default function SearchBars(props: SearchPageParams & SearchBarProps) {
   const layout = props.noLocation ? gridLayouts.withoutLocation : gridLayouts.withLocation;
 
   return (
-    <Grid container spacing={1}>
-      {!props.noLocation && (
-        <Grid item {...layout.location}>
-          <LocationAutocomplete value={location} setValue={setLocation} />
-        </Grid>
+    <>
+      {alert && (
+        <Alert severity="error" sx={{ marginTop: 2 }}>
+          {alert}
+        </Alert>
       )}
-      <Grid item {...layout.checkin}>
-        <Stack justifyContent="center">
-          <TextInput
-            name="date"
-            type="date"
-            label="Check-in Date"
-            value={checkin}
-            onChange={(e: ChangeEvent<HTMLInputElement>) => setCheckin(e.target.value)}
-            sx={{
-              height: '100%',
+      <Grid container spacing={1}>
+        {!props.noLocation && (
+          <Grid {...layout.location}>
+            <LocationAutocomplete value={location} setValue={setLocation} />
+          </Grid>
+        )}
+        <Grid {...layout.checkin}>
+          <Stack justifyContent="center">
+            <TextInput
+              name="date"
+              type="date"
+              label="Check-in Date"
+              value={checkin}
+              onChange={(e: ChangeEvent<HTMLInputElement>) => setCheckin(e.target.value)}
+              sx={{
+                height: '100%',
+              }}
+            />
+          </Stack>
+        </Grid>
+        <Grid {...layout.checkout}>
+          <Stack justifyContent="center">
+            <TextInput
+              name="date"
+              type="date"
+              label="Checkout Date"
+              value={checkout}
+              onChange={(e: ChangeEvent<HTMLInputElement>) => setCheckout(e.target.value)}
+              sx={{
+                height: '100%',
+              }}
+            />
+          </Stack>
+        </Grid>
+        <Grid {...layout.guests}>
+          <GuestsInput guests={guests} setGuests={setGuests} rooms={rooms} setRooms={setRooms} />
+        </Grid>
+        <Grid {...layout.search}>
+          <Button
+            sx={{ fontSize: 20, width: '100%', height: '100%' }}
+            onClick={() => {
+              if (!checkin || !checkout) {
+                setAlert('Please enter check-in and checkout dates.');
+                return;
+              }
+              if (!props.noLocation && !location) {
+                setAlert('Please select a location.');
+                return;
+              }
+              if (props.onSearch) {
+                props.onSearch({
+                  location,
+                  checkin,
+                  checkout,
+                  guests,
+                  rooms,
+                });
+              } else {
+                // TODO: kidna hacky to pass this in the URL. Any ides?
+                const locationHash = btoa(JSON.stringify(location));
+                // TODO: validate dates before proceeding
+                navigate(
+                  `/search?location=${locationHash}&checkin=${checkin}&checkout=${checkout}&guests=${guests}&rooms=${rooms}`,
+                );
+              }
             }}
-          />
-        </Stack>
+          >
+            Search
+          </Button>
+        </Grid>
       </Grid>
-      <Grid item {...layout.checkout}>
-        <Stack justifyContent="center">
-          <TextInput
-            name="date"
-            type="date"
-            label="Checkout Date"
-            value={checkout}
-            onChange={(e: ChangeEvent<HTMLInputElement>) => setCheckout(e.target.value)}
-            sx={{
-              height: '100%',
-            }}
-          />
-        </Stack>
-      </Grid>
-      <Grid item {...layout.guests}>
-        <GuestsInput guests={guests} setGuests={setGuests} rooms={rooms} setRooms={setRooms} />
-      </Grid>
-      <Grid item {...layout.search}>
-        <Button
-          sx={{ fontSize: 20, width: '100%', height: '100%' }}
-          onClick={() => {
-            if ((!props.noLocation && !location) || !checkin || !checkout) {
-              console.error('Missing required fields');
-              return;
-            }
-            if (props.onSearch) {
-              props.onSearch({
-                location,
-                checkin,
-                checkout,
-                guests,
-                rooms,
-              });
-            } else {
-              // TODO: kidna hacky to pass this in the URL. Any ides?
-              const locationHash = btoa(JSON.stringify(location));
-              // TODO: validate dates before proceeding
-              navigate(
-                `/search?location=${locationHash}&checkin=${checkin}&checkout=${checkout}&guests=${guests}&rooms=${rooms}`,
-              );
-            }
-          }}
-        >
-          Search
-        </Button>
-      </Grid>
-    </Grid>
+    </>
   );
 }

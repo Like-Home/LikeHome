@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { ChangeEvent, useEffect, useState } from 'react';
 import { Avatar, Stack, Typography, Button, Checkbox } from '@mui/material';
 import { useRecoilState } from 'recoil';
 import { useNavigate } from 'react-router-dom';
@@ -93,28 +93,28 @@ export default function AboutPage() {
             <TextInput
               label="First Name"
               value={firstName}
-              onChange={(event) => {
+              onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
                 setFirstName(event.target.value);
               }}
             />
             <TextInput
               label="Last Name"
               value={lastName}
-              onChange={(event) => {
+              onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
                 setLastName(event.target.value);
               }}
             />
             <TextInput
               label="Email"
               value={email}
-              onChange={(event) => {
+              onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
                 setEmail(event.target.value);
               }}
             />
             <TextInput
               label="Phone Number"
               value={phoneNumber}
-              onChange={(event) => {
+              onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
                 setPhoneNumber(event.target.value);
               }}
             />

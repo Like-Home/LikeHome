@@ -1,5 +1,6 @@
 import { useState, useRef } from 'react';
 import { Box, InputBase, Menu } from '@mui/material';
+import Person from '@mui/icons-material/Person';
 import { Control } from './Control';
 import NumberStepper from './NumberStepper';
 
@@ -29,6 +30,7 @@ export default function GuestsInput({
         onClick={() => {
           setAnchor(ref.current as HTMLElement);
         }}
+        icon={Person}
       >
         <InputBase
           sx={{ pointerEvents: 'none' }}

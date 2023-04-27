@@ -42,7 +42,7 @@ a {
   text-decoration: inherit;
 }
 
-a:hover {
+a:hover:not(.MuiButton-root) {
   color: #7f7cff;
   text-decoration: underline;
   text-underline-offset: 4px;
