@@ -54,15 +54,15 @@ export default function HotelRoomCard({ room, reserveText, onClick }) {
               </ListItemText>
             </ListItem>
             {room.facilities.map((facility) => {
-              const Icon = FacilityIcons[facility.facility];
+              const Icon = FacilityIcons[facility.facility.description];
               return (
-                <ListItem key={facility.facility}>
+                <ListItem key={facility.facility.code}>
                   {Icon && (
                     <ListItemIcon>
                       <Icon />
                     </ListItemIcon>
                   )}
-                  <ListItemText primary={facility.facility} secondary={room.maxOccupancy} />
+                  <ListItemText primary={facility.facility.description} secondary={room.maxOccupancy} />
                 </ListItem>
               );
             })}
