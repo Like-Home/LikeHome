@@ -11,6 +11,8 @@ https://docs.djangoproject.com/en/4.1/ref/settings/
 """
 
 import os
+import tempfile
+from os import path
 from pathlib import Path
 
 import dj_database_url
@@ -104,9 +106,36 @@ INSTALLED_APPS = [
     'allauth.account',
     'allauth.socialaccount',
     'allauth.socialaccount.providers.google',  # for Google OAuth 2.0
+    # email rendering
+    'templated_email',
     # custom
     'api',
-]
+]  # This replaces django.core.mail.EmailMessage
+TEMPLATED_EMAIL_EMAIL_MESSAGE_CLASS = 'anymail.message.AnymailMessage'
+
+# This replaces django.core.mail.EmailMultiAlternatives
+TEMPLATED_EMAIL_EMAIL_MULTIALTERNATIVES_CLASS = 'anymail.message.AnymailMessage'
+
+TEMPLATED_EMAIL_BACKEND = 'templated_email.backends.vanilla_django.TemplateBackend'
+
+EMAIL_BACKEND = "anymail.backends.sendinblue.EmailBackend"
+
+if config.PRODUCTION:
+    EMAIL_BACKEND = "anymail.backends.sendinblue.EmailBackend"
+    ANYMAIL = {
+        "SENDINBLUE_API_KEY": config.SENDINBLUE_API_KEY,
+    }
+else:
+    EMAIL_BACKEND = "django.core.mail.backends.filebased.EmailBackend"
+    EMAIL_FILE_PATH = path.join(tempfile.gettempdir(), "likehome", "emails")
+    os.makedirs(EMAIL_FILE_PATH, exist_ok=True)
+    print('Emails will be send to "{}" during development.'.format(EMAIL_FILE_PATH))
+
+
+# use '' for top level template dir, ensure there is a trailing slash
+TEMPLATED_EMAIL_TEMPLATE_DIR = 'email/'
+TEMPLATED_EMAIL_FILE_EXTENSION = 'email'
+
 
 MIDDLEWARE = [
     # default

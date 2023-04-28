@@ -45,6 +45,24 @@ export default responsiveFontSizes(
           },
         },
       },
+      MuiListItem: {
+        styleOverrides: {
+          dense: {
+            paddingTop: 2,
+            paddingBottom: 2,
+            paddingLeft: 4,
+            paddingRight: 4,
+          },
+        },
+      },
+      MuiListItemIcon: {
+        styleOverrides: {
+          root: {
+            minWidth: 0,
+            marginRight: 16,
+          },
+        },
+      },
     },
   }),
 );

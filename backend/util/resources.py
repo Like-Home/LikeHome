@@ -268,7 +268,6 @@ class APIResourceHotel(APIResource):
             return records
         except Exception as e:
             traceback.print_exc()
-            # print(item)
         return []
 
 

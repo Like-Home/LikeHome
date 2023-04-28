@@ -1,6 +1,5 @@
 import * as React from 'react';
 import Box from '@mui/material/Box';
-import TextField from '@mui/material/TextField';
 import Autocomplete from '@mui/material/Autocomplete';
 import LocationOnIcon from '@mui/icons-material/LocationOn';
 import Grid from '@mui/material/Grid';
@@ -10,6 +9,7 @@ import match from 'autosuggest-highlight/match';
 
 import { debounce } from '@mui/material/utils';
 import { getLocation } from '../api/location';
+import TextInput from './controls/TextInput';
 
 // eslint-disable-next-line react/prop-types
 export default function LocationAutocomplete({ value, setValue }) {
@@ -73,7 +73,15 @@ export default function LocationAutocomplete({ value, setValue }) {
       onInputChange={(event, newInputValue) => {
         setInputValue(newInputValue);
       }}
-      renderInput={(params) => <TextField {...params} label="Location" fullWidth />}
+      renderInput={(params) => (
+        <TextInput
+          ref={params.InputProps.ref}
+          icon={(props) => <LocationOnIcon {...props} />}
+          inputProps={params.inputProps}
+          label="Location"
+          fullWidth
+        />
+      )}
       renderOption={(props, option) => {
         console.log(option.name, inputValue);
 

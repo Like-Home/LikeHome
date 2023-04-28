@@ -1,12 +1,12 @@
 import React from 'react';
 import { Paper, Stack, SxProps } from '@mui/material';
 
-type Icon = (props: { color?: string }) => JSX.Element;
+type IconType = (props: { style?: object }) => JSX.Element;
 
 export interface ControlProps {
   helperText?: string;
   onClick?: React.MouseEventHandler<HTMLDivElement>;
-  icon?: Icon;
+  icon?: IconType;
   label?: string;
   children?: React.ReactNode;
   sx?: SxProps;
@@ -17,6 +17,7 @@ export const Control = React.forwardRef(function Control(
   { sx = {}, icon, label, onClick, children = [], ...props }: ControlProps,
   ref: React.Ref<HTMLDivElement>,
 ) {
+  const Icon = icon;
   return (
     <Paper
       sx={{
@@ -24,7 +25,7 @@ export const Control = React.forwardRef(function Control(
         px: 1.5,
         display: 'flex',
         flexDirection: 'column',
-        height: 50,
+        maxHeight: 52,
         flex: 1,
         background: '#494747',
         boxShadow: '0px 2px 5px rgba(0, 0, 0, 0.25)',
@@ -44,7 +45,7 @@ export const Control = React.forwardRef(function Control(
         {label ?? ''}
       </label>
       <Stack direction="row" spacing={1}>
-        {typeof icon === 'function' && icon({ color: 'disabled' })}
+        <div>{Icon && <Icon style={{ opacity: 0.5, marginTop: 6, fontSize: '20px' }} />}</div>
         <Stack direction="column" flex={1} alignItems="stretch">
           {children}
         </Stack>

@@ -88,8 +88,8 @@ function BookingsList() {
 
 export default function BookingsPage() {
   return (
-    <main className="card push">
-      <h1>My Bookings</h1>
+    <main className="card card-root push">
+      <Typography variant="h4">My Bookings</Typography>
       <BookingsList />
     </main>
   );

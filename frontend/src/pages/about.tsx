@@ -3,7 +3,7 @@ import theTeamImage from '../assets/the-team.png';
 
 export default function AboutPage() {
   return (
-    <Stack className="card push-center" spacing={3}>
+    <Stack className="card card-root push-center" spacing={3}>
       <Typography variant="h4">About Us</Typography>
       <Typography variant="body1">
         Welcome to LikeHome, the hotel booking website that helps you find the perfect place to stay, no matter where

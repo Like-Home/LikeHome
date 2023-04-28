@@ -187,7 +187,7 @@ const footnotes = ['Some hotels require you to cancel more than 24 hours before 
 function Footer() {
   const theme = useTheme();
   return (
-    <Stack className="card footer" spacing={2}>
+    <Stack className="card card-root footer" spacing={2}>
       <Typography variant="h5">LikeHome Group</Typography>
       <Stack
         direction={{
@@ -227,10 +227,10 @@ function Footer() {
         ))}
       </Stack>
       <Divider />
-      <List>
+      <List dense sx={{ p: 0 }}>
         {...footnotes.map((footnote, index) => (
-          <ListItem key={footnote}>
-            <Typography variant="caption">{`${'*'.repeat(index + 1)} ${footnote}`}</Typography>
+          <ListItem key={footnote} sx={{ py: 0 }}>
+            <Typography color="gray" variant="caption">{`${'*'.repeat(index + 1)} ${footnote}`}</Typography>
           </ListItem>
         ))}
       </List>

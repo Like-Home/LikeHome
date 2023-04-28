@@ -1,5 +1,7 @@
 import { Card, Stack, Button, Typography, Box } from '@mui/material';
-import { CalendarMonth, Discount, ShieldMoon } from '@mui/icons-material';
+import CalendarMonth from '@mui/icons-material/CalendarMonth';
+import Discount from '@mui/icons-material/Discount';
+import ShieldMoon from '@mui/icons-material/ShieldMoon';
 import { Link } from 'react-router-dom';
 import { useRecoilValue } from 'recoil';
 import SearchBars from '../components/SearchBars';
@@ -48,19 +50,23 @@ export default function HomePage() {
     {
       id: 3,
       title: 'Free cancellations',
-      // TODO: foot note about 24 hour cancellation
-      body: 'Flexible bookings at most hotels*',
+      body: 'Flexible bookings at most hotels',
+      footer: () => (
+        <Typography sx={{ mt: 3, fontSize: 11 }} color="dimgray" variant="caption">
+          * Bookings must be cancelled at least 24 hours in advance of check-in.
+        </Typography>
+      ),
       icon: <ShieldMoon sx={iconStyle} />,
-      footer: null,
     },
   ];
   return (
     <>
-      <main className="card push-center">
+      <main className="card card-root push-center" style={{ padding: 24, paddingBottom: 30 }}>
         <Stack spacing={2}>
           <h1 className="text-center">Every hotel, simple pricing.</h1>
           <SearchBars />
           <Stack
+            style={{ margin: 4, marginTop: 10 }}
             sx={{
               background:
                 "url('https://a.travel-assets.com/travel-assets-manager/cread-1037/HCOM_WeekendMOD_hero_1856x796_20230308.jpg?impolicy=fcrop&w=1400&h=600&q=mediumHigh')",
@@ -94,6 +100,7 @@ export default function HomePage() {
             </Stack>
           </Stack>
           <Stack
+            style={{ margin: 4, marginTop: 10 }}
             direction={{ md: 'column', lg: 'row' }}
             spacing={{
               xs: 1,
@@ -101,7 +108,7 @@ export default function HomePage() {
             }}
           >
             {...cards.map((card) => (
-              <Card key={card.id} sx={{ flex: 1, padding: 1 }}>
+              <Card key={card.id} sx={{ flex: 1, padding: 2, pb: 3 }}>
                 <Stack
                   direction="row"
                   alignItems="center"
@@ -112,7 +119,7 @@ export default function HomePage() {
                 >
                   {card.icon}
                   <Stack>
-                    <h3>{card.title}</h3>
+                    <h3 style={{ marginTop: 0 }}>{card.title}</h3>
                     <p>{card.body}</p>
                     {card.footer && card.footer()}
                   </Stack>

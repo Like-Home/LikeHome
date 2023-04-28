@@ -56,18 +56,22 @@ STRIPE_PUBLISHABLE_KEY = getenv('STRIPE_PUBLISHABLE_KEY', required=PRODUCTION)
 STRIPE_SECRET_KEY = getenv('STRIPE_SECRET_KEY', required=PRODUCTION)
 STRIPE_ENDPOINT_SECRET = getenv('STRIPE_ENDPOINT_SECRET', required=PRODUCTION)
 
-POSTGRES_USER = getenv('POSTGRES_USER', required=PRODUCTION)
-POSTGRES_HOST = getenv('POSTGRES_HOST', required=PRODUCTION)
-POSTGRES_DB = getenv('POSTGRES_DB', required=PRODUCTION)
-POSTGRES_PASSWORD = getenv('POSTGRES_PASSWORD', required=PRODUCTION)
+
+PG_FIELDS_REQUIRED = PRODUCTION and 'DATABASE_URL' not in os.environ
+POSTGRES_USER = getenv('POSTGRES_USER', required=PG_FIELDS_REQUIRED)
+POSTGRES_HOST = getenv('POSTGRES_HOST', required=PG_FIELDS_REQUIRED)
+POSTGRES_DB = getenv('POSTGRES_DB', required=PG_FIELDS_REQUIRED)
+POSTGRES_PASSWORD = getenv('POSTGRES_PASSWORD', required=PG_FIELDS_REQUIRED)
 POSTGRES_PORT = int(getenv('POSTGRES_PORT',
                            default='5432',
-                           required=PRODUCTION
+                           required=PG_FIELDS_REQUIRED
                            ))
 
 GOOGLE_MAPS_API_KEY = getenv('GOOGLE_MAPS_API_KEY', required=PRODUCTION)
 GOOGLE_MAPS_API_SECERT = getenv('GOOGLE_MAPS_API_SECERT', required=PRODUCTION)
 MONEY_SAVER_MODE = getenv('MONEY_SAVER_MODE', default=True, boolean=True)
+
+SENDINBLUE_API_KEY = getenv('SENDINBLUE_API_KEY', required=PRODUCTION)
 
 BASE_URL = getenv('BASE_URL', default='http://localhost:8080',
                   required=PRODUCTION)

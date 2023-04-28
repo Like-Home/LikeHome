@@ -86,7 +86,6 @@ class HotelbedsAPIOfferHotelSerializer(serializers.Serializer):
     images = serializers.SerializerMethodField()
 
     # def get_facilities(self, obj):
-    #     print(obj)
     #     db_hotel = HotelbedsHotel.objects.get(code=int(obj['code']))
     #     return list(db_hotel.facilities.values('facility__description', 'facilityGroup__description'))
 

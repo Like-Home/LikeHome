@@ -1,0 +1,344 @@
+{% extends './base.email' %}
+
+{% block content %}
+
+  <table class="st-Copy st-Width st-Width--mobile" border="0" cellpadding="0" cellspacing="0"
+    width="600" style="min-width: 600px;">
+    <tbody>
+      <tr>
+        <td class="st-Spacer st-Spacer--stacked" colspan="3" height="12"
+          style="border: 0; margin: 0; padding: 0; font-size: 1px; line-height: 1px; mso-line-height-rule: exactly;">
+          <div class="st-Spacer st-Spacer--filler"> </div>
+        </td>
+      </tr>
+      <tr>
+        <td class="st-Spacer st-Spacer--stacked" colspan="3" height="12"
+          style="border: 0; margin: 0; padding: 0; font-size: 1px; line-height: 1px; mso-line-height-rule: exactly;">
+          <div class="st-Spacer st-Spacer--filler"> </div>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+  <table class="st-Copy st-Copy--standalone st-Copy--caption" border="0" cellpadding="0"
+    cellspacing="0" width="100%">
+    <tbody>
+      <tr>
+        <td class="st-Font st-Font--caption"
+          style="border: 0; margin: 0; padding: 0; color: #8898aa; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Ubuntu, sans-serif; font-size: 12px; font-weight: bold; line-height: 16px; text-transform: uppercase;">
+
+
+        </td>
+        <td width="64"
+          style="border: 0;border-collapse: collapse;margin: 0;padding: 0;-webkit-font-smoothing: antialiased;-moz-osx-font-smoothing: grayscale;color: #ffffff;font-size: 1px;line-height: 1px;mso-line-height-rule: exactly;">
+        </td>
+        <td class="DataBlocks-item" valign="top"
+          style="border: 0;border-collapse: collapse;margin: 0;padding: 0;-webkit-font-smoothing: antialiased;-moz-osx-font-smoothing: grayscale;">
+          <table style="border: 0;border-collapse: collapse;margin: 0;padding: 0;">
+            <tbody>
+              <tr>
+                <td class="Font Font--caption Font--uppercase Font--mute Font--noWrap"
+                  style="border: 0;border-collapse: collapse;margin: 0;padding: 0;-webkit-font-smoothing: antialiased;-moz-osx-font-smoothing: grayscale;font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Ubuntu, sans-serif;mso-line-height-rule: exactly;vertical-align: middle;color: #8898aa;font-size: 12px;line-height: 16px;white-space: nowrap;font-weight: bold;text-transform: uppercase;">
+                  Check-in
+                </td>
+              </tr>
+              <tr>
+                <td class="Font Font--body Font--noWrap"
+                  style="border: 0;border-collapse: collapse;margin: 0;padding: 0;-webkit-font-smoothing: antialiased;-moz-osx-font-smoothing: grayscale;font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Ubuntu, sans-serif;mso-line-height-rule: exactly;vertical-align: middle;color: #525f7f;font-size: 15px;line-height: 24px;white-space: nowrap;">
+                  {{check_in}}
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </td>
+        <td width="20"
+          style="border: 0;border-collapse: collapse;margin: 0;padding: 0;-webkit-font-smoothing: antialiased;-moz-osx-font-smoothing: grayscale;color: #ffffff;font-size: 1px;line-height: 1px;mso-line-height-rule: exactly;">
+        </td>
+        <td class="DataBlocks-item" valign="top"
+          style="border: 0;border-collapse: collapse;margin: 0;padding: 0;-webkit-font-smoothing: antialiased;-moz-osx-font-smoothing: grayscale;">
+          <table style="border: 0;border-collapse: collapse;margin: 0;padding: 0;">
+            <tbody>
+              <tr>
+                <td class="Font Font--caption Font--uppercase Font--mute Font--noWrap"
+                  style="border: 0;border-collapse: collapse;margin: 0;padding: 0;-webkit-font-smoothing: antialiased;-moz-osx-font-smoothing: grayscale;font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Ubuntu, sans-serif;mso-line-height-rule: exactly;vertical-align: middle;color: #8898aa;font-size: 12px;line-height: 16px;white-space: nowrap;font-weight: bold;text-transform: uppercase;">
+                  Check-out
+                </td>
+              </tr>
+              <tr>
+                <td class="Font Font--body Font--noWrap"
+                  style="border: 0;border-collapse: collapse;margin: 0;padding: 0;-webkit-font-smoothing: antialiased;-moz-osx-font-smoothing: grayscale;font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Ubuntu, sans-serif;mso-line-height-rule: exactly;vertical-align: middle;color: #525f7f;font-size: 15px;line-height: 24px;white-space: nowrap;">
+                  {{check_out}}
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </td>
+        <td width="20"
+          style="border: 0;border-collapse: collapse;margin: 0;padding: 0;-webkit-font-smoothing: antialiased;-moz-osx-font-smoothing: grayscale;color: #ffffff;font-size: 1px;line-height: 1px;mso-line-height-rule: exactly;">
+        </td>
+        <td class="DataBlocks-item" valign="top"
+          style="border: 0;border-collapse: collapse;margin: 0;padding: 0;-webkit-font-smoothing: antialiased;-moz-osx-font-smoothing: grayscale;">
+          <table style="border: 0;border-collapse: collapse;margin: 0;padding: 0;">
+            <tbody>
+              <tr>
+                <td class="Font Font--caption Font--uppercase Font--mute Font--noWrap"
+                  style="border: 0;border-collapse: collapse;margin: 0;padding: 0;-webkit-font-smoothing: antialiased;-moz-osx-font-smoothing: grayscale;font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Ubuntu, sans-serif;mso-line-height-rule: exactly;vertical-align: middle;color: #8898aa;font-size: 12px;line-height: 16px;white-space: nowrap;font-weight: bold;text-transform: uppercase;">
+                  Card
+                </td>
+              </tr>
+              <tr>
+                <td class="Font Font--body Font--noWrap"
+                  style="border: 0;border-collapse: collapse;margin: 0;padding: 0;-webkit-font-smoothing: antialiased;-moz-osx-font-smoothing: grayscale;font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Ubuntu, sans-serif;mso-line-height-rule: exactly;vertical-align: middle;color: #525f7f;font-size: 15px;line-height: 24px;white-space: nowrap;">
+
+                  <span>
+                    <img alt="{{card.capitalized_network}}" height="16"
+                      src="https://stripe-images.s3.amazonaws.com/emails/receipt_assets/card/{{card.network}}-dark@2x.png"
+                      style="border: 0; margin: 0; padding: 0; vertical-align: text-bottom;">
+                  </span>
+                  <span>
+                    {{card.last_four}}
+                  </span>
+
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </td>
+        <td width="64"
+          style="border: 0;border-collapse: collapse;margin: 0;padding: 0;-webkit-font-smoothing: antialiased;-moz-osx-font-smoothing: grayscale;color: #ffffff;font-size: 1px;line-height: 1px;mso-line-height-rule: exactly;">
+        </td>
+
+
+
+      </tr>
+    </tbody>
+  </table>
+
+  <table class="st-Spacer st-Spacer--standalone st-Width st-Width--mobile" border="0" cellpadding="0"
+    cellspacing="0" width="100%">
+    <tbody>
+      <tr>
+        <td height="32"
+          style="border: 0; margin: 0; padding: 0; font-size: 1px; line-height: 1px; max-height: 1px; mso-line-height-rule: exactly;">
+          <div class="st-Spacer st-Spacer--filler"> </div>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+  {% for section in sections %}
+  <table class="st-Copy st-Copy--caption st-Width st-Width--mobile" border="0" cellpadding="0"
+    cellspacing="0" width="600" style="min-width: 600px;">
+    <tbody>
+      <tr>
+        <td class="st-Spacer st-Spacer--gutter"
+          style="border: 0; margin: 0; padding: 0; font-size: 1px; line-height: 1px; mso-line-height-rule: exactly;"
+          width="64">
+          <div class="st-Spacer st-Spacer--filler"> </div>
+        </td>
+        <td class="st-Font st-Font--caption"
+          style="border: 0; margin: 0; padding: 0; color: #8898aa; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Ubuntu, sans-serif; font-size: 12px; line-height: 16px; text-transform: uppercase;">
+          <span class="st-Delink" style="border: 0; margin: 0; padding: 0; font-weight: bold;">
+            {{section.title}}
+          </span>
+        </td>
+        <td class="st-Spacer st-Spacer--gutter"
+          style="border: 0; margin: 0; padding: 0; font-size: 1px; line-height: 1px; mso-line-height-rule: exactly;"
+          width="64">
+          <div class="st-Spacer st-Spacer--filler"> </div>
+        </td>
+      </tr>
+      <tr>
+        <td class="st-Spacer st-Spacer--stacked" colspan="3" height="12"
+          style="border: 0; margin: 0; padding: 0; font-size: 1px; line-height: 1px; mso-line-height-rule: exactly;">
+          <div class="st-Spacer st-Spacer--filler"> </div>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+  <table class="st-Blocks st-Width st-Width--mobile" border="0" cellpadding="0" cellspacing="0"
+    width="600" style="min-width: 600px;">
+    <tbody>
+      <tr>
+        <td class="st-Spacer st-Spacer--stacked" colspan="3" height="4"
+          style="border: 0; margin: 0; padding: 0; font-size: 1px; line-height: 1px; mso-line-height-rule: exactly;">
+          <div class="st-Spacer st-Spacer--filler"> </div>
+        </td>
+      </tr>
+      <tr>
+        <td class="st-Spacer st-Spacer--kill"
+          style="border: 0; margin: 0; padding: 0; font-size: 1px; line-height: 1px; mso-line-height-rule: exactly;"
+          width="64">
+          <div class="st-Spacer st-Spacer--filler"> </div>
+        </td>
+        <td style="border: 0; margin: 0; padding: 0;">
+          <table class="st-Blocks-inner" bgcolor="f6f9fc" border="0" cellpadding="0" cellspacing="0"
+            style="border-radius: 4px;" width="100%">
+            <tbody>
+
+              <tr>
+                <td style="border: 0; margin: 0; padding: 0;">
+                  <table class="st-Blocks-item" border="0" cellpadding="0" cellspacing="0"
+                    width="100%">
+                    <tbody>
+                      <tr>
+                        <td class="st-Spacer st-Spacer--blocksItemEnds" colspan="3" height="12"
+                          style="border: 0; margin: 0; padding: 0; font-size: 1px; line-height: 1px; mso-line-height-rule: exactly;">
+                          <div class="st-Spacer st-Spacer--filler"> </div>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td class="st-Spacer st-Spacer--gutter"
+                          style="border: 0; margin: 0; padding: 0; font-size: 1px; line-height: 1px; mso-line-height-rule: exactly;"
+                          width="16">
+                          <div class="st-Spacer st-Spacer--filler"> </div>
+                        </td>
+                        <td class="st-Blocks-item-cell st-Font st-Font--body"
+                          style="border: 0; margin: 0; padding: 0; color: #525F7f; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Ubuntu, sans-serif; font-size: 16px; line-height: 24px;">
+
+
+                          <table style="padding-left: 5px; padding-right:5px;" width="100%">
+                            {% for line_item in section.line_items %}
+                            {% if not line_item.spacer %}
+                            <tr>
+                              <td class="Table-description Font Font--body"
+                                style="border: 0;border-collapse: collapse;margin: 0;padding: 0;-webkit-font-smoothing: antialiased;-moz-osx-font-smoothing: grayscale;font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Ubuntu, sans-serif;mso-line-height-rule: exactly;vertical-align: middle;color: #525f7f;font-size: 15px;line-height: 24px; width: 50%; ">
+                                {% if line_item.bold %}
+                                <strong>{{line_item.description}}</strong>
+                                {% else %}
+                                {{line_item.description}}
+                                {% endif %}
+                              </td>
+                              <td class="Spacer Table-gap" width="8"
+                                style="border: 0;border-collapse: collapse;margin: 0;padding: 0;-webkit-font-smoothing: antialiased;-moz-osx-font-smoothing: grayscale;color: #ffffff;font-size: 1px;line-height: 1px;mso-line-height-rule: exactly;">
+                              </td>
+                              <td class="Table-amount Font Font--body" align="right" valign="top"
+                                style="border: 0;border-collapse: collapse;margin: 0;padding: 0;-webkit-font-smoothing: antialiased;-moz-osx-font-smoothing: grayscale;font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Ubuntu, sans-serif;mso-line-height-rule: exactly;vertical-align: middle;color: #525f7f;font-size: 15px;line-height: 24px;">
+
+                                {% if line_item.href %}
+                                <a style="border: 0; margin: 0; padding: 0; color: #556cd6 !important; text-decoration: none; "
+                                  href="{{line_item.href}}" target="_blank">
+                                  {% endif %}
+                                  {% if line_item.bold %}
+                                  <strong>{{line_item.amount}}</strong>
+                                  {% else %}
+                                  {{line_item.amount}}
+                                  {% endif %}
+                                  {% if line_item.href %}
+                                </a>
+                                {% endif %}
+
+                              </td>
+                            </tr>
+                            {% for subitem in line_item.subitems %}
+                            <tr>
+                              <td class="Table-subtext Font Font--body"
+                                style="border: 0;border-collapse: collapse;margin: 0;padding:0;padding-left:1em;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing: grayscale;font-family:-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'HelveticaNeue', Ubuntu, sans-serif;mso-line-height-rule:exactly;vertical-align: middle;color: #525f7f;font-size:12px;line-height: 24px; width: 50%; ">
+                                {% if line_item.bold %}
+                                <strong>{{subitem.description}}</strong>
+                                {% else %}
+                                {{subitem.description}}
+                                {% endif %}
+                              </td>
+                              <td class="Spacer Table-gap" width="8"
+                                style="border: 0;border-collapse: collapse;margin: 0;padding: 0;-webkit-font-smoothing: antialiased;-moz-osx-font-smoothing: grayscale;color: #ffffff;font-size: 1px;line-height: 1px;mso-line-height-rule: exactly;">
+                              </td>
+                              <td class="Table-subtext Font Font--body" align="right" valign="top"
+                                style="border: 0;border-collapse: collapse;margin: 0;padding: 0;-webkit-font-smoothing: antialiased;-moz-osx-font-smoothing: grayscale;font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Ubuntu, sans-serif;mso-line-height-rule: exactly;vertical-align: middle;color: #525f7f;font-size: 12px;line-height: 24px;">
+
+                                {% if subitem.href %}
+                                <a style="border: 0; margin: 0; padding: 0; color: #556cd6 !important; text-decoration: none; "
+                                  href="{{subitem.href}}" target="_blank">
+                                  {% endif %}
+                                  {% if subitem.bold %}
+                                  <strong>{{subitem.amount}}</strong>
+                                  {% else %}
+                                  {{subitem.amount}}
+                                  {% endif %}
+                                  {% if subitem.href %}
+                                </a>
+                                {% endif %}
+
+                              </td>
+                            </tr>
+                            {% endfor %}
+                            <tr>
+                              <td class="Table-divider Spacer" colspan="3" height="6"
+                                style="border: 0;border-collapse: collapse;margin: 0;padding: 0;-webkit-font-smoothing: antialiased;-moz-osx-font-smoothing: grayscale;color: #ffffff;font-size: 1px;line-height: 1px;mso-line-height-rule: exactly;">
+                              </td>
+                            </tr>
+                            {% else %}
+                            <tr>
+                              <td class="Table-divider Spacer" colspan="3" height="6"
+                                style="border: 0;border-collapse: collapse;margin: 0;padding: 0;-webkit-font-smoothing: antialiased;-moz-osx-font-smoothing: grayscale;color: #ffffff;font-size: 1px;line-height: 1px;mso-line-height-rule: exactly;">
+                              </td>
+                            </tr>
+                            <tr>
+                              <td class="Spacer" bgcolor="e6ebf1" colspan="3" height="1"
+                                style="border: 0;border-collapse: collapse;margin: 0;padding: 0;-webkit-font-smoothing: antialiased;-moz-osx-font-smoothing: grayscale;color: #ffffff;font-size: 1px;line-height: 1px;mso-line-height-rule: exactly;">
+                              </td>
+                            </tr>
+                            <tr>
+                              <td class="Table-divider Spacer" colspan="3" height="8"
+                                style="border: 0;border-collapse: collapse;margin: 0;padding: 0;-webkit-font-smoothing: antialiased;-moz-osx-font-smoothing: grayscale;color: #ffffff;font-size: 1px;line-height: 1px;mso-line-height-rule: exactly;">
+                              </td>
+                            </tr>
+                            {% endif %}
+                            {% endfor %}
+                          </table>
+                        </td>
+                        <td class="st-Spacer st-Spacer--gutter"
+                          style="border: 0; margin: 0; padding: 0; font-size: 1px; line-height: 1px; mso-line-height-rule: exactly;"
+                          width="16">
+                          <div class="st-Spacer st-Spacer--filler"> </div>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td class="st-Spacer st-Spacer--blocksItemEnds" colspan="3" height="12"
+                          style="border: 0; margin: 0; padding: 0; font-size: 1px; line-height: 1px; mso-line-height-rule: exactly;">
+                          <div class="st-Spacer st-Spacer--filler"> </div>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </td>
+              </tr>
+
+            </tbody>
+          </table>
+        </td>
+        <td class="st-Spacer st-Spacer--kill"
+          style="border: 0; margin: 0; padding: 0; font-size: 1px; line-height: 1px; mso-line-height-rule: exactly;"
+          width="64">
+          <div class="st-Spacer st-Spacer--filler"> </div>
+        </td>
+      </tr>
+      <tr>
+        <td class="st-Spacer st-Spacer--stacked" colspan="3" height="16"
+          style="border: 0; margin: 0; padding: 0; font-size: 1px; line-height: 1px; mso-line-height-rule: exactly;">
+          <div class="st-Spacer st-Spacer--filler"> </div>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+  {% endfor %}
+{% endblock %}
+
+{% block disclaimer %}
+<p>
+  Thanks for reading this far down in the email. Here's a little secret for you - the
+  "LikeHome"
+  company doesn't actually exist in the real world. It's all just a figment of our
+  collective
+  imagination for the purposes of Meng's Spring of 2023 CMPE-165 class. So, if you were
+  planning
+  on investing all your
+  life savings into our non-existent company, you might want to think twice!
+</p>
+<p>
+  Any any points you spent on this booking are nonrefundable. Glhf!
+</p>
+{% endblock %}
+{% block reason %}
+You're receiving this email because you booked a hotel though 
+<a style="border: 0; margin: 0; padding: 0; color: #556cd6; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Ubuntu, sans-serif; text-decoration: none;" target="_blank" rel="noreferrer" href="https://likehome.dev/">LikeHome</a>, a hotel booking website.
+{% endblock %}
