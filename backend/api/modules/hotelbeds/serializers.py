@@ -57,7 +57,8 @@ class HotelbedsAPIOfferHotelRoomSerializer(serializers.Serializer):
         try:
             room = HotelbedsHotelRoom.objects.get(
                 roomCode=obj['code'], hotel=self.context['hotel'])
-            facilities = HotelbedsHotelRoomFacility.objects.filter(room=room)
+            facilities = HotelbedsHotelRoomFacility.objects.filter(
+                room=room).order_by('facilityGroup', 'facility')
             return HotelbedsHotelRoomFacilitySerializer(facilities, many=True).data
         except HotelbedsHotelRoom.DoesNotExist:
             return None
