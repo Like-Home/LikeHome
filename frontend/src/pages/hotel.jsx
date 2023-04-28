@@ -28,6 +28,7 @@ import { convertCategoryToRatingProps } from '../api/hotel';
 import { usePageParamsObject } from '../hooks';
 import { bookingById } from '../recoil/bookings/atom';
 import CardModal from '../components/CardModal';
+import Amenities from '../components/Amenities';
 
 function a11yProps(index) {
   return {
@@ -51,9 +52,9 @@ export default function HotelPage() {
 
   const tabs = [
     { label: 'Overview', href: '#overview', value: 0 },
-    { label: 'Rooms', href: '#rooms', value: 1 },
-    { label: 'Location', href: '#location', value: 2 },
-    { label: 'Amenities', disabled: true, href: '#amenities', value: 3 },
+    { label: 'Amenities', href: '#amenities', value: 1 },
+    { label: 'Rooms', href: '#rooms', value: 2 },
+    { label: 'Location', href: '#location', value: 3 },
     { label: 'Policies', disabled: true, href: '#policies', value: 4 },
   ];
 
@@ -61,6 +62,7 @@ export default function HotelPage() {
     return <div>Hotel not found</div>;
   }
   const [params, setParams] = usePageParamsObject();
+  const [showAllAmenities, setShowAllAmenities] = React.useState(false);
 
   const [showRebookingModal, setShowRebookingModal] = React.useState(false);
 
@@ -208,6 +210,21 @@ export default function HotelPage() {
           </Grid>
         </Stack>
         <Stack className="card" spacing={3} alignItems={'start'}>
+          <Typography variant="h4" id="amenities">
+            Amenities
+          </Typography>
+          <Grid container>
+            {hotel?.facilities?.map((f, i) => {
+              const amenity = Amenities({ facility: f });
+              return amenity ? (
+                <Grid item key={i} md={4}>
+                  {amenity}
+                </Grid>
+              ) : null;
+            })}
+          </Grid>
+        </Stack>
+        <Stack className="card" spacing={3} alignItems={'start'}>
           <Typography variant="h4" id="rooms">
             Choose your room
           </Typography>
@@ -249,6 +266,8 @@ export default function HotelPage() {
                 key={room.code}
                 room={room}
                 reserveText={rebooking ? 'Rebook' : 'Reserve'}
+                expanded={showAllAmenities}
+                setExpanded={setShowAllAmenities}
                 onClick={() => {
                   let href = `/checkout/${btoa(room.rates[0].rateKey)}`;
                   if (rebooking) {
