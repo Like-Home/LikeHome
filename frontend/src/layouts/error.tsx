@@ -1,16 +1,13 @@
 import { isRouteErrorResponse, useRouteError } from 'react-router-dom';
 import { Stack, Typography, Box } from '@mui/material';
-import Navbar from '../components/Navbar';
 import Result from '../components/Result';
-import Notifications from '../components/Notifications';
+import RootLayout from './root';
 
 export default function ErrorLayout() {
   const error = useRouteError();
 
   return (
-    <>
-      <Navbar />
-      <Notifications />
+    <RootLayout>
       <Box
         className="card"
         sx={{
@@ -35,6 +32,6 @@ export default function ErrorLayout() {
           </Stack>
         </Result>
       </Box>
-    </>
+    </RootLayout>
   );
 }

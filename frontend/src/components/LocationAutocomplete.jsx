@@ -68,7 +68,6 @@ export default function LocationAutocomplete({ value, setValue }) {
       onChange={(event, newValue) => {
         setOptions(newValue ? [newValue, ...options] : options);
         setValue(newValue);
-        console.log(newValue);
       }}
       onInputChange={(event, newInputValue) => {
         setInputValue(newInputValue);
@@ -83,8 +82,6 @@ export default function LocationAutocomplete({ value, setValue }) {
         />
       )}
       renderOption={(props, option) => {
-        console.log(option.name, inputValue);
-
         // eslint-disable-next-line prefer-const
         let [title, ...subtitle] = option.name.split(' - ');
 

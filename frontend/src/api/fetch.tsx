@@ -1,6 +1,8 @@
 /* eslint-disable guard-for-in */
+import { enqueueSnackbar } from 'notistack';
+import { Typography } from '@mui/material';
+import moment from 'moment';
 import { getCSRFValue } from './csrf';
-import Errors from './errorlog';
 
 export class APIError extends Error {
   name: string;
@@ -52,7 +54,32 @@ async function http<T>(path: string, config: RequestInit): Promise<T> {
   const response = await fetch(request);
 
   if (!response.ok) {
-    Errors.log({ response });
+    if (response.status === 429) {
+      const retryAfter = response.headers.get('Retry-After');
+      console.log(retryAfter ? parseInt(retryAfter, 10) * 1000 : undefined);
+      enqueueSnackbar(
+        <>
+          <Typography variant="subtitle1" sx={{ fontWeight: 'bold' }}>
+            Whooh there, slow down friend!
+          </Typography>
+          <Typography variant="body2">This site is in slowmode for the demo.</Typography>
+          {retryAfter && (
+            <Typography variant="body2">
+              Please try again {moment(Date.now() + Number(retryAfter) * 1000).fromNow()}.
+            </Typography>
+          )}
+        </>,
+        {
+          variant: 'error',
+          autoHideDuration: 5000,
+        },
+      );
+    } else if (response.status === 403) {
+      // TODO: Show a login dialog
+      // enqueueSnackbar(`You don't have permission to do that.`, { variant: 'error' });
+    } else {
+      enqueueSnackbar(`Error ${response.status}: ${response.statusText}`, { variant: 'error' });
+    }
 
     const error = new APIError({
       name: String(response.status),
