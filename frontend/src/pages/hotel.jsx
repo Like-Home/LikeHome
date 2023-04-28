@@ -8,7 +8,6 @@ import {
   Card,
   CardContent,
   CardActions,
-  List,
   ListItem,
   ListItemText,
   Tab,
@@ -208,7 +207,7 @@ export default function HotelPage() {
             </Grid>
           </Grid>
         </Stack>
-        <Stack className="card" spacing={2} alignItems={'start'}>
+        <Stack className="card" spacing={3} alignItems={'start'}>
           <Typography variant="h4" id="rooms">
             Choose your room
           </Typography>
@@ -216,6 +215,7 @@ export default function HotelPage() {
             className="push-center"
             sx={{
               width: '100%',
+              pl: 1,
             }}
             alignItems={'center'}
           >
@@ -239,6 +239,7 @@ export default function HotelPage() {
           </Stack>
           <Grid
             container
+            spacing={2}
             sx={{
               width: '100%',
             }}
