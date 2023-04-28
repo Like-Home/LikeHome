@@ -32,7 +32,7 @@ class HotelbedsHotelView(viewsets.mixins.RetrieveModelMixin, viewsets.GenericVie
         if self.action == 'offers':
             throttle_classes = [HotelbedsRateThrottle]
 
-        return [super().get_throttles()] + [throttle() for throttle in throttle_classes]
+        return super().get_throttles() + [throttle() for throttle in throttle_classes]
 
     @action(detail=True, methods=['get'])
     def offers(self, request, pk=None):
