@@ -3,8 +3,6 @@ import { Stack, Typography, Box } from '@mui/material';
 import Navbar from '../components/Navbar';
 import Result from '../components/Result';
 import Notifications from '../components/Notifications';
-import Errors from '../api/errorlog';
-import { APIError } from '../api/fetch';
 
 export default function ErrorLayout() {
   const error = useRouteError();

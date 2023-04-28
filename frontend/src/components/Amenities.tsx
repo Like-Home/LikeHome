@@ -1,7 +1,7 @@
 // @ts-nocheck
 /* eslint-disable react/prop-types */
 
-import { Stack, ListItem, ListItemText, ListItemIcon } from '@mui/material';
+import { Stack, ListItemIcon } from '@mui/material';
 import {
   LunchDining as FullBoard,
   AttachMoney as FeeIcon,
@@ -129,7 +129,7 @@ const FacilityIcons = {
   '': ignore,
 };
 
-export default function Amenities({ facility, room = false }) {
+export default function Amenities({ facility }) {
   let fac = facility;
   const present = fac.indYesOrNo !== false && fac.indLogic !== false;
 

@@ -6,7 +6,6 @@ import {
   CardContent,
   CardActions,
   Divider,
-  Box,
   Avatar,
   Button,
   ButtonProps,
@@ -15,11 +14,10 @@ import {
   Stack,
   Typography,
   Chip,
+  List,
   ListItem,
   ListItemAvatar,
   ListItemText,
-  ListItemSecondaryAction,
-  List,
   ListItemButton,
 } from '@mui/material';
 import { useRecoilValue } from 'recoil';

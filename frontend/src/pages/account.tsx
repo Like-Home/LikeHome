@@ -1,4 +1,4 @@
-import { ChangeEvent, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Avatar, Stack, Typography, Button, Checkbox } from '@mui/material';
 import { useRecoilState } from 'recoil';
 import { useNavigate } from 'react-router-dom';
@@ -17,8 +17,6 @@ export default function AboutPage() {
   const [phoneNumber, setPhoneNumber] = useState(user?.phone_number as string);
   const [autoFillBookingInfo, setAutoFillBookingInfo] = useState(user?.autofill_booking_info as boolean);
   const [changesToSave, setChangesToSave] = useState(false);
-
-  // console.log(autoFillBookingInfo, user?.autofill_booking_info);
 
   useEffect(() => {
     setChangesToSave(false);
@@ -125,7 +123,6 @@ export default function AboutPage() {
               <Checkbox
                 checked={autoFillBookingInfo}
                 onChange={() => {
-                  console.log(autoFillBookingInfo);
                   setAutoFillBookingInfo((value) => !value);
                 }}
               />
