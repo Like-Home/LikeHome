@@ -1,5 +1,6 @@
 // @ts-nocheck
 /* eslint-disable react/prop-types */
+/* eslint-disable no-nested-ternary */
 
 import { Stack, ListItemText, Typography, Card, CardContent, CardActions, Button, ListItemIcon } from '@mui/material';
 import Grid from '@mui/material/Unstable_Grid2/Grid2';
@@ -48,15 +49,17 @@ export default function HotelRoomCard({
           </Stack>
           <Stack>
             {expanded ? amenities : amenities.slice(0, 4)}
-            {!expanded ? (
-              <Button variant="text" onClick={() => setExpanded(true)} sx={{ order: 2 }}>
-                <ExpandMore /> Show More
-              </Button>
-            ) : (
-              <Button variant="text" onClick={() => setExpanded(false)} sx={{ order: 2 }}>
-                <ExpandLess /> Show Less
-              </Button>
-            )}
+            {amenities.length > 4 ? (
+              !expanded ? (
+                <Button variant="text" onClick={() => setExpanded(true)} sx={{ order: 2 }}>
+                  <ExpandMore /> Show More
+                </Button>
+              ) : (
+                <Button variant="text" onClick={() => setExpanded(false)} sx={{ order: 2 }}>
+                  <ExpandLess /> Show Less
+                </Button>
+              )
+            ) : null}
           </Stack>
         </CardContent>
         <CardActions sx={{ pb: 2, px: 2, justifyContent: 'space-between', alignItems: 'end' }}>

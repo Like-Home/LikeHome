@@ -114,6 +114,8 @@ const FacilityIcons = {
   Pool,
 
   // Filter out junk
+  'Czeck Republic - Safe Stay': ignore,
+  'NH - Feel safe at NH': ignore,
   'Blue Diamond Resorts - Enhanced Health, Safety & Cleanliness Protocols': ignore,
   'Morocco - Tourisme au Maroc post Covid-19': ignore,
   'Colombia - Check in certificado, COVID-19 bioseguro': ignore,
