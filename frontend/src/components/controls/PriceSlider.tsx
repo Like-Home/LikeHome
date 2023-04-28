@@ -8,6 +8,7 @@ export default function PriceSlider({
   max = 500,
   loading = false,
   maxIncludesAbove = false,
+  adults = 1,
 }: {
   priceRange: number[];
   setPriceRange: (v: number[]) => void;
@@ -15,12 +16,13 @@ export default function PriceSlider({
   max?: number;
   maxIncludesAbove?: boolean;
   loading?: boolean;
+  adults?: number;
 }) {
   const maxPostfix = maxIncludesAbove ? '+' : '';
   return (
     <Stack alignItems={'center'}>
       <Typography width="100%" mb={loading ? 0 : 5}>
-        Price
+        Price per night
       </Typography>
       {loading ? (
         <Skeleton width="70%" height={100} />
@@ -35,14 +37,16 @@ export default function PriceSlider({
               onChange={(e, v) => Array.isArray(v) && setPriceRange(v)}
               valueLabelDisplay="on"
               valueLabelFormat={(v, i) =>
-                i === 1 && v >= max ? `${formatCurrency(v)}${maxPostfix}` : `${formatCurrency(v)}`
+                i === 1 && v >= max ? `${formatCurrency(v * adults)}${maxPostfix}` : `${formatCurrency(v * adults)}`
               }
               disableSwap
             />
           </Box>
-          <Typography variant="body2" sx={{ mx: 'auto' }}>
-            per night per adult
-          </Typography>
+          {adults > 1 && (
+            <Typography variant="caption" color="lightgray" sx={{ mx: 'auto' }}>
+              for {adults} adults
+            </Typography>
+          )}
         </>
       )}
     </Stack>

@@ -7,7 +7,7 @@ import Spinner from '../components/Spinner';
 import config from '../config';
 
 const Loading = () => (
-  <div className="card">
+  <div className="card card-root">
     <Spinner />
   </div>
 );

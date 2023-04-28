@@ -14,6 +14,7 @@ import {
   Checkbox,
   CircularProgress,
   Backdrop,
+  FormControlLabel,
 } from '@mui/material';
 import { useParams, useSearchParams } from 'react-router-dom';
 import { useRecoilValue } from 'recoil';
@@ -208,13 +209,17 @@ export default function CheckoutPage() {
               </Grid>
               <Grid xs={12}>
                 <Stack direction="row" alignItems="center">
-                  <Checkbox
-                    checked={termsAccepted}
-                    onChange={() => {
-                      setTermsAccepted((value) => !value);
-                    }}
-                  ></Checkbox>
-                  <Typography variant="body1">I agree to the terms and conditions</Typography>
+                  <FormControlLabel
+                    control={
+                      <Checkbox
+                        checked={termsAccepted}
+                        onChange={() => {
+                          setTermsAccepted((value) => !value);
+                        }}
+                      ></Checkbox>
+                    }
+                    label="I agree to the terms and conditions"
+                  />
                 </Stack>
               </Grid>
               <Grid xs={12}>
@@ -258,7 +263,10 @@ export default function CheckoutPage() {
               <Grid xs={12} md={3}>
                 <Stack justifyContent="end" alignItems="end" sx={{ height: '100%' }}>
                   <Box onMouseEnter={handlePopoverOpen} onMouseLeave={handlePopoverClose}>
-                    <Button onClick={onCheckout} disabled={!termsAccepted}>
+                    <Button
+                      onClick={onCheckout}
+                      disabled={!termsAccepted || (!firstName && !lastName) || (!email && !phone)}
+                    >
                       {rebooking ? 'Rebook' : 'Checkout'}
                     </Button>
                   </Box>

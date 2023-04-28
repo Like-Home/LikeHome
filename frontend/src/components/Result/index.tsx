@@ -1,12 +1,10 @@
 import React from 'react';
 import { Button, Typography } from '@mui/material';
 import { Link } from 'react-router-dom';
-import {
-  CheckCircle as CheckCircleIcon,
-  ErrorOutline as ErrorOutlineIcon,
-  Warning as WarningIcon,
-  Info as InfoIcon,
-} from '@mui/icons-material';
+import CheckCircleIcon from '@mui/icons-material/CheckCircle';
+import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline';
+import WarningIcon from '@mui/icons-material/Warning';
+import InfoIcon from '@mui/icons-material/Info';
 import { Stack } from '@mui/system';
 
 interface ResultProps {

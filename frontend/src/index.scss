@@ -18,7 +18,7 @@ html {
 // Background is separate element to allow for multiple layered blurs
 body::after {
   content: ' ';
-  position: absolute;
+  position: fixed;
   left: 0;
   right: calc(-1 * (100vw - 100%)); // Prevent scrollbar moving background
   top: 0;
@@ -42,7 +42,7 @@ a {
   text-decoration: inherit;
 }
 
-a:hover {
+a:hover:not(.MuiButton-root) {
   color: #7f7cff;
   text-decoration: underline;
   text-underline-offset: 4px;

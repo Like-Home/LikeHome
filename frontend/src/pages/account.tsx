@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { ChangeEvent, useEffect, useState } from 'react';
 import { Avatar, Stack, Typography, Button, Checkbox } from '@mui/material';
 import { useRecoilState } from 'recoil';
 import { useNavigate } from 'react-router-dom';
@@ -18,7 +18,7 @@ export default function AboutPage() {
   const [autoFillBookingInfo, setAutoFillBookingInfo] = useState(user?.autofill_booking_info as boolean);
   const [changesToSave, setChangesToSave] = useState(false);
 
-  console.log(autoFillBookingInfo, user?.autofill_booking_info);
+  // console.log(autoFillBookingInfo, user?.autofill_booking_info);
 
   useEffect(() => {
     setChangesToSave(false);
@@ -72,8 +72,8 @@ export default function AboutPage() {
 
   return (
     <Stack spacing={3}>
-      <Typography variant="h4">Account</Typography>
-      <Stack className="card" spacing={3} sx={{ p: 4 }}>
+      <Stack className="card card-root" spacing={3}>
+        <Typography variant="h4">Account</Typography>
         <Stack
           direction={{
             sm: 'column',
@@ -84,37 +84,34 @@ export default function AboutPage() {
             md: 4,
           }}
         >
-          <Stack alignItems={'center'} justifyContent={'center'}>
-            <Avatar src={user.image} sx={{ width: 100, height: 100 }}></Avatar>
-            <AccountOverview user={user} />
-          </Stack>
+          <AccountOverview user={user} />
           <Stack spacing={2} flexGrow={1} minWidth={250}>
             <Typography variant="h5">Profile</Typography>
             <TextInput
               label="First Name"
               value={firstName}
-              onChange={(event) => {
+              onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
                 setFirstName(event.target.value);
               }}
             />
             <TextInput
               label="Last Name"
               value={lastName}
-              onChange={(event) => {
+              onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
                 setLastName(event.target.value);
               }}
             />
             <TextInput
               label="Email"
               value={email}
-              onChange={(event) => {
+              onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
                 setEmail(event.target.value);
               }}
             />
             <TextInput
               label="Phone Number"
               value={phoneNumber}
-              onChange={(event) => {
+              onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
                 setPhoneNumber(event.target.value);
               }}
             />

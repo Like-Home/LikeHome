@@ -195,7 +195,7 @@ export default function SearchPage() {
 
   if (pageParamsAreInvalid(offerHotelsArgs)) {
     return (
-      <main className="card push-center" style={{ marginTop: 50, maxWidth: 1200 }}>
+      <main className="card card-root push-center" style={{ marginTop: 50, maxWidth: 1200 }}>
         <p>Something seems to be missing in the URL.</p>
         <Button component={Link} to="/">
           Go Home
@@ -271,6 +271,7 @@ export default function SearchPage() {
     >
       <Box width={'100%'}>
         <PriceSlider
+          adults={adults}
           loading={filterLoading}
           priceRange={priceRange}
           setPriceRange={setPriceRange}
@@ -320,7 +321,7 @@ export default function SearchPage() {
     sm: 3,
   };
   return (
-    <Stack className="card push-center" spacing={sizing}>
+    <Stack className="card card-root push-center" spacing={sizing}>
       <SearchBars
         location={location}
         guests={params.guests}
@@ -389,7 +390,7 @@ export default function SearchPage() {
                   }}
                 />
               ))}
-            {loading && (
+            {(loading || filterLoading) && (
               <>
                 <HotelCardSkeleton />
                 <HotelCardSkeleton />
