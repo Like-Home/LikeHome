@@ -165,8 +165,23 @@ AUTHENTICATION_BACKENDS = [
 ]
 
 REST_FRAMEWORK = {
-    'EXCEPTION_HANDLER': 'rest_framework.views.exception_handler'
+    'EXCEPTION_HANDLER': 'rest_framework.views.exception_handler',
+    # by default the throttling is disabled
+    'DEFAULT_THROTTLE_RATES': {
+        "anon": '100/s',
+        "anon_whitelisted": '100/s',
+        "user": "100/s",
+        "user_whitelisted": "100/s",
+    }
 }
+
+if config.RATELIMIT_BYPASS is not None:
+    REST_FRAMEWORK['DEFAULT_THROTTLE_RATES'] = {  # type: ignore
+        "anon": '5/day',
+        "anon_whitelisted": '5/min',
+        "user": "5/min",
+        "user_whitelisted": "100/min",
+    }
 
 ROOT_URLCONF = 'app.urls'
 

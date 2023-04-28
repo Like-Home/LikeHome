@@ -30,7 +30,7 @@ export const Control = React.forwardRef(function Control(
         background: '#494747',
         boxShadow: '0px 2px 5px rgba(0, 0, 0, 0.25)',
         borderRadius: '6px',
-
+        overflow: 'hidden',
         '&:hover': onClick && {
           cursor: 'pointer',
           background: '#666262',
@@ -45,7 +45,11 @@ export const Control = React.forwardRef(function Control(
         {label ?? ''}
       </label>
       <Stack direction="row" spacing={1}>
-        <div>{Icon && <Icon style={{ opacity: 0.5, marginTop: 6, fontSize: '20px' }} />}</div>
+        {Icon && (
+          <div>
+            <Icon style={{ opacity: 0.5, marginTop: 6, fontSize: '20px' }} />
+          </div>
+        )}
         <Stack direction="column" flex={1} alignItems="stretch">
           {children}
         </Stack>

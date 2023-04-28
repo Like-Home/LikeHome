@@ -1,36 +1,39 @@
 // @ts-nocheck
 /* eslint-disable react/prop-types */
+/* eslint-disable no-nested-ternary */
 
-import {
-  Stack,
-  List,
-  ListItem,
-  ListItemText,
-  Typography,
-  Card,
-  CardContent,
-  CardActions,
-  Button,
-  ListItemIcon,
-} from '@mui/material';
+import { Stack, ListItemText, Typography, Card, CardContent, CardActions, Button, ListItemIcon } from '@mui/material';
 import Grid from '@mui/material/Unstable_Grid2/Grid2';
 import Person from '@mui/icons-material/Person';
-import Fitness from '@mui/icons-material/FitnessCenter';
-import Sailing from '@mui/icons-material/Sailing';
-import Bed from '@mui/icons-material/Bed';
+import ExpandMore from '@mui/icons-material/ExpandMore';
+import ExpandLess from '@mui/icons-material/ExpandLess';
 import { createHotelbedsSrcSetFromPath, formatCurrency } from '../utils';
+import Amenities from './Amenities';
 
-const FacilityIcons = {
-  Sailing,
-  Fitness,
-  'Children share the bed with parents': Bed,
-};
-
-export default function HotelRoomCard({ room, reserveText, onClick }) {
+export default function HotelRoomCard({
+  room,
+  expanded = true,
+  setExpanded = () => {
+    /* do nothing */
+  },
+  reserveText,
+  onClick,
+}) {
+  const amenities = room.facilities
+    .map((f) => <Amenities facility={f} key={f.facility.description ?? f.facility.code} />)
+    .filter((a) => a != null);
   // TODO: Price per night
   return (
-    <Grid item sm={12} md={6} lg={3.5} mr={2} mb={2} key={room.code}>
-      <Card sx={{ height: '100%', width: '100%' }}>
+    <Grid item sm={12} md={6} lg={4} key={room.code} sx={{ width: '100%', flexGrow: 1 }} justifyContent={'center'}>
+      <Card
+        sx={{
+          height: '100%',
+          width: '100%',
+          display: 'flex',
+          flexDirection: 'column',
+          justifyContent: 'space-between',
+        }}
+      >
         <img
           {...createHotelbedsSrcSetFromPath(room.images[0].path)}
           alt="Room Preview"
@@ -41,32 +44,31 @@ export default function HotelRoomCard({ room, reserveText, onClick }) {
           <Typography variant="h6" textTransform="capitalize">
             {room.name.toLowerCase()}
           </Typography>
-          <List dense>
-            <ListItem icon={Person}>
-              <ListItemIcon>
-                <Person />
-              </ListItemIcon>
-              <ListItemText>
-                Sleeps {room.details.maxAdults}
-                {room.details.maxChildren > 0
-                  ? ` adults, ${room.details.maxChildren} child${room.details.maxChildren !== 1 ? 'ren' : ''}`
-                  : ''}
-              </ListItemText>
-            </ListItem>
-            {room.facilities.map((facility) => {
-              const Icon = FacilityIcons[facility.facility.description];
-              return (
-                <ListItem key={facility.facility.code}>
-                  {Icon && (
-                    <ListItemIcon>
-                      <Icon />
-                    </ListItemIcon>
-                  )}
-                  <ListItemText primary={facility.facility.description} secondary={room.maxOccupancy} />
-                </ListItem>
-              );
-            })}
-          </List>
+          <Stack direction="row" icon={Person}>
+            <ListItemIcon>
+              <Person />
+            </ListItemIcon>
+            <ListItemText>
+              Sleeps {room.details.maxAdults}
+              {room.details.maxChildren > 0
+                ? ` adults, ${room.details.maxChildren} child${room.details.maxChildren !== 1 ? 'ren' : ''}`
+                : ''}
+            </ListItemText>
+          </Stack>
+          <Stack>
+            {expanded ? amenities : amenities.slice(0, 4)}
+            {amenities.length > 4 ? (
+              !expanded ? (
+                <Button variant="text" onClick={() => setExpanded(true)} sx={{ order: 2 }}>
+                  <ExpandMore /> Show More
+                </Button>
+              ) : (
+                <Button variant="text" onClick={() => setExpanded(false)} sx={{ order: 2 }}>
+                  <ExpandLess /> Show Less
+                </Button>
+              )
+            ) : null}
+          </Stack>
         </CardContent>
         <CardActions sx={{ pb: 2, px: 2, justifyContent: 'space-between', alignItems: 'end' }}>
           <Typography variant="h5" sx={{ fontWeight: 'bold' }}>

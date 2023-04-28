@@ -10,7 +10,6 @@ import {
   Typography,
   Chip,
 } from '@mui/material';
-import { Box } from '@mui/system';
 import moment from 'moment';
 import { Link } from 'react-router-dom';
 import { bookingsSelector } from '../recoil/bookings/atom';

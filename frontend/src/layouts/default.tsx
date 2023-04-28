@@ -1,10 +1,9 @@
-import { Outlet } from 'react-router-dom';
 import { Suspense } from 'react';
+import { Outlet } from 'react-router-dom';
 import { Box } from '@mui/material';
-import Navbar from '../components/Navbar';
-import Foorter from '../components/Footer';
 import Spinner from '../components/Spinner';
 import config from '../config';
+import RootLayout from './root';
 
 const Loading = () => (
   <div className="card card-root">
@@ -14,8 +13,7 @@ const Loading = () => (
 
 export default function DefaultRouterLayout() {
   return (
-    <>
-      <Navbar />
+    <RootLayout>
       <Box
         style={{
           maxWidth: config.maxWidth,
@@ -25,8 +23,7 @@ export default function DefaultRouterLayout() {
         <Suspense fallback={<Loading />}>
           <Outlet />
         </Suspense>
-        <Foorter />
       </Box>
-    </>
+    </RootLayout>
   );
 }

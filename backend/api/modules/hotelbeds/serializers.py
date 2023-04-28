@@ -1,5 +1,8 @@
+from api.models.hotelbeds.HotelbedsFacilityTypology import \
+    HotelbedsFacilityTypology
 from api.models.hotelbeds.HotelbedsHotel import (HotelbedsFacility,
                                                  HotelbedsFacilityGroup,
+                                                 HotelbedsHotelFacility,
                                                  HotelbedsHotelImage,
                                                  HotelbedsHotelInterestPoint,
                                                  HotelbedsHotelRoom,
@@ -18,7 +21,15 @@ class HotelbedsHotelInterestPointSerializer(HotelbedsHotelRoomFacilityGetters, s
         fields = '__all__'
 
 
+class HotelbedsFacilityTypologySerializer(serializers.ModelSerializer):
+    class Meta:
+        fields = '__all__'
+        model = HotelbedsFacilityTypology
+
+
 class HotelbedsFacilitySerializer(serializers.ModelSerializer):
+    facilityTypology = HotelbedsFacilityTypologySerializer()
+
     class Meta:
         fields = '__all__'
         model = HotelbedsFacility
@@ -34,6 +45,15 @@ class HotelbedsHotelRoomSerializer(serializers.ModelSerializer):
     class Meta:
         fields = '__all__'
         model = HotelbedsHotelRoom
+
+
+class HotelbedsHotelFacilitySerializer(serializers.ModelSerializer):
+    facility = HotelbedsFacilitySerializer()
+    facilityGroup = HotelbedsFacilityGroupSerializer()
+
+    class Meta:
+        fields = '__all__'
+        model = HotelbedsHotelFacility
 
 
 class HotelbedsHotelRoomFacilitySerializer(serializers.ModelSerializer):
@@ -99,13 +119,15 @@ class HotelbedsAPIOfferHotelSerializer(serializers.Serializer):
     minRate = serializers.FloatField()
     maxRate = serializers.FloatField()
     currency = serializers.CharField()
+    facilities = serializers.SerializerMethodField()
 
     # interest_points = serializers.SerializerMethodField()
     images = serializers.SerializerMethodField()
 
-    # def get_facilities(self, obj):
-    #     db_hotel = HotelbedsHotel.objects.get(code=int(obj['code']))
-    #     return list(db_hotel.facilities.values('facility__description', 'facilityGroup__description'))
+    def get_facilities(self, obj):
+        queryset = HotelbedsHotelFacility.objects.filter(
+            hotel=obj['code']).order_by('facilityGroup', 'facility')
+        return HotelbedsHotelFacilitySerializer(queryset, many=True).data
 
     # def get_interest_points(self, obj):
     #     interest_points = HotelbedsHotelInterestPoint.objects.filter(
