@@ -59,10 +59,15 @@ run(f"{py} -m poetry --quiet install", echo=True)
 py = f"{py} -m poetry --quiet run python"
 
 print("backend: Running 'manage.py migrate'...")
-run(f"{py} manage.py migrate", echo=True)
+migrate = run(f"{py} manage.py migrate", echo=True)
 
 print("backend: Running 'manage.py makemigrations'...")
+print("If you get stuck here, it may need user input,\nrun it on the command line as 'poetry --quiet run python manage.py makemigrations' in backend/")
 run(f"{py} manage.py makemigrations", echo=True)
+
+if "re-run 'manage.py migrate'" in migrate: # Ok
+    print("backend: Running 'manage.py migrate'...")
+    run(f"{py} manage.py migrate", echo=True)
 
 if len(sys.argv) > 1 and sys.argv[1] == "admin":
     print("Running 'manage.py createsuperuser'...")
@@ -73,3 +78,5 @@ os.chdir(os.path.join(GIT_ROOT, "frontend"))
 
 print("frontend: Running 'npm install'...")
 run("npm install", echo=True)
+
+print("Okay, now run 'node run.js'")
