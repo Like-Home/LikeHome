@@ -84,7 +84,10 @@ export default function AboutPage() {
             md: 4,
           }}
         >
-          <AccountOverview user={user} />
+          <Stack alignItems="center">
+            <Avatar src={user.image} sx={{ width: 100, height: 100 }}></Avatar>
+            <AccountOverview user={user} simple />
+          </Stack>
           <Stack spacing={2} flexGrow={1} minWidth={250}>
             <Typography variant="h5">Profile</Typography>
             <TextInput

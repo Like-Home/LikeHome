@@ -98,23 +98,31 @@ export function PointOverview({ user }: { user: User }) {
   );
 }
 
-export function AccountOverview({ user, link = false }: { user: User; link?: boolean }) {
-  const ListItemComponent = link ? LinkListItem : ListItem;
+export function AccountOverview({ user, simple = false }: { user: User; simple?: boolean }) {
+  const ListItemComponent = !simple ? LinkListItem : ListItem;
   return (
     <Stack alignItems={'center'} spacing={1} sx={{ pb: 1 }}>
-      <List sx={{ pt: 0 }}>
-        <ListItemComponent to="/account" sx={{ minWidth: 325 }}>
-          <ListItemAvatar>
-            <Avatar src={user.image || undefined} />
-          </ListItemAvatar>
-          <ListItemText primary={`Hi, ${user.first_name}`} secondary={user.email}>
-            <Typography variant="h6">Hi, {user.first_name}</Typography>
-          </ListItemText>
-          <ListItemSecondaryAction>
-            <Chip label="Member" sx={{ mt: 2 }} />
-          </ListItemSecondaryAction>
-        </ListItemComponent>
-      </List>
+      {!simple ? (
+        <List sx={{ pt: 0 }}>
+          <ListItemComponent to="/account" sx={{ minWidth: 325 }}>
+            {!simple && (
+              <ListItemAvatar>
+                <Avatar src={user.image || undefined} />
+              </ListItemAvatar>
+            )}
+            <ListItemText primary={`Hi, ${user.first_name}`} secondary={user.email} />
+            <Stack sx={{ ml: 1, pointerEvents: 'none' }}>
+              <Chip label="Member" />
+            </Stack>
+          </ListItemComponent>
+        </List>
+      ) : (
+        <Stack alignItems="center" sx={{ minWidth: 325, mb: 2, mt: 1 }}>
+          <ListItemText primary={`Hi, ${user.first_name}`} />
+          <ListItemText secondary={user.email} sx={{ mb: 2 }} />
+          <Chip label="Member" />
+        </Stack>
+      )}
       <PointOverview user={user} />
     </Stack>
   );
@@ -150,7 +158,7 @@ function AccountMenu({ navbarEl, user }: { navbarEl: React.RefObject<HTMLElement
         onClose={() => setAnchorEl(null)}
       >
         <Stack spacing={0.5}>
-          <AccountOverview user={user} link />
+          <AccountOverview user={user} />
           <Divider />
           <LinkMenuItem to="/bookings">My Bookings</LinkMenuItem>
           <LinkMenuItem to="/rewards">Rewards</LinkMenuItem>
