@@ -1,4 +1,6 @@
-from api.models.hotelbeds.HotelbedsHotel import (HotelbedsHotelImage,
+from api.models.hotelbeds.HotelbedsHotel import (HotelbedsFacility,
+                                                 HotelbedsFacilityGroup,
+                                                 HotelbedsHotelImage,
                                                  HotelbedsHotelInterestPoint,
                                                  HotelbedsHotelRoom,
                                                  HotelbedsHotelRoomFacility)
@@ -16,13 +18,28 @@ class HotelbedsHotelInterestPointSerializer(HotelbedsHotelRoomFacilityGetters, s
         fields = '__all__'
 
 
+class HotelbedsFacilitySerializer(serializers.ModelSerializer):
+    class Meta:
+        fields = '__all__'
+        model = HotelbedsFacility
+
+
+class HotelbedsFacilityGroupSerializer(serializers.ModelSerializer):
+    class Meta:
+        fields = '__all__'
+        model = HotelbedsFacilityGroup
+
+
 class HotelbedsHotelRoomSerializer(serializers.ModelSerializer):
     class Meta:
         fields = '__all__'
         model = HotelbedsHotelRoom
 
 
-class HotelbedsHotelRoomFacilitySerializer(HotelbedsHotelRoomFacilityGetters, serializers.ModelSerializer):
+class HotelbedsHotelRoomFacilitySerializer(serializers.ModelSerializer):
+    facility = HotelbedsFacilitySerializer()
+    facilityGroup = HotelbedsFacilityGroupSerializer()
+
     class Meta:
         model = HotelbedsHotelRoomFacility
         fields = ('facility', 'facilityGroup',
