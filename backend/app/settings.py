@@ -166,6 +166,13 @@ AUTHENTICATION_BACKENDS = [
 
 REST_FRAMEWORK = {
     'EXCEPTION_HANDLER': 'rest_framework.views.exception_handler',
+    # by default the throttling is disabled
+    'DEFAULT_THROTTLE_RATES': {
+        "anon": '100/s',
+        "anon_whitelisted": '100/s',
+        "user": "100/s",
+        "user_whitelisted": "100/s",
+    }
 }
 
 if config.RATELIMIT_BYPASS is not None:
