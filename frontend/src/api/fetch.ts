@@ -1,5 +1,6 @@
 /* eslint-disable guard-for-in */
 import { getCSRFValue } from './csrf';
+import Errors from './errorlog';
 
 export class APIError extends Error {
   name: string;
@@ -51,14 +52,16 @@ async function http<T>(path: string, config: RequestInit): Promise<T> {
   const response = await fetch(request);
 
   if (!response.ok) {
-    // TODO: display notification to user
+    Errors.log({ response });
 
-    throw new APIError({
+    const error = new APIError({
       name: String(response.status),
       message: response.statusText,
       request,
       response,
     });
+    Errors.log(error);
+    throw error;
   }
 
   return response.json();

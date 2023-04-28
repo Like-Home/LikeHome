@@ -2,15 +2,17 @@ import { isRouteErrorResponse, useRouteError } from 'react-router-dom';
 import { Stack, Typography, Box } from '@mui/material';
 import Navbar from '../components/Navbar';
 import Result from '../components/Result';
+import Notifications from '../components/Notifications';
+import Errors from '../api/errorlog';
+import { APIError } from '../api/fetch';
 
 export default function ErrorLayout() {
   const error = useRouteError();
 
-  console.error(error);
-
   return (
     <>
       <Navbar />
+      <Notifications />
       <Box
         className="card"
         sx={{
