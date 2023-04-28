@@ -8,6 +8,7 @@ from api.models.Booking import Booking, BookingCancelException
 from api.models.hotelbeds.HotelbedsHotel import (HotelbedsHotel,
                                                  HotelbedsHotelImage)
 from api.modules.hotelbeds import hotelbeds
+from api.throttles import HotelbedsRateThrottle
 from api.utils import format_currency
 from app import config
 from django.utils.dateparse import parse_date
@@ -111,6 +112,14 @@ class CheckoutView(viewsets.mixins.CreateModelMixin, viewsets.GenericViewSet):
         if self.action == 'create':
             return CheckoutSerializer
         return serializers.Serializer
+
+    def get_throttles(self):
+        throttle_classes = []
+
+        if self.action in ['retrieve', 'create']:
+            throttle_classes = [HotelbedsRateThrottle]
+
+        return super().get_throttles() + [throttle() for throttle in throttle_classes]
 
     def retrieve(self, request: Request, pk=None):
         """Returns a list of offers for a specific hotel id.

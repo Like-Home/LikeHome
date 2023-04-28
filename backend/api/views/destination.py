@@ -9,6 +9,7 @@ from api.models.hotelbeds.HotelbedsHotel import (HotelbedsHotel,
                                                  HotelbedsHotelImage)
 from api.modules.hotelbeds import hotelbeds
 from api.modules.hotelbeds.serializers import HotelbedsAPIOfferHotelSerializer
+from api.throttles import HotelbedsRateThrottle
 from api.validators import OfferFilterParams, OfferSearchParams
 from rest_framework import pagination, serializers, viewsets
 from rest_framework.decorators import action
@@ -109,6 +110,14 @@ class DestinationView(viewsets.mixins.RetrieveModelMixin, viewsets.GenericViewSe
     class Meta:
         ordering = ['-code']
 
+    def get_throttles(self):
+        throttle_classes = []
+
+        if self.action == 'offers':
+            throttle_classes = [HotelbedsRateThrottle]
+
+        return super().get_throttles() + [throttle() for throttle in throttle_classes]
+
     @action(detail=False, methods=['get'])
     def search(self, request: Request):
         """Search for a destination location by name."""
@@ -117,7 +126,7 @@ class DestinationView(viewsets.mixins.RetrieveModelMixin, viewsets.GenericViewSe
         params = params.data
 
         queryset = HotelbedsDestinationLocation.objects.filter(
-            name__icontains=params['q'])
+            name__icontains=params['q']).order_by('-code')
         page = self.paginate_queryset(queryset)
 
         serializer = self.get_serializer(page, many=True)

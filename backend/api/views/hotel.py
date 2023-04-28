@@ -3,6 +3,7 @@ from api.modules.hotelbeds import hotelbeds
 from api.modules.hotelbeds.serializers import \
     HotelbedsAPIOfferHotelRoomSerializer
 from api.serializers import HotelbedsHotelSerializer
+from api.throttles import HotelbedsRateThrottle
 from api.validators import DateBeforeValidator
 from rest_framework import serializers, viewsets
 from rest_framework.decorators import action
@@ -24,6 +25,14 @@ class OfferSearchParams(serializers.Serializer):
 class HotelbedsHotelView(viewsets.mixins.RetrieveModelMixin, viewsets.GenericViewSet):
     queryset = HotelbedsHotel.objects.all()
     serializer_class = HotelbedsHotelSerializer
+
+    def get_throttles(self):
+        throttle_classes = []
+
+        if self.action == 'offers':
+            throttle_classes = [HotelbedsRateThrottle]
+
+        return [super().get_throttles()] + [throttle() for throttle in throttle_classes]
 
     @action(detail=True, methods=['get'])
     def offers(self, request, pk=None):

@@ -82,4 +82,9 @@ SECRET_KEY = getenv(
     required=PRODUCTION
 )
 
+RATELIMIT_BYPASS = getenv(
+    'RATELIMIT_BYPASS',
+    default=None
+)
+
 stripe.api_key = STRIPE_SECRET_KEY

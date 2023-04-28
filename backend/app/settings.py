@@ -165,8 +165,16 @@ AUTHENTICATION_BACKENDS = [
 ]
 
 REST_FRAMEWORK = {
-    'EXCEPTION_HANDLER': 'rest_framework.views.exception_handler'
+    'EXCEPTION_HANDLER': 'rest_framework.views.exception_handler',
 }
+
+if config.RATELIMIT_BYPASS is not None:
+    REST_FRAMEWORK['DEFAULT_THROTTLE_RATES'] = {  # type: ignore
+        "anon": '5/day',
+        "anon_whitelisted": '5/min',
+        "user": "5/min",
+        "user_whitelisted": "100/min",
+    }
 
 ROOT_URLCONF = 'app.urls'
 
