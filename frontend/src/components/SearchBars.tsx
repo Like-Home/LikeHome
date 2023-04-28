@@ -73,20 +73,20 @@ export default function SearchBars(props: SearchPageParams & SearchBarProps) {
       checkin: { xs: 12, sm: 4, md: 3 },
       checkout: { xs: 12, sm: 4, md: 3 },
       guests: { xs: 12, sm: 4, md: 3 },
-      search: { xs: 12, sm: 12, md: 2 },
+      search: { xs: 12, sm: 12, md: 3 },
     },
   };
 
   const layout = props.noLocation ? gridLayouts.withoutLocation : gridLayouts.withLocation;
 
   return (
-    <>
+    <Stack spacing={2} sx={{ width: '100%' }}>
       {alert && (
         <Alert severity="error" sx={{ marginTop: 2 }}>
           {alert}
         </Alert>
       )}
-      <Grid container spacing={1}>
+      <Grid container spacing={1} sx={{ width: '100%' }}>
         {!props.noLocation && (
           <Grid {...layout.location}>
             <LocationAutocomplete value={location} setValue={setLocation} />
@@ -157,6 +157,6 @@ export default function SearchBars(props: SearchPageParams & SearchBarProps) {
           </Button>
         </Grid>
       </Grid>
-    </>
+    </Stack>
   );
 }

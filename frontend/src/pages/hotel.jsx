@@ -212,11 +212,12 @@ export default function HotelPage() {
           <Typography variant="h4" id="rooms">
             Choose your room
           </Typography>
-          <Box
+          <Stack
             className="push-center"
             sx={{
               width: '100%',
             }}
+            alignItems={'center'}
           >
             <SearchBars
               noLocation={true}
@@ -235,7 +236,7 @@ export default function HotelPage() {
                 setParams(newParams);
               }}
             />
-          </Box>
+          </Stack>
           <Grid
             container
             sx={{
