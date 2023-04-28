@@ -1,14 +1,15 @@
-from enum import Enum
 
 import stripe
 from api.models.hotelbeds.HotelbedsHotel import (HotelbedsHotel,
                                                  HotelbedsHotelImage)
+from app import config
 from django.contrib.auth.models import User
 from django.db import models
 from django.db.models import (CharField, DateField, DateTimeField, FloatField,
                               ForeignKey, IntegerField, TextChoices)
 from django.utils import timezone
 from django.utils.timezone import now
+from templated_email import send_templated_mail
 
 
 class BookingCancelException(Exception):
@@ -122,6 +123,52 @@ class Booking(models.Model):
         self.canceled_at = timezone.now()
         self.user.account.travel_points -= self.points_earned
         self.points_earned = 0
+
+        if self.user.account.travel_points < 0:
+            stripe.Customer.create_balance_transaction(
+                self.user.account.stripe_customer_id,
+                amount=int(self.user.account.travel_points * -1),
+                currency="usd",
+                description="Adjustment for refunded booking reward point value.",
+            )
+            invoice = stripe.Invoice.create(
+                customer=self.user.account.stripe_customer_id,
+                collection_method="send_invoice",
+                days_until_due=14,
+                auto_advance=True,
+                description="Chargeback for refunded booking reward point value.",
+            )
+            invoice.finalize_invoice()
+            invoice.send_invoice()
+
+            email_context = {
+                'subject': f'LikeHome not so fast - Itin #{self.id}',
+                'email_title': 'Hold up there partner! We\'re not done yet.',
+                'content_title': 'Reward Point Chargeback',
+                'image': {
+                    'src': 'https://media4.giphy.com/media/3o8dp3z1qMdvfOgv28/giphy.gif?cid=ecf05e47gzaueouo6rj108zxqa6zq4k122b721pw2edm61r2&ep=v1_gifs_related&rid=giphy.gif&ct=g',
+                    'alt': 'Waiting for our money...',
+                    'subtitle1': 'We know you probably didn\'t try to break the point system.',
+                    'subtitle2': 'But in case you did, we\'re on to you.',
+                },
+                'invoice_url': invoice['hosted_invoice_url'],
+                'thank_you_tag': 'Thank you for our money back!',
+                'contact_us_email': 'bookings@likehome.dev',
+                'header_logo_url': 'https://raw.githubusercontent.com/Like-Home/LikeHome/main/frontend/static/favicon.png',
+                'rendered_online': True,
+                'base_url': config.BASE_URL,
+            }
+
+            send_templated_mail(
+                recipient_list=[self.stripe_customer_email],
+                to=[f'{self.stripe_customer_name} <{self.stripe_customer_email}>'],
+                template_name='reward_point_chargeback',
+                from_email='LikeHome <bookings@likehome.dev>',
+                context=email_context,
+                create_link=True,
+            )
+
+            self.user.account.travel_points = 0
 
         self.user.account.save()
         self.save()

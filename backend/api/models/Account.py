@@ -1,3 +1,4 @@
+import stripe
 from app import config
 from django.contrib.auth.models import User
 from django.db import models
@@ -10,6 +11,7 @@ class Account(models.Model):
     travel_points = IntegerField(default=0)
     phone_number = models.CharField(max_length=30, blank=True)
     autofill_booking_info = models.BooleanField(default=False)
+    stripe_customer_id = models.CharField(max_length=255)
 
     def _str_(self):
         return self.user.username
@@ -17,7 +19,15 @@ class Account(models.Model):
 
 def auto_create_account(sender, instance, created, **kwargs):
     if created:
-        Account.objects.create(user=instance)
+        customer = stripe.Customer.create(
+            email=instance.email,
+            name=f'{instance.first_name} {instance.last_name}',
+            metadata={
+                'user_id': instance.id,
+            }
+        )
+
+        Account.objects.create(user=instance, stripe_customer_id=customer.id)
 
         send_templated_mail(
             recipient_list=[instance.email],

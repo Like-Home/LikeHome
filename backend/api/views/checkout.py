@@ -331,6 +331,7 @@ class CheckoutView(viewsets.mixins.CreateModelMixin, viewsets.GenericViewSet):
                 cancel_url=f"{referrer}?stripe=canceled",
                 payment_method_types=['card'],
                 mode='payment',
+                customer=request.user.account.stripe_customer_id,
                 line_items=[
                     {
                         "price_data": {
@@ -346,6 +347,11 @@ class CheckoutView(viewsets.mixins.CreateModelMixin, viewsets.GenericViewSet):
                         "quantity": 1,
                     }
                 ],
+                submit_type='book',
+                # total_details={
+                #     'amount_discount': int(booking.amount_discount * 100),
+                #     'amount_tax': int(booking.amount_fees_taxes * 100),
+                # },
                 metadata={
                     "booking_id": booking.id,
                     "points_earned": int(total_net_float),
@@ -474,6 +480,7 @@ def create_booking_confirmation_email_section(title: str, booking: Booking, incl
             {
                 'description': 'Email',
                 'amount': booking.email,
+                'href': f'mailto:{booking.email}',
             },
             {
                 'description': 'Phone Number',
