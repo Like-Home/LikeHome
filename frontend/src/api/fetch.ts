@@ -60,7 +60,6 @@ async function http<T>(path: string, config: RequestInit): Promise<T> {
       request,
       response,
     });
-    Errors.log(error);
     throw error;
   }
 
