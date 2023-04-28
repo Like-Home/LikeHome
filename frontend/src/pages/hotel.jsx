@@ -217,7 +217,7 @@ export default function HotelPage() {
             {hotel?.facilities?.map((f, i) => {
               const amenity = Amenities({ facility: f });
               return amenity ? (
-                <Grid item key={i} md={4}>
+                <Grid item key={i} md={4} sm={6} xs={12}>
                   {amenity}
                 </Grid>
               ) : null;
@@ -259,6 +259,7 @@ export default function HotelPage() {
             spacing={2}
             sx={{
               width: '100%',
+              alignItems: 'stretch',
             }}
           >
             {hotelRoomOffers.offers.rooms.map((room) => (

@@ -24,8 +24,16 @@ export default function HotelRoomCard({
     .filter((a) => a != null);
   // TODO: Price per night
   return (
-    <Grid item sm={12} md={6} lg={3.5} key={room.code}>
-      <Card sx={{ height: '100%', width: '100%' }}>
+    <Grid item sm={12} md={6} lg={4} key={room.code} sx={{ width: '100%', flexGrow: 1 }} justifyContent={'center'}>
+      <Card
+        sx={{
+          height: '100%',
+          width: '100%',
+          display: 'flex',
+          flexDirection: 'column',
+          justifyContent: 'space-between',
+        }}
+      >
         <img
           {...createHotelbedsSrcSetFromPath(room.images[0].path)}
           alt="Room Preview"
