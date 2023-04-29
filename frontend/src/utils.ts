@@ -1,7 +1,25 @@
 import { HotelbedsHotel } from './api/types';
 
-export const formatCurrency = (value: number) => {
-  return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(value);
+const baseCurrencyFormatConfig = {
+  style: 'currency',
+  currency: 'USD',
+};
+
+const formatCurrencyWithCents = new Intl.NumberFormat('en-US', baseCurrencyFormatConfig);
+
+const formatCurrencyWithoutCents = new Intl.NumberFormat('en-US', {
+  ...baseCurrencyFormatConfig,
+  maximumFractionDigits: 0,
+});
+
+export const formatCurrency = (value: number, cents = true) => {
+  console.log(cents, (cents ? formatCurrencyWithCents : formatCurrencyWithoutCents).format(value));
+
+  return (cents ? formatCurrencyWithCents : formatCurrencyWithoutCents).format(value);
+};
+
+export const formatPoints = (value: number) => {
+  return new Intl.NumberFormat('en-US', { style: '' }).format(value);
 };
 
 export function createHotelbedsSrcSetFromPath(path: string) {

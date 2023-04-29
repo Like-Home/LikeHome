@@ -37,7 +37,9 @@ export default function PriceSlider({
               onChange={(e, v) => Array.isArray(v) && setPriceRange(v)}
               valueLabelDisplay="on"
               valueLabelFormat={(v, i) =>
-                i === 1 && v >= max ? `${formatCurrency(v * adults)}${maxPostfix}` : `${formatCurrency(v * adults)}`
+                i === 1 && v >= max
+                  ? `${formatCurrency(v * adults, false)}${maxPostfix}`
+                  : `${formatCurrency(v * adults, false)}`
               }
               disableSwap
             />
