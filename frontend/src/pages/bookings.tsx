@@ -1,14 +1,29 @@
+import React from 'react';
 import { Link } from 'react-router-dom';
-import { Avatar, Button, Divider, ListItem, ListItemAvatar, ListItemText, List, Typography } from '@mui/material';
+import {
+  Avatar,
+  Stack,
+  Button,
+  ListItem,
+  ListItemAvatar,
+  ListItemText,
+  Typography,
+  Tab,
+  Tabs,
+  Box,
+} from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import moment from 'moment';
 import { useRecoilValue } from 'recoil';
+import { useSnackbar } from 'notistack';
 import { Booking } from '../api/types';
 import { bookingsByStatusSelector } from '../recoil/bookings/atom';
 import { createHotelbedsSrcSetFromPath } from '../utils';
 import { statusToText } from '../enums';
+import Result from '../components/Result';
+import PaginatedList from '../components/PaginatedList';
 
-function BookingItem({ booking }: { booking: Booking }) {
+function BookingItem({ item: booking }: { item: Booking }) {
   const linkToDetails = `/booking/${booking.id}`;
   const theme = useTheme();
 
@@ -62,35 +77,89 @@ function BookingItem({ booking }: { booking: Booking }) {
   );
 }
 
-function BookingsList() {
-  const response = useRecoilValue(bookingsByStatusSelector('CO'));
-
-  return response.count > 0 ? (
-    <List sx={{ width: '100%' }}>
-      {response.results.map((booking, index) => (
-        <>
-          <BookingItem key={booking.id} booking={booking} />
-          {index + 1 !== response.results.length && <Divider variant="inset" component="li" />}
-        </>
-      ))}
-    </List>
-  ) : (
-    <div
-      style={{
-        textAlign: 'center',
-      }}
-    >
-      <h3>Nothing to see here. </h3>
-      <p>Go spend some money and check back.</p>
-    </div>
-  );
-}
-
 export default function BookingsPage() {
+  const { enqueueSnackbar } = useSnackbar();
+  const [value, setValue] = React.useState(0);
+
+  const confirmedResponse = useRecoilValue(bookingsByStatusSelector(['CO', 'IP']));
+  const pastResponse = useRecoilValue(bookingsByStatusSelector('PA'));
+  const canceledResponse = useRecoilValue(bookingsByStatusSelector(['CA', 'RE']));
+
+  const tabs = [
+    {
+      response: confirmedResponse,
+      placeholder: (
+        <Result
+          key={1}
+          variant="info"
+          title="Frugal much?"
+          message="Go spend some money and check back."
+          primaryButtonText="Book a room now"
+          primaryButtonTo="/"
+        />
+      ),
+    },
+    {
+      response: pastResponse,
+      placeholder: (
+        <Result
+          key={2}
+          variant="info"
+          title="Nothing to see here!"
+          message="It would appear you've never had the pleasure of staying at one of our hotels!"
+          primaryButtonText="Book a room now"
+          primaryButtonTo="/"
+        />
+      ),
+    },
+    {
+      response: canceledResponse,
+      placeholder: (
+        <Result
+          key={3}
+          variant="success"
+          title="We're proud!"
+          message="You've never gone back on your word and canceled a booking! Yet..."
+          primaryButtonText="Cancel one now"
+          onPrimaryButtonClick={() => {
+            setValue(0);
+            if (confirmedResponse.total > 0) {
+              enqueueSnackbar("You don't have to, please don't.", {
+                variant: 'warning',
+              });
+            } else {
+              enqueueSnackbar('Ha! You have no bookings to cancel.', {
+                variant: 'info',
+              });
+            }
+          }}
+        />
+      ),
+    },
+  ].map(({ response, placeholder }) => (
+    <PaginatedList
+      key={response.links.generic}
+      response={response}
+      placeholder={placeholder}
+      listItemComponent={BookingItem}
+    />
+  ));
+
+  const handleChange = (event: React.SyntheticEvent, newValue: number) => {
+    setValue(newValue);
+  };
+
   return (
-    <main className="card card-root push">
+    <Stack className="card card-root" spacing={2}>
       <Typography variant="h4">My Bookings</Typography>
-      <BookingsList />
-    </main>
+      <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
+        <Tabs value={value} onChange={handleChange} aria-label="basic tabs example">
+          <Tab label="Current" />
+          <Tab label="Past" />
+          <Tab label="Canceled" />
+        </Tabs>
+      </Box>
+      {tabs[value]}
+    </Stack>
   );
 }

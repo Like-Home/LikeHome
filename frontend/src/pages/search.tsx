@@ -159,7 +159,7 @@ export default function SearchPage() {
     getOffersByLocation({ ...args, size: 5 }).then((response) => {
       if (!cancel) {
         setResults(response.results);
-        setResultsMessage(`Found ${response.count} hotel${response.count !== 1 ? 's' : ''}`);
+        setResultsMessage(`Found ${response.total} hotel${response.total !== 1 ? 's' : ''}`);
         setLoading(false);
         if (response.links.next) {
           // Do a delayed request

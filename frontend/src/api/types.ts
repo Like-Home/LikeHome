@@ -94,10 +94,13 @@ export type BookingPostArgs = {
 
 export type PaginationResponse<T> = {
   links: {
+    generic: string;
     next?: string;
     previous?: string;
   };
-  count: number;
+  page_total: number;
+  page_size: number;
+  total: number;
   results: T[];
 };
 

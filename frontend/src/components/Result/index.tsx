@@ -1,5 +1,5 @@
 import React from 'react';
-import { Button, Typography } from '@mui/material';
+import { Button, ButtonProps, Typography } from '@mui/material';
 import { Link } from 'react-router-dom';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline';
@@ -96,35 +96,44 @@ const Result: React.FC<ResultProps> = ({
     }
   };
 
+  const buttonSx = {
+    width: '100%',
+  };
+
+  const primaryButtonProps: ButtonProps = {
+    sx: buttonSx,
+    variant: 'contained',
+    color,
+    onClick: handlePrimaryButtonClick,
+    ...(primaryButtonTo ? { component: Link, to: primaryButtonTo } : {}),
+  };
+
+  const secondaryButtonProps: ButtonProps = {
+    sx: buttonSx,
+    variant: 'outlined',
+    onClick: handleSecondaryButtonClick,
+    ...(secondaryButtonTo ? { component: Link, to: secondaryButtonTo } : {}),
+  };
+
   return (
-    <Stack alignItems="center" spacing={2}>
-      {icon || defaultIcon}
-      <Typography variant="h3" gutterBottom>
-        {title || defaultTitle}
-      </Typography>
-      <Typography variant="body1" gutterBottom>
-        {message || children}
-      </Typography>
-      {!hidePrimaryButton &&
-        (primaryButtonTo ? (
-          <Button variant="contained" color={color} component={Link} to={primaryButtonTo}>
-            {primaryButtonText || defaultPrimaryButtonText}
-          </Button>
-        ) : (
-          <Button variant="contained" color={color} onClick={handlePrimaryButtonClick}>
-            {primaryButtonText || defaultPrimaryButtonText}
-          </Button>
-        ))}
-      {secondaryButtonText &&
-        (secondaryButtonTo ? (
-          <Button variant="outlined" component={Link} to={secondaryButtonTo}>
-            {secondaryButtonText}
-          </Button>
-        ) : (
-          <Button variant="outlined" onClick={handleSecondaryButtonClick}>
-            {secondaryButtonText}
-          </Button>
-        ))}
+    <Stack alignItems="center">
+      <Stack
+        alignItems="center"
+        spacing={2}
+        sx={{
+          maxWidth: '300px',
+        }}
+      >
+        {icon || defaultIcon}
+        <Typography variant="h4" gutterBottom sx={{ textAlign: 'center' }}>
+          {title || defaultTitle}
+        </Typography>
+        <Typography variant="body1" gutterBottom sx={{ textAlign: 'center' }}>
+          {message || children}
+        </Typography>
+        {!hidePrimaryButton && <Button {...primaryButtonProps}>{primaryButtonText || defaultPrimaryButtonText}</Button>}
+        {secondaryButtonText && <Button {...secondaryButtonProps}>{secondaryButtonText}</Button>}
+      </Stack>
     </Stack>
   );
 };
