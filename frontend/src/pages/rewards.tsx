@@ -12,14 +12,14 @@ import {
 } from '@mui/material';
 import moment from 'moment';
 import { Link } from 'react-router-dom';
-import { bookingsSelector } from '../recoil/bookings/atom';
+import { bookingsByStatusSelector } from '../recoil/bookings/atom';
 import { createHotelbedsSrcSetFromPath } from '../utils';
 import userAtom from '../recoil/user/atom';
 import { PointOverview } from '../components/Navbar';
 import { User } from '../api/types';
 
 export default function RewardsPage() {
-  const bookings = useRecoilValue(bookingsSelector);
+  const response = useRecoilValue(bookingsByStatusSelector(['CO', 'CA', 'RE', 'PA', 'IP']));
   const user = useRecoilValue(userAtom) as User;
 
   return (
@@ -31,7 +31,7 @@ export default function RewardsPage() {
         </Stack>
       </Stack>
       <List sx={{ width: '100%' }}>
-        {bookings.map((booking) => (
+        {response.results.map((booking) => (
           <ListItem key={booking.id}>
             <ListItemButton component={Link} to={`/booking/${booking.id}`}>
               <Stack

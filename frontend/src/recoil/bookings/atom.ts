@@ -1,10 +1,10 @@
-import { atom, selector, selectorFamily } from 'recoil';
-import { getBookingHistory, getBooking } from '../../api/bookings';
+import { atom, selectorFamily } from 'recoil';
+import { getBookingsByStatus, getBooking } from '../../api/bookings';
 import { Booking } from '../../api/types';
 
-export const bookingsSelector = selector({
+export const bookingsByStatusSelector = selectorFamily({
   key: 'bookingsDefault',
-  get: async () => getBookingHistory(),
+  get: (status: string | string[]) => () => getBookingsByStatus(status),
 });
 
 // function bookingIdGetter(id: string): () => Promise<Booking>;
@@ -24,7 +24,7 @@ export const bookingById = selectorFamily({
   get: bookingIdGetter,
 });
 
-export default atom({
-  key: 'bookingsAtom',
-  default: bookingsSelector,
-});
+// export default atom({
+//   key: 'bookingsAtom',
+//   default: bookingsSelector,
+// });

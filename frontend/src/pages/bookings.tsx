@@ -4,7 +4,7 @@ import { useTheme } from '@mui/material/styles';
 import moment from 'moment';
 import { useRecoilValue } from 'recoil';
 import { Booking } from '../api/types';
-import { bookingsSelector } from '../recoil/bookings/atom';
+import { bookingsByStatusSelector } from '../recoil/bookings/atom';
 import { createHotelbedsSrcSetFromPath } from '../utils';
 import { statusToText } from '../enums';
 
@@ -63,14 +63,14 @@ function BookingItem({ booking }: { booking: Booking }) {
 }
 
 function BookingsList() {
-  const bookings = useRecoilValue(bookingsSelector);
+  const response = useRecoilValue(bookingsByStatusSelector('CO'));
 
-  return bookings.length > 0 ? (
+  return response.count > 0 ? (
     <List sx={{ width: '100%' }}>
-      {bookings.map((booking, index) => (
+      {response.results.map((booking, index) => (
         <>
           <BookingItem key={booking.id} booking={booking} />
-          {index + 1 !== bookings.length && <Divider variant="inset" component="li" />}
+          {index + 1 !== response.results.length && <Divider variant="inset" component="li" />}
         </>
       ))}
     </List>

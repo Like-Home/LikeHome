@@ -1,8 +1,20 @@
 import * as fetch from './fetch';
-import { Booking, BookingPutArgs } from './types';
+import { Booking, BookingPutArgs, PaginationResponse } from './types';
 
-export function getBookingHistory() {
-  return fetch.get<Booking[]>('/booking/');
+function objectToURLSearchParamsString(
+  obj: Record<string, string | number | boolean | string[] | number[] | boolean[]>,
+) {
+  const qs = new URLSearchParams();
+  Object.entries(obj).forEach(([key, value]) => {
+    const values = Array.isArray(value) ? value : [value];
+    values.forEach((v) => qs.append(key, String(v)));
+  });
+  return qs.toString();
+}
+
+export function getBookingsByStatus(status: string | string[]) {
+  const searchParams = objectToURLSearchParamsString({ status });
+  return fetch.get<PaginationResponse<Booking>>(`/booking/?${searchParams}`);
 }
 
 export function getBooking(id: string) {
