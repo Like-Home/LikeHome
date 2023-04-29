@@ -55,7 +55,7 @@ export default function PaginatedList<T extends PaginatedListItemWithId | Pagina
                   key: item.id || item.code,
                   item,
                 })}
-                {index + 1 !== response.results.length && <Divider variant="inset" component="li" />}
+                {index + 1 !== response.results.length && <Divider component="li" />}
               </>
             ))}
           </List>
