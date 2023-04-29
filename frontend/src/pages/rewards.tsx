@@ -109,6 +109,8 @@ export default function RewardsPage() {
             title="Not much over here!"
             message={`Like usual, you have to spend money to make money — or in this case, points.`}
             variant="info"
+            primaryButtonText="Book a hotel"
+            primaryButtonTo="/"
           />
         }
         listItemComponent={RewardPageItem}
