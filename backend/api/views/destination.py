@@ -9,6 +9,7 @@ from api.models.hotelbeds.HotelbedsHotel import (HotelbedsHotel,
                                                  HotelbedsHotelImage)
 from api.modules.hotelbeds import hotelbeds
 from api.modules.hotelbeds.serializers import HotelbedsAPIOfferHotelSerializer
+from api.pagination import BasePagination
 from api.throttles import HotelbedsRateThrottle
 from api.validators import OfferFilterParams, OfferSearchParams
 from rest_framework import pagination, serializers, viewsets
@@ -29,22 +30,6 @@ def convert_category_to_rating_props(category_description):
         value += 0.5
 
     return value
-
-
-class CustomPagination(pagination.PageNumberPagination):
-    page_size = 5
-    page_size_query_param = 'size'
-    max_page_size = 100
-
-    def get_paginated_response(self, data):
-        return Response({
-            'links': {
-                'next': self.get_next_link(),
-                'previous': self.get_previous_link()
-            },
-            'count': self.page.paginator.count,
-            'results': data
-        })
 
 
 class LocationOfferSearchParams(OfferSearchParams, OfferFilterParams):
@@ -105,7 +90,7 @@ def extract_hotelbeds_offer_filters_from_params(params):
 class DestinationView(viewsets.mixins.RetrieveModelMixin, viewsets.GenericViewSet):
     serializer_class = DestinationLocationSerializer
     queryset = HotelbedsDestinationLocation.objects.all()
-    pagination_class = CustomPagination
+    pagination_class = BasePagination
 
     class Meta:
         ordering = ['-code']

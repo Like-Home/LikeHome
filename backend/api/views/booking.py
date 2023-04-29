@@ -1,7 +1,10 @@
+import django_filters
 from api.models.Booking import Booking, BookingCancelException
+from api.pagination import BasePagination
 from api.serializers import BookingSerializer
 from api.utils import format_currency
 from app import config
+from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import status, viewsets
 from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated
@@ -254,9 +257,24 @@ def send_booking_cancelation_email_partial_refund(booking: Booking):
     )
 
 
+class BookingFilterSet(django_filters.FilterSet):
+    status = django_filters.MultipleChoiceFilter(
+        choices=Booking.BookingStatus.choices)
+
+    class Meta:
+        model = Booking
+        fields = ['status']
+
+
 class BookingView(viewsets.ReadOnlyModelViewSet, viewsets.mixins.UpdateModelMixin):
     serializer_class = BookingSerializer
     permission_classes = [IsAuthenticated]
+
+    filter_backends = [DjangoFilterBackend]
+    filterset_fields = ['status']
+    filterset_class = BookingFilterSet
+
+    pagination_class = BasePagination
 
     def get_queryset(self):
         """
@@ -265,7 +283,7 @@ class BookingView(viewsets.ReadOnlyModelViewSet, viewsets.mixins.UpdateModelMixi
         """
 
         # filter the bookings by the request.user and order them by check_in date descending
-        return Booking.objects.filter(user=self.request.user).order_by('check_in').exclude(status=Booking.BookingStatus.PENDING)
+        return Booking.objects.filter(user=self.request.user).order_by('check_in', '-pk').exclude(status=Booking.BookingStatus.PENDING)
 
     def get_object(self):
         """Get a single booking object by pk

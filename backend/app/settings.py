@@ -100,7 +100,9 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     # installed
     'corsheaders',
+    'django_filters',
     'rest_framework',
+
     # Add the following django-allauth apps
     'allauth',
     'allauth.account',
