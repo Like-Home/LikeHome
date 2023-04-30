@@ -10,10 +10,10 @@ class BasePagination(pagination.PageNumberPagination):
     page_size_query_param = 'size'
     max_page_size = 100
 
-    def get_paginated_response(self, data):
+    def get_paginated_response(self, data, extra_data={}):
         url = self.request.build_absolute_uri()
 
-        return Response({
+        data = {
             'links': {
                 'generic': replace_query_param(url, self.page_query_param, 'PAGE_NUMBER'),
                 'next': self.get_next_link(),
@@ -23,4 +23,9 @@ class BasePagination(pagination.PageNumberPagination):
             'page_size': self.page_size,
             'total': self.page.paginator.count,
             'results': data
-        })
+        }
+
+        if self.page.number == 1:
+            data = data | extra_data
+
+        return Response(data);

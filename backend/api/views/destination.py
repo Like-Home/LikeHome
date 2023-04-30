@@ -160,9 +160,9 @@ class DestinationView(viewsets.mixins.RetrieveModelMixin, viewsets.GenericViewSe
             hotels  # type: ignore
         )
 
-        return self.get_paginated_response([
+        return self.paginator.get_paginated_response([
             hotel for hotel in HotelbedsAPIOfferHotelSerializer(
                 page,
                 many=True
             ).data if hotel['images']
-        ])
+        ], extra_data={'name': HotelbedsDestinationLocation.objects.get(pk=pk).name})
