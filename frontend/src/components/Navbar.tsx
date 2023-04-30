@@ -62,7 +62,7 @@ export function PointOverview({ user }: { user: User }) {
     <>
       {user.travel_points !== undefined && (
         <Stack direction="row" alignItems={'center'} spacing={1}>
-          <Typography variant="h4">{user.travel_points / 100}</Typography>
+          <Typography variant="h4">{user.travel_points}</Typography>
           <Typography variant="h6" sx={{ pt: 0.5 }}>
             points
           </Typography>
