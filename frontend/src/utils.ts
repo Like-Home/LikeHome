@@ -13,7 +13,7 @@ const formatCurrencyWithoutCents = new Intl.NumberFormat('en-US', {
 });
 
 export const formatCurrency = (value: number, cents = true) => {
-  console.log(cents, (cents ? formatCurrencyWithCents : formatCurrencyWithoutCents).format(value));
+  // console.log(cents, (cents ? formatCurrencyWithCents : formatCurrencyWithoutCents).format(value));
 
   return (cents ? formatCurrencyWithCents : formatCurrencyWithoutCents).format(value);
 };

@@ -28,17 +28,12 @@ export default function LocationAutocomplete({ value, setValue }) {
     let active = true;
 
     if (inputValue === '') {
-      setOptions(value ? [value] : []);
       return undefined;
     }
 
     fetch(inputValue, ({ results }) => {
       if (active) {
         let newOptions = [];
-
-        if (value) {
-          newOptions = [value];
-        }
 
         if (results.length > 0) {
           newOptions = [...newOptions, ...results];
@@ -59,7 +54,7 @@ export default function LocationAutocomplete({ value, setValue }) {
       sx={{ width: '100%' }}
       getOptionLabel={(option) => option.name}
       filterOptions={(x) => x}
-      options={options}
+      options={value ? [...options, value] : options}
       autoComplete
       includeInputInList
       filterSelectedOptions

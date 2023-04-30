@@ -1,4 +1,4 @@
-import { ChangeEvent, useState } from 'react';
+import { ChangeEvent, useEffect, useState } from 'react';
 import { Stack, Button, Alert } from '@mui/material';
 import Grid from '@mui/material/Unstable_Grid2';
 import { useNavigate } from 'react-router-dom';
@@ -25,11 +25,15 @@ export type onSearchProps = {
   rooms?: string;
 };
 
-type SearchBarProps = SearchPageParams & {
+type SearchBarProps = {
   location?: {
     code: string;
     name: string;
   };
+  checkin?: string;
+  checkout?: string;
+  guests?: string;
+  rooms?: string;
   noLocation?: boolean;
   onSearch?: (props: onSearchProps) => void;
 };
@@ -40,7 +44,7 @@ type SearchBarProps = SearchPageParams & {
  * @param onSearch redirect to /search if not set
  * @returns
  */
-export default function SearchBars(props: SearchPageParams & SearchBarProps) {
+export default function SearchBars(props: SearchBarProps) {
   const navigate = useNavigate();
 
   // default to setting the checkin/checkout date to the next weekend
@@ -78,6 +82,11 @@ export default function SearchBars(props: SearchPageParams & SearchBarProps) {
   };
 
   const layout = props.noLocation ? gridLayouts.withoutLocation : gridLayouts.withLocation;
+
+  // This prop can update dynamically as we get the location display name from the server.
+  useEffect(() => {
+    setLocation(props.location);
+  }, [props.location]);
 
   return (
     <Stack spacing={2} sx={{ width: '100%' }}>
@@ -144,11 +153,9 @@ export default function SearchBars(props: SearchPageParams & SearchBarProps) {
                   rooms,
                 });
               } else {
-                // TODO: kidna hacky to pass this in the URL. Any ides?
-                const locationHash = btoa(JSON.stringify(location));
                 // TODO: validate dates before proceeding
                 navigate(
-                  `/search?location=${locationHash}&checkin=${checkin}&checkout=${checkout}&guests=${guests}&rooms=${rooms}`,
+                  `/search?location=${location?.code}&checkin=${checkin}&checkout=${checkout}&guests=${guests}&rooms=${rooms}`,
                 );
               }
             }}

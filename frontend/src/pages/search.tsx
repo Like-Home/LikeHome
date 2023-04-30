@@ -52,7 +52,12 @@ function pageParamsAreInvalid(params: setOfferHotelsArgsProps) {
 export default function SearchPage() {
   const [params, setParams] = usePageParamsObject<SearchPageParams>();
 
-  const location = JSON.parse(atob(params.location || ''));
+  let locationCode = params.location ?? '';
+
+  // Backwards compatibility with old location JSON string
+  if (locationCode.length > 3 && locationCode.endsWith('=')) locationCode = JSON.parse(atob(locationCode)).code;
+
+  const [location, setLocation] = useState({ code: locationCode, name: locationCode });
   const [offerHotelsArgs, setOfferHotelsArgs] = useState<setOfferHotelsArgsProps>({
     destinationCode: location?.code,
     checkin: params.checkin,
@@ -119,13 +124,13 @@ export default function SearchPage() {
     }
 
     // const searchParams = new URLSearchParams();
-    // searchParams.set('location', btoa(JSON.stringify(kwargs.location)));
+    // searchParams.set('location', kwargs.location?.code);
     // searchParams.set('checkin', kwargs.checkin);
     // searchParams.set('checkout', kwargs.checkout);
     // searchParams.set('guests', kwargs.guests);
     // searchParams.set('rooms', kwargs.rooms);
     setParams({
-      location: btoa(JSON.stringify(kwargs.location)),
+      location: kwargs.location?.code,
       checkin: kwargs.checkin,
       checkout: kwargs.checkout,
       guests: kwargs.guests,
@@ -157,6 +162,8 @@ export default function SearchPage() {
 
     // Do an immediate request
     getOffersByLocation({ ...args, size: 5 }).then((response) => {
+      // Update location display name
+      if (response.name) setLocation({ ...location, name: response.name });
       if (!cancel) {
         setResults(response.results);
         setResultsMessage(`Found ${response.total} hotel${response.total !== 1 ? 's' : ''}`);

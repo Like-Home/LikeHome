@@ -53,7 +53,9 @@ export type OfferHotel = {
   images: OfferHotelRoomImage[];
 };
 
-export type LocationOfferResults = PaginationResponse<OfferHotel>;
+export type LocationOfferResults = PaginationResponse<OfferHotel> & {
+  name?: string;
+};
 export type HotelOfferResults = PaginationResponse<OfferHotelRoom>;
 
 type OfferParams = {
