@@ -83,6 +83,10 @@ export function getOffersByLocation({ destinationCode, checkin, checkout, rooms,
   );
 }
 
+export function getHotelsByLocation(destinationCode: string) {
+  return fetch.get<LocationOfferResults>(`/destination/${destinationCode}/hotels`);
+}
+
 export function getOffersByHotel({ hotelCode, checkin, checkout, rooms, guests }: OffersByHotel) {
   return fetch.get<HotelOfferResults>(
     `/hotel/${hotelCode}/offers/?check_in=${checkin}&check_out=${checkout}&adults=${guests}&rooms=${rooms}`,

@@ -1,133 +1,16 @@
 import { Divider, Typography, Stack, List, ListItem, useTheme } from '@mui/material';
 import { Link } from 'react-router-dom';
+import slugify from 'slugify';
+import Locations from '../data/locations';
 
 const sections = [
   {
     title: 'Top Destinations',
     // TODO resolve the id's for these locations
-    // TODO: Do we want to use the prefix "Hotels in"?
-    links: [
-      {
-        // text: 'Hotels in Las Vegas',
-        text: 'Las Vegas',
-        to: '/destination/nnnn/las-vegas',
-      },
-      {
-        // text: 'Hotels in New York',
-        text: 'New York',
-        to: '/destination/nnnn/new-york',
-      },
-      {
-        // text: 'Hotels in Chicago',
-        text: 'Chicago',
-        to: '/destination/nnnn/chicago',
-      },
-      {
-        // text: 'Hotels in Orlando',
-        text: 'Orlando',
-        to: '/destination/nnnn/orlando',
-      },
-      {
-        // text: 'Hotels in New Orleans',
-        text: 'New Orleans',
-        to: '/destination/nnnn/new-orleans',
-      },
-      {
-        // text: 'Hotels in San Diego',
-        text: 'San Diego',
-        to: '/destination/nnnn/san-diego',
-      },
-      {
-        // text: 'Hotels in Nashville',
-        text: 'Nashville',
-        to: '/destination/nnnn/nashville',
-      },
-      {
-        // text: 'Hotels in San Francisco',
-        text: 'San Francisco',
-        to: '/destination/nnnn/san-francisco',
-      },
-      {
-        // text: 'Hotels in Los Angeles',
-        text: 'Los Angeles',
-        to: '/destination/nnnn/los-angeles',
-      },
-      {
-        // text: 'Hotels in Miami',
-        text: 'Miami',
-        to: '/destination/nnnn/miami',
-      },
-      {
-        // text: 'Hotels in Paris',
-        text: 'Paris',
-        to: '/destination/nnnn/paris',
-      },
-      {
-        // text: 'Hotels in Denver',
-        text: 'Denver',
-        to: '/destination/nnnn/denver',
-      },
-      {
-        // text: 'Hotels in Washington',
-        text: 'Washington',
-        to: '/destination/nnnn/washington',
-      },
-      {
-        // text: 'Hotels in Austin',
-        text: 'Austin',
-        to: '/destination/nnnn/austin',
-      },
-      {
-        // text: 'Hotels in Atlanta',
-        text: 'Atlanta',
-        to: '/destination/nnnn/atlanta',
-      },
-      {
-        // text: 'Hotels in San Antonio',
-        text: 'San Antonio',
-        to: '/destination/nnnn/san-antonio',
-      },
-      {
-        // text: 'Hotels in Boston',
-        text: 'Boston',
-        to: '/destination/nnnn/boston',
-      },
-      {
-        // text: 'Hotels in Atlantic City',
-        text: 'Atlantic City',
-        to: '/destination/nnnn/atlantic-city',
-      },
-      {
-        // text: 'Hotels in Key West',
-        text: 'Key West',
-        to: '/destination/nnnn/key-west',
-      },
-      {
-        // text: 'Hotels in London',
-        text: 'London',
-        to: '/destination/nnnn/london',
-      },
-      {
-        // text: 'Hotels in Virginia Beach',
-        text: 'Virginia Beach',
-        to: '/destination/nnnn/virginia-beach',
-      },
-      {
-        // text: 'Hotels in Seattle',
-        text: 'Seattle',
-        to: '/destination/nnnn/seattle',
-      },
-      {
-        // text: 'Hotels in Anaheim',
-        text: 'Anaheim',
-        to: '/destination/nnnn/anaheim',
-      },
-      {
-        // text: 'Hotels in Dallas',
-        text: 'Dallas',
-        to: '/destination/nnnn/dallas',
-      },
-    ],
+    links: Object.entries(Locations.codes).map(([key, value]) => ({
+      text: value[2] ?? value[0],
+      to: `/destination/${key}/${slugify(value[0]).toLowerCase()}`,
+    })),
   },
   {
     title: 'Support & FAQ',

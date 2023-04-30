@@ -70,10 +70,22 @@ export default function HotelPage() {
   const rebooking = useRecoilValue(rebookingSelector);
 
   const hotel = useRecoilValue(hotelById(hotelId));
+
+  // TODO: Get this from SearchBars
+  const today = new Date();
+  const nextWeekend = new Date();
+  nextWeekend.setDate(today.getDate() + ((6 - today.getDay() + 7) % 7) + 1);
+  const nextWeekendStr = nextWeekend.toISOString().split('T')[0];
+  const nextWeekendPlusOne = new Date(nextWeekend);
+  nextWeekendPlusOne.setDate(nextWeekendPlusOne.getDate() + 2);
+  const nextWeekendPlusOneStr = nextWeekendPlusOne.toISOString().split('T')[0];
   const hotelRoomOffers = useRecoilValue(
     hotelOffersById({
       hotelCode: hotelId,
-      ...params,
+      checkin: params.checkin ?? nextWeekendStr,
+      checkout: params.checkout ?? nextWeekendPlusOneStr,
+      guests: params.guests ?? 2,
+      rooms: params.rooms ?? 1,
     }),
   );
 
@@ -224,15 +236,17 @@ export default function HotelPage() {
             })}
           </Grid>
         </Stack>
-        <Stack className="card" spacing={3} alignItems={'start'}>
+        <Stack className="card" alignItems={'start'}>
           <Typography variant="h4" id="rooms">
             Choose your room
           </Typography>
+          <Typography sx={{ mb: 2 }}>Choose your dates to see room prices and availability.</Typography>
           <Stack
             className="push-center"
             sx={{
               width: '100%',
               pl: 1,
+              mb: 3,
             }}
             alignItems={'center'}
           >
@@ -245,8 +259,8 @@ export default function HotelPage() {
               onSearch={(searchParams) => {
                 const newParams = {
                   ...searchParams,
-                  location: btoa(JSON.stringify(searchParams.location)),
                 };
+                delete newParams.location;
                 if (rebooking) {
                   newParams.rebooking = params.rebooking;
                 }
@@ -259,6 +273,8 @@ export default function HotelPage() {
             spacing={2}
             sx={{
               width: '100%',
+              pl: 1,
+              mb: 1,
               alignItems: 'stretch',
             }}
           >

@@ -11,6 +11,7 @@ import BookingsPage from './pages/bookings';
 import AccountPage from './pages/account';
 import AboutPage from './pages/about';
 import RewardsPage from './pages/rewards';
+import DestinationPage from './pages/destination';
 import TermsOfServicePage from './pages/tos';
 import PrivacyPage from './pages/privacy';
 import CookiesPage from './pages/cookies';
@@ -47,6 +48,10 @@ const router = createBrowserRouter([
       {
         path: '/hotel/:hotelId/:hotelName',
         element: <HotelPage />,
+      },
+      {
+        path: '/destination/:code/:name',
+        element: <DestinationPage />,
       },
       {
         path: '/search',

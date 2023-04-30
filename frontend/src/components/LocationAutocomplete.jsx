@@ -6,8 +6,8 @@ import Grid from '@mui/material/Grid';
 import Typography from '@mui/material/Typography';
 import parse from 'autosuggest-highlight/parse';
 import match from 'autosuggest-highlight/match';
-
 import { debounce } from '@mui/material/utils';
+import Locations from '../data/locations';
 import { getLocation } from '../api/location';
 import TextInput from './controls/TextInput';
 
@@ -52,7 +52,13 @@ export default function LocationAutocomplete({ value, setValue }) {
   return (
     <Autocomplete
       sx={{ width: '100%' }}
-      getOptionLabel={(option) => option.name}
+      getOptionLabel={(option) => {
+        const loc = Locations.get(option.code);
+        if (loc) {
+          return `${loc[0]}, ${loc[1]}`;
+        }
+        return option.name;
+      }}
       filterOptions={(x) => x}
       options={value ? [...options, value] : options}
       autoComplete

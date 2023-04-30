@@ -17,6 +17,9 @@
 
 .card .card {
   background: rgba(41, 41, 41, 0.75);
+}
+
+.card .card:not(.blur) {
   backdrop-filter: none;
 }
 
