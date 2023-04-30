@@ -1,0 +1,2 @@
+- All placeholder images here are freely licensed as CC0 from https://pexels.com/ or Wikimedia Commons
+- Attributions are stored in src/data/photos.ts
