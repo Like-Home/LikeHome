@@ -157,6 +157,9 @@ class DestinationView(viewsets.mixins.RetrieveModelMixin, viewsets.GenericViewSe
 
         offers = hotelbeds.post('/hotel-api/1.0/hotels', json=payload).json()
 
+        if not 'hotels' in offers and 'error' in offers:
+            raise Exception(offers['error']) 
+
         hotels = offers['hotels'].get('hotels', [])
 
         if params.get('sort_by') == 'price':
