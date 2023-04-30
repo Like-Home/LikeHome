@@ -10,6 +10,7 @@ from api.models.hotelbeds.HotelbedsHotel import (HotelbedsHotel,
 from api.modules.hotelbeds import hotelbeds
 from api.modules.hotelbeds.serializers import HotelbedsAPIOfferHotelSerializer
 from api.pagination import BasePagination
+from api.serializers import HotelbedsHotelSerializer
 from api.throttles import HotelbedsRateThrottle
 from api.validators import OfferFilterParams, OfferSearchParams
 from rest_framework import pagination, serializers, viewsets
@@ -115,6 +116,17 @@ class DestinationView(viewsets.mixins.RetrieveModelMixin, viewsets.GenericViewSe
         page = self.paginate_queryset(queryset)
 
         serializer = self.get_serializer(page, many=True)
+        return self.get_paginated_response(serializer.data)
+
+    @action(detail=True, methods=['get'])
+    def hotels(self, request: Request, pk=None):
+        """Search for a destination location by name."""
+
+        queryset = HotelbedsHotel.objects.filter(
+            destinationCode=pk).order_by('-code')
+        page = self.paginate_queryset(queryset)
+
+        serializer = HotelbedsHotelSerializer(page, many=True)
         return self.get_paginated_response(serializer.data)
 
     @action(detail=True, methods=['get'])
