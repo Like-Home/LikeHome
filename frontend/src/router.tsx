@@ -11,6 +11,9 @@ import BookingsPage from './pages/bookings';
 import AccountPage from './pages/account';
 import AboutPage from './pages/about';
 import RewardsPage from './pages/rewards';
+import TermsOfServicePage from './pages/tos';
+import PrivacyPage from './pages/privacy';
+import CookiesPage from './pages/cookies';
 
 import ErrorLayout from './layouts/error';
 import DefaultRouterLayout from './layouts/default';
@@ -52,6 +55,18 @@ const router = createBrowserRouter([
       {
         path: '/about',
         element: <AboutPage />,
+      },
+      {
+        path: '/tos',
+        element: <TermsOfServicePage />,
+      },
+      {
+        path: '/cookies',
+        element: <CookiesPage />,
+      },
+      {
+        path: '/privacy',
+        element: <PrivacyPage />,
       },
       {
         element: <AuthGuard />,

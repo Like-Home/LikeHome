@@ -155,7 +155,7 @@ const sections = [
       },
       {
         text: 'Terms of Use',
-        to: '/terms',
+        to: '/tos',
       },
       {
         text: 'Cookies Policy',
