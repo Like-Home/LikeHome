@@ -132,6 +132,7 @@ class DestinationView(viewsets.mixins.RetrieveModelMixin, viewsets.GenericViewSe
     @action(detail=True, methods=['get'])
     def offers(self, request: Request, pk=None):
         """Returns a list of offers for a specific hotel id."""
+        pk = pk.upper()
         params = LocationOfferSearchParams(data=request.GET)
         params.is_valid(raise_exception=True)
         params = params.data
