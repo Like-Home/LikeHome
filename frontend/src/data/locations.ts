@@ -23,6 +23,7 @@ export const codes: Dict = {
   VIR: ['Virginia Beach', 'VA'],
   SEA: ['Seattle', 'WA'],
   DFW: ['Dallas', 'TX'],
+  SAJ: ['San Jose', 'CA'],
 };
 
 export function get(code: string): string[] {

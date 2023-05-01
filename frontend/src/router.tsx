@@ -50,6 +50,10 @@ const router = createBrowserRouter([
         element: <HotelPage />,
       },
       {
+        path: '/hotels-near-me', // TODO: Find user's approximate location?
+        element: <Navigate to="/destination/SAJ/san-jose" />,
+      },
+      {
         path: '/destination/:code/:name',
         element: <DestinationPage />,
       },

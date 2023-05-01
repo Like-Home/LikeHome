@@ -17,6 +17,7 @@ export const photos: { [key: string]: string } = {
   ATL: 'Richard Solano',
   SEA: 'Chait Goli',
   YSP: 'Nextvoyage',
+  SAJ: 'Todd Jacobson',
 };
 
 export function get(code: string) {

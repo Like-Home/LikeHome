@@ -6,7 +6,6 @@ import Locations from '../data/locations';
 const sections = [
   {
     title: 'Top Destinations',
-    // TODO resolve the id's for these locations
     links: Object.entries(Locations.codes).map(([key, value]) => ({
       text: value[2] ?? value[0],
       to: `/destination/${key}/${slugify(value[0]).toLowerCase()}`,
@@ -21,11 +20,11 @@ const sections = [
       },
       {
         text: 'FAQs',
-        to: '/faqs',
+        to: '/about', // TODO: '/faqs',
       },
       {
         text: 'Contact us',
-        to: '/contact',
+        to: '/tos#contact', // TODO: '/contact',
       },
     ],
   },
@@ -38,7 +37,7 @@ const sections = [
       },
       {
         text: 'Terms of Use',
-        to: '/terms',
+        to: '/tos',
       },
       {
         text: 'Cookies Policy',
@@ -59,7 +58,7 @@ const sections = [
       },
       {
         text: 'Site Index',
-        to: '/site-index',
+        to: '/#footer', // TODO: '/site-index',
       },
     ],
   },
@@ -70,7 +69,7 @@ const footnotes = ['Some hotels require you to cancel more than 24 hours before 
 function Footer() {
   const theme = useTheme();
   return (
-    <Stack className="card card-root footer" spacing={2}>
+    <Stack className="card card-root footer" id="footer" spacing={2}>
       <Stack
         direction={{
           xs: 'column',
@@ -99,7 +98,10 @@ function Footer() {
             >
               {section.links.map((link) => (
                 <ListItem key={link.text}>
-                  <Link to={link.to}>
+                  <Link
+                    to={link.to}
+                    onClick={() => !link.to.includes('#') && window.scrollTo({ top: 0, behavior: 'smooth' })}
+                  >
                     <Typography variant="subtitle2">{link.text}</Typography>
                   </Link>
                 </ListItem>
