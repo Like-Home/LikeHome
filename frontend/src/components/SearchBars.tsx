@@ -140,6 +140,17 @@ export default function SearchBars(props: SearchBarProps) {
                 setAlert('Please enter check-in and checkout dates.');
                 return;
               }
+              const now = new Date();
+              const checkinDate = new Date(checkin);
+              const checkoutDate = new Date(checkout);
+              if (checkinDate < now) {
+                setAlert('Check-in date must be in the future.');
+                return;
+              }
+              if (checkinDate > checkoutDate) {
+                setAlert('Check-in date must be before checkout date.');
+                return;
+              }
               if (!props.noLocation && !location) {
                 setAlert('Please select a location.');
                 return;
