@@ -20,7 +20,7 @@ import {
 } from '@mui/material';
 import moment from 'moment';
 import slugify from 'slugify';
-import { bookingById } from '../recoil/bookings/atom';
+import { bookingById, bookingsByStatusSelector } from '../recoil/bookings/atom';
 import { createHotelbedsSrcSetFromPath, formatAddressFromHotel, formatCurrency } from '../utils';
 import { nightsFromDates } from '../api/hotel';
 import { Booking } from '../api/types';
@@ -100,6 +100,9 @@ export default function BookingPage() {
     return <div>Booking not found!</div>;
   }
 
+  const updateConfirmedResponses = useRecoilRefresher_UNSTABLE(bookingsByStatusSelector(['CO', 'IP']));
+  const updateCanceledResponses = useRecoilRefresher_UNSTABLE(bookingsByStatusSelector(['CA', 'RE']));
+
   const bookingSelector = bookingById(bookingId);
   const refreshBookingAtom = useRecoilRefresher_UNSTABLE(bookingSelector);
   const booking = useRecoilValue(bookingSelector) as unknown as Booking;
@@ -119,6 +122,8 @@ export default function BookingPage() {
 
   const onCancel = async () => {
     await cancelBooking(booking.id);
+    updateConfirmedResponses();
+    updateCanceledResponses();
     refreshBookingAtom();
     handleCancelBookingClose();
   };
