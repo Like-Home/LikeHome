@@ -17,6 +17,7 @@ import {
   Language as Website,
   Park as Garden,
   WbSunny as Sun,
+  ContentCut as Scissors,
   Tv,
   Desk,
   SmokingRooms,
@@ -47,7 +48,13 @@ import {
   Dining,
   Woman,
   Man,
-  Info,
+  HotTub,
+  LocalBar,
+  LocalMovies,
+  Water,
+  Badge,
+  Spa,
+  Check as DefaultFacilityIcon,
 } from '@mui/icons-material';
 
 // Some facilities have meaningless numbers
@@ -67,6 +74,7 @@ const FacilityIcons = {
   '24h dining café': Breakfast,
   'Cycling / mountain biking': noNumber(Cycling),
   'Full board': FullBoard,
+  'Poolside snack bar': FullBoard,
   'Smoking rooms': smoking,
   'Smoking area': smoking,
   'Multilingual staff': Translate,
@@ -93,6 +101,15 @@ const FacilityIcons = {
   'Non-smoking establishment': SmokeFree,
   'Tea and coffee making facilities ': CoffeeMaker,
   'Tea and coffee making facilities': CoffeeMaker,
+  'Jet ski': Ski,
+  'Hairdressing salon': Scissors,
+  'Banana boating': Water,
+  'Pay movies': LocalMovies,
+  'Turndown service': Bed,
+  'Minimum check-in age': Badge,
+  'Spa centre': Spa,
+  Sauna: HotTub,
+  Nightclub: LocalBar,
   Sailing: noNumber(Sailing),
   Fitness: noNumber(Fitness),
   Toiletries: Shower,
@@ -126,6 +143,11 @@ const FacilityIcons = {
   'Highgate - Be Well. Stay Well.': ignore,
   'RIU - Covid-19 Health Protocol': ignore,
   'Minor - AvaniSHIELD': ignore,
+  'Shangri-La – Shangri-La Cares': ignore,
+  'WTTC - Safe Travels Stamp': ignore,
+  'Green Star Hotel Certificate – Egypt': ignore,
+  'Mauritian Standard on Sustainable Tourism': ignore,
+  'Hilton LightStay': ignore,
   '': ignore,
 };
 
@@ -149,7 +171,7 @@ export default function Amenities({ facility }) {
   }
 
   if (!Icon) {
-    Icon = fac.indFee ? FeeIcon : Info;
+    Icon = fac.indFee ? FeeIcon : DefaultFacilityIcon;
   }
 
   const name = fac.name ?? fac.facility.description;

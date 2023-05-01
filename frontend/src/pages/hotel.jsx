@@ -47,6 +47,34 @@ function rowColByIndex(index) {
   return { rows: 1, cols: 1 };
 }
 
+function groupBy(xs, func) {
+  return Object.entries(
+    xs.reduce(function (rv, x) {
+      const group = func(x);
+      // eslint-disable-next-line no-param-reassign
+      (rv[group] = rv[group] || []).push(x);
+      return rv;
+    }, {}),
+  );
+}
+
+function amenitiesGroupName(name) {
+  switch (name) {
+    case 'Room facilities (Standard room)':
+      return 'Room';
+    case 'Facilities':
+    case 'Catering':
+    case 'Business':
+      return 'General';
+    case 'Entertainment':
+    case 'Health':
+    case 'Sports':
+      return 'Activities';
+    default:
+      return name;
+  }
+}
+
 export default function HotelPage() {
   const { hotelId } = useParams();
 
@@ -96,6 +124,7 @@ export default function HotelPage() {
   }, []);
 
   const [value, setValue] = React.useState(0);
+  const [amenitiesTab, setAmenitiesTab] = React.useState(0);
   function handleChange(event, newValue) {
     // eslint-disable-next-line no-undef
     window.location.hash = tabs[newValue].href.slice(1);
@@ -103,6 +132,20 @@ export default function HotelPage() {
   }
 
   const navigate = useNavigate();
+
+  const amenities = groupBy(hotel?.facilities ?? [], (x) => amenitiesGroupName(x.facilityGroup.description))
+    .map(([key, items]) => [
+      key,
+      items?.map((f, i) => {
+        const amenity = Amenities({ facility: f });
+        return amenity ? (
+          <Grid item key={i} md={4} sm={6} xs={12}>
+            {amenity}
+          </Grid>
+        ) : null;
+      }),
+    ])
+    .filter(([key, items]) => items && items.length !== 0 && items.some((x) => x != null));
 
   return (
     <>
@@ -221,20 +264,18 @@ export default function HotelPage() {
             </Grid>
           </Grid>
         </Stack>
-        <Stack className="card" spacing={3} alignItems={'start'}>
+        <Stack className="card" spacing={1} sx={{ p: 3 }} alignItems={'start'}>
           <Typography variant="h4" id="amenities">
             Amenities
           </Typography>
-          <Grid container>
-            {hotel?.facilities?.map((f, i) => {
-              const amenity = Amenities({ facility: f });
-              return amenity ? (
-                <Grid item key={i} md={4} sm={6} xs={12}>
-                  {amenity}
-                </Grid>
-              ) : null;
-            })}
-          </Grid>
+          {amenities.map(([key, items]) => (
+            <React.Fragment key={key}>
+              <Typography variant="h6">{key}</Typography>
+              <Grid container sx={{ width: '80%' }}>
+                {items}
+              </Grid>
+            </React.Fragment>
+          ))}
         </Stack>
         <Stack className="card" alignItems={'start'}>
           <Typography variant="h4" id="rooms">
