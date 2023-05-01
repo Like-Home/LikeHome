@@ -2,6 +2,7 @@ import { Divider, Typography, Stack, List, ListItem, useTheme } from '@mui/mater
 import { Link } from 'react-router-dom';
 import slugify from 'slugify';
 import Locations from '../data/locations';
+import codeWranglers from '../assets/codewranglers.svg';
 
 const sections = [
   {
@@ -38,7 +39,7 @@ const sections = [
       },
       {
         text: 'Terms of Use',
-        to: '/tos',
+        to: '/terms',
       },
       {
         text: 'Cookies Policy',
@@ -71,7 +72,6 @@ function Footer() {
   const theme = useTheme();
   return (
     <Stack className="card card-root footer" spacing={2}>
-      <Typography variant="h5">LikeHome Group</Typography>
       <Stack
         direction={{
           xs: 'column',
@@ -109,6 +109,7 @@ function Footer() {
           </Stack>
         ))}
       </Stack>
+      <img src={codeWranglers} alt="Code Wranglers" width={300} style={{ position: 'absolute', right: 10, top: 195 }} />
       <Divider />
       <List dense sx={{ p: 0 }}>
         {...footnotes.map((footnote, index) => (

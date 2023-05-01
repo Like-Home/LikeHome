@@ -23,11 +23,12 @@ import {
 import { useRecoilValue } from 'recoil';
 import { useNavigate } from 'react-router-dom';
 import Info from '@mui/icons-material/Info';
+import { Box } from '@mui/system';
 import InputCSRF from '../api/csrf';
 import userAtom from '../recoil/user';
 import './styles.scss';
 import config from '../config';
-import logoSvg from '../assets/logo.svg';
+import logoSvg from '../assets/logo_dark.svg';
 import { formatCurrency } from '../utils';
 import CardModal from './CardModal';
 import { User } from '../api/types';
@@ -190,22 +191,23 @@ export default function Navbar() {
       className="card card-root navbar"
       style={{
         maxWidth: config.maxWidth,
+        paddingLeft: 8,
       }}
       ref={navbarEl}
     >
+      <LinkButton to="/">
+        <Box px={1}>
+          <img
+            src={logoSvg}
+            alt="LikeHome logo"
+            style={{
+              height: '2rem',
+            }}
+          />
+        </Box>
+      </LinkButton>
       <Stack alignItems="center" direction="row" spacing={1}>
-        <img
-          src={logoSvg}
-          alt="Logo"
-          style={{
-            height: '2rem',
-          }}
-        />
-        <LinkButton to="/">LikeHome</LinkButton>
-      </Stack>
-      <Stack alignItems="center" direction="row" spacing={1}>
-        <LinkButton to="/about">About Us</LinkButton>
-        <LinkButton to="/hotels">Hotels</LinkButton>
+        <LinkButton to="/about">About</LinkButton>
         {user ? (
           <AccountMenu user={user} navbarEl={navbarEl} />
         ) : (
