@@ -67,7 +67,7 @@ export function PointOverview({ user }: { user: User }) {
           <Typography variant="h6" sx={{ pt: 0.5 }}>
             points
           </Typography>
-          <IconButton sx={{ pt: 1.5 }} onClick={toggleOpen}>
+          <IconButton sx={{ mt: 1.5 }} onClick={toggleOpen}>
             <Info fontSize="small"></Info>
           </IconButton>
         </Stack>

@@ -27,6 +27,7 @@ import { Booking } from '../api/types';
 import { cancelBooking, editBooking } from '../api/bookings';
 import CardModal from '../components/CardModal';
 import { statusToText, phoneTypeToText, cancelationStatusToText } from '../enums';
+import { BookingStatusChip } from './bookings';
 
 function EditBookingModal({
   booking,
@@ -145,7 +146,6 @@ export default function BookingPage() {
   return (
     <>
       <Stack spacing={2}>
-        <Typography variant="h4">{booking.hotel.name}</Typography>
         <Stack
           className="push-center"
           direction={{
@@ -169,7 +169,7 @@ export default function BookingPage() {
               </Alert>
             )}
             <Stack className="card" spacing={1}>
-              <Typography variant="h4">Hotel Information</Typography>
+              <Typography variant="h4">{booking.hotel.name}</Typography>
               <Typography variant="body1">{booking.hotel.description}</Typography>
               <Typography variant="h5">Phones</Typography>
               <List dense>
@@ -261,12 +261,39 @@ export default function BookingPage() {
                     </Stack>
                   </Stack>
                   <Stack direction="row" justifyContent="space-between" sx={{ width: '100%' }}>
+                    <Typography variant="body1">Room Type</Typography>
+                    <Typography variant="body1" fontWeight="bold">
+                      {booking.room_name}
+                    </Typography>
+                  </Stack>
+                  <Stack direction="row" justifyContent="space-between" sx={{ width: '100%' }}>
                     <Typography variant="body1">Nights</Typography>
                     <Typography variant="body1">{nights}</Typography>
                   </Stack>
+                  {booking.children ? (
+                    <>
+                      <Stack direction="row" justifyContent="space-between" sx={{ width: '100%' }}>
+                        <Typography variant="body1">Adults</Typography>
+                        <Typography variant="body1">{booking.adults}</Typography>
+                      </Stack>
+                      <Stack direction="row" justifyContent="space-between" sx={{ width: '100%' }}>
+                        <Typography variant="body1">Children</Typography>
+                        <Typography variant="body1">{booking.children}</Typography>
+                      </Stack>
+                    </>
+                  ) : (
+                    <Stack direction="row" justifyContent="space-between" sx={{ width: '100%' }}>
+                      <Typography variant="body1">Guests</Typography>
+                      <Typography variant="body1">{booking.adults}</Typography>
+                    </Stack>
+                  )}
+                  <Stack direction="row" justifyContent="space-between" sx={{ width: '100%' }}>
+                    <Typography variant="body1">Rooms</Typography>
+                    <Typography variant="body1">{booking.rooms}</Typography>
+                  </Stack>
                   <Stack direction="row" justifyContent="space-between" sx={{ width: '100%' }}>
                     <Typography variant="body1">Status</Typography>
-                    <Typography variant="body1">{statusToText[booking.status]}</Typography>
+                    <Typography variant="body1">{<BookingStatusChip status={booking.status} />}</Typography>
                   </Stack>
                   <Stack direction="row" justifyContent="space-between" sx={{ width: '100%' }}>
                     <Typography variant="body1">Total</Typography>
