@@ -11,17 +11,22 @@ import {
   Tab,
   Tabs,
   Box,
+  Chip,
 } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import moment from 'moment';
 import { useRecoilValue } from 'recoil';
 import { useSnackbar } from 'notistack';
-import { Booking } from '../api/types';
+import { Booking, BookingStatusEnum } from '../api/types';
 import { bookingsByStatusSelector } from '../recoil/bookings/atom';
 import { createHotelbedsSrcSetFromPath } from '../utils';
-import { statusToText } from '../enums';
+import { statusToColor, statusToText } from '../enums';
 import Result from '../components/Result';
 import PaginatedList from '../components/PaginatedList';
+
+export function BookingStatusChip({ status }: { status: BookingStatusEnum }) {
+  return <Chip size="small" label={statusToText[status]} color={statusToColor[status]} />;
+}
 
 function BookingItem({ item: booking }: { item: Booking }) {
   const linkToDetails = `/booking/${booking.id}`;
@@ -48,6 +53,7 @@ function BookingItem({ item: booking }: { item: Booking }) {
         />
       </ListItemAvatar>
       <ListItemText
+        sx={{ mb: 3 }}
         primary={
           <Typography variant="h6" color="text.primary">
             {booking.hotel.name}
@@ -57,7 +63,7 @@ function BookingItem({ item: booking }: { item: Booking }) {
           <div>
             <div>
               <Typography variant="body2" color="text.primary">
-                Status: {statusToText[booking.status]}
+                Status: <BookingStatusChip status={booking.status} />
               </Typography>
             </div>
             <div>
