@@ -302,21 +302,26 @@ export default function HotelPage() {
               <Typography variant="h5">About this location</Typography>
             </Grid>
             <Grid item md={9}>
+              <Typography variant="body1" sx={{ mb: 1 }}>
+                {formatAddressFromHotel(hotel)}
+              </Typography>
               <Box justifyContent="center">
                 <img src={hotel.google_map_url} alt="Google Maps" style={{ borderRadius: '4px', width: 275 }} />
               </Box>
-              <Stack direction="column" justifyContent="space-between" id="location" sx={{ mt: 3 }}>
-                <Typography variant="h6">What&apos;s nearby</Typography>
-                <Grid container flexWrap="wrap" sx={{ ml: 2, mt: 1 }}>
-                  {hotel.interestPoints.map((point) => (
-                    <Grid item xs={12} md={6} lg={4} xl={3} key={point.id}>
-                      <ListItem sx={{ flex: 1, p: 0 }}>
-                        <ListItemText primary={point.poiName} secondary={`${point.distance / 1000} mi`} />
-                      </ListItem>
-                    </Grid>
-                  ))}
-                </Grid>
-              </Stack>
+              {hotel.interestPoints.length > 0 && (
+                <Stack direction="column" justifyContent="space-between" id="location" sx={{ mt: 3 }}>
+                  <Typography variant="h6">What&apos;s nearby</Typography>
+                  <Grid container flexWrap="wrap" sx={{ ml: 2, mt: 1 }}>
+                    {hotel.interestPoints.map((point) => (
+                      <Grid item xs={12} md={6} lg={4} xl={3} key={point.id}>
+                        <ListItem sx={{ flex: 1, p: 0 }}>
+                          <ListItemText primary={point.poiName} secondary={`${point.distance / 1000} mi`} />
+                        </ListItem>
+                      </Grid>
+                    ))}
+                  </Grid>
+                </Stack>
+              )}
             </Grid>
           </Grid>
         )}
