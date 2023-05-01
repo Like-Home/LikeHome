@@ -7,17 +7,19 @@ export const TextInput = React.forwardRef(function TextInput(
   ref: React.Ref<HTMLDivElement>,
 ) {
   return (
-    <Control
-      label={label}
-      icon={icon}
-      sx={{
-        marginBottom: helperText ? 1 : undefined,
-      }}
-      ref={ref}
-    >
-      <InputBase {...props} />
+    <>
+      <Control
+        label={label}
+        icon={icon}
+        sx={{
+          marginBottom: helperText ? 1 : undefined,
+        }}
+        ref={ref}
+      >
+        <InputBase {...props} />
+      </Control>
       {helperText && <FormHelperText>{helperText}</FormHelperText>}
-    </Control>
+    </>
   );
 });
 
