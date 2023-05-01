@@ -283,7 +283,7 @@ class BookingView(viewsets.ReadOnlyModelViewSet, viewsets.mixins.UpdateModelMixi
         """
 
         # filter the bookings by the request.user and order them by check_in date descending
-        return Booking.objects.filter(user=self.request.user).order_by('check_in', '-pk').exclude(status=Booking.BookingStatus.PENDING)
+        return Booking.objects.filter(user=self.request.user).order_by('check_in', '-pk')
 
     def get_object(self):
         """Get a single booking object by pk
