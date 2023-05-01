@@ -331,6 +331,9 @@ class CheckoutView(viewsets.mixins.CreateModelMixin, viewsets.GenericViewSet):
             ]
 
         referrer = request.META.get('HTTP_REFERER')
+        stripe_customer_id = request.user.account.stripe_customer_id
+        if stripe_customer_id == '':
+            stripe_customer_id = None;
 
         try:
             # TODO: indicate the discount in the stripe checkout
@@ -340,7 +343,7 @@ class CheckoutView(viewsets.mixins.CreateModelMixin, viewsets.GenericViewSet):
                 cancel_url=f"{referrer}?stripe=canceled",
                 payment_method_types=['card'],
                 mode='payment',
-                customer=request.user.account.stripe_customer_id,
+                customer=stripe_customer_id,
                 line_items=[
                     {
                         "price_data": {
