@@ -147,7 +147,6 @@ export default function CheckoutPage() {
           Having second thoughts? Take time time. We know it&apos;s hard to find a home LikeHome.
         </Alert>
       )}
-      <Typography variant="h4">{checkoutDetailsState.hotel.rooms[0].name}</Typography>
       <Stack
         className="push-center"
         direction={{
@@ -358,8 +357,22 @@ export default function CheckoutPage() {
                   </Stack>
                 </Stack>
                 <Stack direction="row" justifyContent="space-between" sx={{ width: '100%' }}>
+                  <Typography variant="body1">Room Type</Typography>
+                  <Typography variant="body1" fontWeight="bold">
+                    {checkoutDetailsState.hotel.rooms[0].name}
+                  </Typography>
+                </Stack>
+                <Stack direction="row" justifyContent="space-between" sx={{ width: '100%' }}>
                   <Typography variant="body1">Nights</Typography>
                   <Typography variant="body1">{nights}</Typography>
+                </Stack>
+                <Stack direction="row" justifyContent="space-between" sx={{ width: '100%' }}>
+                  <Typography variant="body1">Guests</Typography>
+                  <Typography variant="body1">{checkoutDetailsState.guests}</Typography>
+                </Stack>
+                <Stack direction="row" justifyContent="space-between" sx={{ width: '100%' }}>
+                  <Typography variant="body1">Rooms</Typography>
+                  <Typography variant="body1">{checkoutDetailsState.rooms}</Typography>
                 </Stack>
               </Stack>
             </CardContent>

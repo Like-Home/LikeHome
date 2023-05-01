@@ -36,8 +36,18 @@ type CheckoutDetailsResponse = {
   };
 };
 
-export function getCheckoutDetails(rateKey: string) {
-  return fetch.get<CheckoutDetailsResponse>(`/checkout/${rateKey}/`);
+type CheckoutDetails = CheckoutDetailsResponse & {
+  guests: string;
+  rooms: string;
+};
+
+export async function getCheckoutDetails(rateKey: string): Promise<CheckoutDetails> {
+  const data = await fetch.get<CheckoutDetailsResponse>(`/checkout/${rateKey}/`);
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const [from, to, unk0, unk1, hotelCode, roomCode, unk2, boardCode, unk3, guestsRooms, unk4, unk5] =
+    atob(rateKey).split('|');
+  const [guests, rooms] = guestsRooms.split('~');
+  return { ...data, guests, rooms };
 }
 
 type StripeCheckoutRequest = {
