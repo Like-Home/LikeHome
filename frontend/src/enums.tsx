@@ -9,6 +9,17 @@ export const statusToText: Record<BookingStatusEnum, string> = {
   PA: 'Past',
 };
 
+type Color = 'default' | 'primary' | 'secondary' | 'error' | 'info' | 'success' | 'warning';
+
+export const statusToColor: Record<BookingStatusEnum, Color> = {
+  PE: 'info',
+  CO: 'success',
+  CA: 'error',
+  RE: 'warning',
+  IP: 'primary',
+  PA: 'secondary',
+};
+
 export const cancelationStatusToText: Record<BookingCancelationStatusEnum, string> = {
   N: 'None',
   F: 'Full',
