@@ -39,6 +39,16 @@ type SearchBarProps = {
   onSearch?: (props: onSearchProps) => void;
 };
 
+const getNextFriday = (date?: Date) => {
+  const today = date || new Date();
+  const nextWeekend = new Date();
+  nextWeekend.setDate(today.getDate() + (6 - today.getDay()) - 1);
+  if (nextWeekend.getDate() === today.getDate()) {
+    nextWeekend.setDate(nextWeekend.getDate() + 7);
+  }
+  return nextWeekend;
+};
+
 /**
  * Renders the hotel search bars
  * @param query
@@ -48,13 +58,13 @@ type SearchBarProps = {
 export default function SearchBars(props: SearchBarProps) {
   const navigate = useNavigate();
 
+  const nextFriday = getNextFriday();
+  const nextWeekendPlusOne = new Date(nextFriday);
+
   // default to setting the checkin/checkout date to the next weekend
-  const today = new Date();
-  const nextWeekend = new Date();
-  nextWeekend.setDate(today.getDate() + ((6 - today.getDay() + 7) % 7) + 1);
-  const nextWeekendStr = nextWeekend.toISOString().split('T')[0];
-  const nextWeekendPlusOne = new Date(nextWeekend);
   nextWeekendPlusOne.setDate(nextWeekendPlusOne.getDate() + 2);
+
+  const nextWeekendStr = nextFriday.toISOString().split('T')[0];
   const nextWeekendPlusOneStr = nextWeekendPlusOne.toISOString().split('T')[0];
 
   const [location, setLocation] = useState(props.location);
