@@ -5,9 +5,19 @@ import codeWranglers from '../assets/codewranglers.svg';
 export default function AboutPage() {
   return (
     <Stack className="card card-root push-center">
-      <img src={codeWranglers} alt="Code Wranglers" width={300} style={{ position: 'absolute', right: 20, top: 20 }} />
       <Stack spacing={3}>
-        <Typography variant="h4">About Us</Typography>
+        <Stack
+          spacing={3}
+          direction={{
+            xs: 'column',
+            sm: 'row',
+          }}
+          alignItems="center"
+          justifyContent="space-between"
+        >
+          <Typography variant="h4">About Us</Typography>
+          <img src={codeWranglers} alt="Code Wranglers" width={300} />
+        </Stack>
         <Typography variant="body1">
           Welcome to LikeHome, the hotel booking website that helps you find the perfect place to stay, no matter where
           you are in the world. Our mission is to make travel easier and more enjoyable for everyone by providing a
@@ -35,6 +45,9 @@ export default function AboutPage() {
             borderRadius: '4px',
           }}
         />
+        <Typography variant="body2">
+          Meet our amazing team of rockstar developers who made this project possible!
+        </Typography>
       </Stack>
     </Stack>
   );

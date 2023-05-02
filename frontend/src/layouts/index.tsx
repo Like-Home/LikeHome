@@ -46,12 +46,27 @@ export default function Layout() {
     >
       <Box
         sx={{
+          height: '100%',
           [theme.breakpoints.up('sm')]: {
             padding: '2em',
           },
         }}
       >
-        <Suspense fallback={<AppLoadingSpinner />}>
+        <Suspense
+          fallback={
+            <div
+              style={{
+                display: 'flex',
+                justifyContent: 'center',
+                alignItems: 'center',
+                height: '100%',
+                width: '100%',
+              }}
+            >
+              <AppLoadingSpinner />
+            </div>
+          }
+        >
           <RouterProvider router={router} />
         </Suspense>
       </Box>

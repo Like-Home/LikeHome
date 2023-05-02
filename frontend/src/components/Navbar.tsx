@@ -34,7 +34,21 @@ import CardModal from './CardModal';
 import { User } from '../api/types';
 
 function NavButton(props?: ButtonProps) {
-  return <Button variant="text" sx={{ color: '#9b99ff' }} {...props} />;
+  const theme = useTheme();
+  return (
+    <Button
+      variant="text"
+      sx={{
+        [theme.breakpoints.only('xs')]: {
+          fontSize: 14,
+        },
+        color: '#9b99ff',
+        fontSize: 18,
+        fontWeight: 'bold',
+      }}
+      {...props}
+    />
+  );
 }
 
 type ComponentType = React.ComponentType<{ onClick: () => void; children: React.ReactNode }>;
@@ -186,9 +200,13 @@ export default function Navbar() {
   const user = useRecoilValue(userAtom);
   const navbarEl = createRef<HTMLElement>();
   const location = useLocation();
+  const theme = useTheme();
 
   return (
-    <nav
+    <Stack
+      component={'nav'}
+      direction="row"
+      alignItems="center"
       className="card card-root navbar"
       style={{
         maxWidth: config.maxWidth,
@@ -197,20 +215,33 @@ export default function Navbar() {
       ref={navbarEl}
     >
       <LinkButton to="/">
-        <Box px={1}>
+        <Stack
+          px={1}
+          direction="row"
+          alignItems="center"
+          sx={{
+            [theme.breakpoints.only('xs')]: {
+              width: 120,
+            },
+          }}
+        >
           <img
             src={logoSvg}
             alt="LikeHome logo"
             style={{
               height: '2rem',
+              width: '100%',
             }}
           />
-        </Box>
+        </Stack>
       </LinkButton>
       <Stack alignItems="center" direction="row" spacing={1}>
         <LinkButton to="/about">About</LinkButton>
         {user ? (
-          <AccountMenu user={user} navbarEl={navbarEl} />
+          <>
+            <LinkButton to="/bookings">My Bookings</LinkButton>
+            <AccountMenu user={user} navbarEl={navbarEl} />
+          </>
         ) : (
           <form
             action={`/accounts/google/login/?process=login&next=${encodeURIComponent(
@@ -225,6 +256,6 @@ export default function Navbar() {
           </form>
         )}
       </Stack>
-    </nav>
+    </Stack>
   );
 }

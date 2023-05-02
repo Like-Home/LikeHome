@@ -11,7 +11,7 @@
   // make sure cards conners hug the
   // edge of the screen on mobile
   @media (max-width: 600px) {
-    border-radius: 0;
+    border-radius: 0 !important;
   }
 }
 
