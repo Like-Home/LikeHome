@@ -73,7 +73,7 @@ class HotelbedsHotelView(viewsets.mixins.RetrieveModelMixin, viewsets.GenericVie
                         context={
                             'hotel': self.get_object()
                         },
-                        many=True).data if room['details']
+                        many=True).data if room['details'] and room['images']
                 ] if hotels else []
             }
         })
