@@ -29,6 +29,7 @@
     "@mui/icons-material": "^5.11.11",
     "@mui/material": "^5.11.12",
     "@mui/system": "^5.11.13",
+    "@mui/types": "^7.2.4",
     "@vitejs/plugin-react-swc": "^3.2.0",
     "autosuggest-highlight": "^3.3.4",
     "moment": "^2.29.4",
