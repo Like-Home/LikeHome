@@ -2,6 +2,7 @@
 import base64
 import traceback
 from typing import Optional
+from urllib.parse import unquote
 
 import stripe
 from api.models.Booking import Booking, BookingCancelException
@@ -133,7 +134,14 @@ class CheckoutView(viewsets.mixins.CreateModelMixin, viewsets.GenericViewSet):
         if pk is None:
             return Response({"message": "Missing rateKey."}, status=400)
 
-        rate_key = base64.b64decode(pk).decode('utf-8')
+        try:
+            rate_key = base64.b64decode(pk).decode('utf-8')
+        except UnicodeDecodeError:
+            try:
+                print(unquote(pk))
+                rate_key = base64.b64decode(unquote(pk)).decode('utf-8')
+            except UnicodeDecodeError:
+                return Response({"message": "Invalid rateKey."}, status=400)
 
         payload = {
             "rooms": [
@@ -232,7 +240,14 @@ class CheckoutView(viewsets.mixins.CreateModelMixin, viewsets.GenericViewSet):
             previous_booking = Booking.objects.get(
                 id=rebooking_id, user=request.user, status=Booking.BookingStatus.CONFIRMED)
 
-        rate_key = base64.b64decode(params['rate_key']).decode('utf-8')
+        try:
+            rate_key = base64.b64decode(params['rate_key']).decode('utf-8')
+        except UnicodeDecodeError:
+            try:
+                rate_key = base64.b64decode(
+                    unquote(params['rate_key'])).decode('utf-8')
+            except UnicodeDecodeError:
+                return Response({"message": "Invalid rateKey."}, status=400)
 
         payload = {
             "rooms": [
@@ -333,7 +348,7 @@ class CheckoutView(viewsets.mixins.CreateModelMixin, viewsets.GenericViewSet):
         referrer = request.META.get('HTTP_REFERER')
         stripe_customer_id = request.user.account.stripe_customer_id
         if stripe_customer_id == '':
-            stripe_customer_id = None;
+            stripe_customer_id = None
 
         try:
             # TODO: indicate the discount in the stripe checkout

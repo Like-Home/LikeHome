@@ -29,6 +29,7 @@ import { usePageParamsObject } from '../hooks';
 import { bookingById } from '../recoil/bookings/atom';
 import CardModal from '../components/CardModal';
 import Amenities from '../components/Amenities';
+import userState from '../recoil/user/atom';
 
 function a11yProps(index) {
   return {
@@ -76,6 +77,7 @@ function amenitiesGroupName(name) {
 }
 
 export default function HotelPage() {
+  const user = useRecoilValue(userState);
   const { hotelId } = useParams();
 
   const tabs = [
@@ -327,11 +329,20 @@ export default function HotelPage() {
                 expanded={showAllAmenities}
                 setExpanded={setShowAllAmenities}
                 onClick={() => {
-                  let href = `/checkout/${btoa(room.rates[0].rateKey)}`;
+                  const encodedRateKey = btoa(room.rates[0].rateKey);
+
+                  let href = `/checkout/${encodeURIComponent(encodedRateKey)}`;
+
                   if (rebooking) {
-                    href += `?rebooking=${params.rebooking}`;
+                    href += `/?rebooking=${params.rebooking}`;
                   }
-                  navigate(href);
+
+                  if (user) {
+                    navigate(href);
+                  } else {
+                    const redirect = encodeURIComponent(href);
+                    navigate(`/auth?flow=booking&redirect=${redirect}`);
+                  }
                 }}
               />
             ))}

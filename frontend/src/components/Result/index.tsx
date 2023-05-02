@@ -1,5 +1,7 @@
 import React from 'react';
-import { Button, ButtonProps, Typography } from '@mui/material';
+import { Button, ButtonProps, Typography, ButtonPropsColorOverrides } from '@mui/material';
+import { OverridableStringUnion } from '@mui/types'; // eslint-disable-line import/no-unresolved
+
 import { Link } from 'react-router-dom';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline';
@@ -7,8 +9,14 @@ import WarningIcon from '@mui/icons-material/Warning';
 import InfoIcon from '@mui/icons-material/Info';
 import { Stack } from '@mui/system';
 
+type ButtonColor = OverridableStringUnion<
+  'inherit' | 'primary' | 'secondary' | 'success' | 'error' | 'info' | 'warning',
+  ButtonPropsColorOverrides
+>;
+
 interface ResultProps {
   variant: 'success' | 'error' | 'warning' | 'info';
+  color?: ButtonColor;
   title?: string;
   message?: string;
   icon?: React.ReactNode;
@@ -25,7 +33,7 @@ interface ResultProps {
 interface Variant {
   icon: JSX.Element;
   title: string;
-  color: 'success' | 'error' | 'warning' | 'info';
+  color: ButtonColor;
   primaryButtonText: string;
 }
 
@@ -48,31 +56,32 @@ const Result: React.FC<ResultProps> = ({
   onPrimaryButtonClick,
   onSecondaryButtonClick,
   hidePrimaryButton,
+  color: overrideColor,
   children,
 }) => {
   const defaultVariant: DefaultVariant = {
     success: {
-      icon: <CheckCircleIcon fontSize="large" color="success" />,
+      icon: <CheckCircleIcon fontSize="large" color={overrideColor || 'success'} />,
       title: 'Yay! it worked!',
-      color: 'success',
+      color: overrideColor || 'success',
       primaryButtonText: 'Okay',
     },
     error: {
-      icon: <ErrorOutlineIcon fontSize="large" color="error" />,
+      icon: <ErrorOutlineIcon fontSize="large" color={overrideColor || 'error'} />,
       title: 'Oh no! Something went wrong...',
-      color: 'error',
+      color: overrideColor || 'error',
       primaryButtonText: 'Back',
     },
     warning: {
-      icon: <WarningIcon fontSize="large" color="warning" />,
+      icon: <WarningIcon fontSize="large" color={overrideColor || 'warning'} />,
       title: 'Uh oh! There might be an issue...',
-      color: 'warning',
+      color: overrideColor || 'warning',
       primaryButtonText: 'Okay',
     },
     info: {
-      icon: <InfoIcon fontSize="large" color="info" />,
+      icon: <InfoIcon fontSize="large" color={overrideColor || 'info'} />,
       title: 'Heads up!',
-      color: 'info',
+      color: overrideColor || 'info',
       primaryButtonText: 'Okay',
     },
   };
@@ -110,7 +119,8 @@ const Result: React.FC<ResultProps> = ({
 
   const secondaryButtonProps: ButtonProps = {
     sx: buttonSx,
-    variant: 'outlined',
+    variant: 'text',
+    color,
     onClick: handleSecondaryButtonClick,
     ...(secondaryButtonTo ? { component: Link, to: secondaryButtonTo } : {}),
   };
