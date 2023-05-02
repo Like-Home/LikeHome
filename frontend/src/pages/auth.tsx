@@ -64,7 +64,9 @@ export default function AuthPage() {
             <Stack spacing={3} direction="row" justifyContent={'space-between'}>
               <form action={action} method="post">
                 <InputCSRF />
-                <Button variant="text" color="success" type="submit"></Button>
+                <Button variant="contained" type="submit">
+                  Login With Google
+                </Button>
               </form>
               <form action={action} method="post">
                 <InputCSRF />
