@@ -181,13 +181,11 @@ export default function HotelCard({ stay, hotel, onBookNow }: HotelCardProps) {
                     ml: 1,
                   }}
                 >
-                  <Typography variant="h5">
-                    {formatCurrency(Math.round(price.perNightPerAdult * stay.adults) - 0.01)}
-                  </Typography>
+                  <Typography variant="h5">{formatCurrency(price.perNightPerAdult * stay.adults, false)}</Typography>
                   <Typography variant="caption" sx={{ opacity: 0.5 }}>
                     per night
                   </Typography>
-                  <Typography variant="body1">{formatCurrency(price.afterTax)}</Typography>
+                  <Typography variant="body1">{formatCurrency(price.afterTax, false)}</Typography>
                   <Typography variant="caption" sx={{ opacity: 0.5 }}>
                     total after tax
                   </Typography>
