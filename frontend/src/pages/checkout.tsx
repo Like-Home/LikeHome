@@ -30,6 +30,22 @@ import CardModal from '../components/CardModal';
 import { bookingById } from '../recoil/bookings/atom';
 import userAtom from '../recoil/user';
 
+type ErrorFieldsType = {
+  date?: 'CONFLICTING_BOOKING';
+  first_name?: string;
+  last_name?: string;
+  email?: string;
+  phone?: string;
+};
+
+type ErrorFieldsAPIType = {
+  date?: 'CONFLICTING_BOOKING';
+  first_name?: string[];
+  last_name?: string[];
+  email?: string[];
+  phone?: string[];
+};
+
 export default function CheckoutPage() {
   const { rateKey } = useParams();
   const [searchParams] = useSearchParams();
@@ -42,6 +58,7 @@ export default function CheckoutPage() {
   const [lastName, setLastName] = useState('');
   const [email, setEmail] = useState('');
   const [phone, setPhone] = useState('');
+  const [errorFields, setErrorFields] = useState<ErrorFieldsType>({});
   const [checkoutLoading, setCheckoutLoading] = useState(false);
 
   const rebookingId = searchParams.get('rebooking');
@@ -118,10 +135,23 @@ export default function CheckoutPage() {
         throw e; // Unhandled error
       }
 
-      const body = await e.response.json();
+      // check if error is object
+      if (!(e.data instanceof Object)) {
+        throw e;
+      }
 
-      if (body.date === 'CONFLICTING_BOOKING') {
+      const error = e.data as ErrorFieldsAPIType;
+
+      if (error.date === 'CONFLICTING_BOOKING') {
         setOpen(true);
+      } else {
+        setErrorFields({
+          first_name: error.first_name?.[0],
+          last_name: error.last_name?.[0],
+          email: error.email?.[0],
+          phone: error.phone?.[0],
+        });
+        setCheckoutLoading(false);
       }
     }
   };
@@ -169,6 +199,7 @@ export default function CheckoutPage() {
               container
               columnSpacing={2}
               rowSpacing={{
+                xs: 2,
                 sm: 3,
                 md: 5,
                 lg: 3,
@@ -176,7 +207,8 @@ export default function CheckoutPage() {
             >
               <Grid xs={12} md={6}>
                 <TextInput
-                  helperText="The name of one of the people checking in."
+                  error={!!errorFields.first_name}
+                  helperText={errorFields.first_name || 'The name of one of the people checking in.'}
                   label="First name"
                   value={firstName}
                   onChange={(e: ChangeEvent<HTMLInputElement>) => setFirstName(e.target.value)}
@@ -184,7 +216,8 @@ export default function CheckoutPage() {
               </Grid>
               <Grid xs={12} md={6}>
                 <TextInput
-                  helperText=" "
+                  error={!!errorFields.last_name}
+                  helperText={errorFields.last_name || ' '}
                   label="Last name"
                   value={lastName}
                   onChange={(e: ChangeEvent<HTMLInputElement>) => setLastName(e.target.value)}
@@ -192,7 +225,8 @@ export default function CheckoutPage() {
               </Grid>
               <Grid xs={12} md={6}>
                 <TextInput
-                  helperText="We'll send your confirmation email to this address."
+                  error={!!errorFields.email}
+                  helperText={errorFields.email || "We'll send your confirmation email to this address."}
                   label="Email"
                   value={email}
                   onChange={(e: ChangeEvent<HTMLInputElement>) => setEmail(e.target.value)}
@@ -200,7 +234,8 @@ export default function CheckoutPage() {
               </Grid>
               <Grid xs={12} md={6}>
                 <TextInput
-                  helperText="We'll only contact you in an emergency."
+                  error={!!errorFields.phone}
+                  helperText={errorFields.phone || "We'll only contact you in an emergency."}
                   label="Phone"
                   value={phone}
                   onChange={(e: ChangeEvent<HTMLInputElement>) => setPhone(e.target.value)}

@@ -85,7 +85,7 @@ export default function HotelPage() {
     { label: 'Amenities', href: '#amenities', value: 1 },
     { label: 'Rooms', href: '#rooms', value: 2 },
     { label: 'Location', href: '#location', value: 3 },
-    { label: 'Policies', disabled: true, href: '#policies', value: 4 },
+    // { label: 'Policies', disabled: true, href: '#policies', value: 4 },
   ];
 
   if (!hotelId) {

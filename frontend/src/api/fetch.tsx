@@ -11,22 +11,27 @@ export class APIError extends Error {
 
   response: Response;
 
+  data: unknown;
+
   constructor({
     name,
     message,
     request,
     response,
+    data,
   }: {
     name: string;
     message: string;
     request: Request;
     response: Response;
+    data: unknown;
   }) {
     super(message);
 
     this.name = name;
     this.request = request;
     this.response = response;
+    this.data = data;
 
     // Set the prototype explicitly.
     Object.setPrototypeOf(this, APIError.prototype);
@@ -52,11 +57,12 @@ async function http<T>(path: string, config: RequestInit): Promise<T> {
 
   const request = new Request(prefixedPath, config);
   const response = await fetch(request);
+  const data = await response.json();
 
   if (!response.ok) {
     if (response.status === 429) {
       const retryAfter = response.headers.get('Retry-After');
-      console.log(retryAfter ? parseInt(retryAfter, 10) * 1000 : undefined);
+
       enqueueSnackbar(
         <>
           <Typography variant="subtitle1" sx={{ fontWeight: 'bold' }}>
@@ -77,8 +83,10 @@ async function http<T>(path: string, config: RequestInit): Promise<T> {
     } else if (response.status === 403) {
       // TODO: Show a login dialog
       // enqueueSnackbar(`You don't have permission to do that.`, { variant: 'error' });
+    } else if (data.message) {
+      enqueueSnackbar(`${data.message}`, { variant: data.variant || 'error' });
     } else {
-      enqueueSnackbar(`Error ${response.status}: ${response.statusText}`, { variant: 'error' });
+      // enqueueSnackbar(`Error ${response.status}: ${response.statusText}`, { variant: 'error' });
     }
 
     const error = new APIError({
@@ -86,11 +94,12 @@ async function http<T>(path: string, config: RequestInit): Promise<T> {
       message: response.statusText,
       request,
       response,
+      data,
     });
     throw error;
   }
 
-  return response.json();
+  return data;
 }
 
 export function get<T>(path: string, config?: RequestInit): Promise<T> {

@@ -3,7 +3,7 @@ import React from 'react';
 import { Control, ControlProps } from './Control';
 
 export const TextInput = React.forwardRef(function TextInput(
-  { label, icon, helperText, ...props }: ControlProps & InputBaseProps,
+  { label, icon, error, helperText, ...props }: ControlProps & InputBaseProps,
   ref: React.Ref<HTMLDivElement>,
 ) {
   return (
@@ -11,6 +11,7 @@ export const TextInput = React.forwardRef(function TextInput(
       <Control
         label={label}
         icon={icon}
+        error={error}
         sx={{
           marginBottom: helperText ? 1 : undefined,
         }}
@@ -18,7 +19,7 @@ export const TextInput = React.forwardRef(function TextInput(
       >
         <InputBase {...props} />
       </Control>
-      {helperText && <FormHelperText>{helperText}</FormHelperText>}
+      {helperText && <FormHelperText error={error}>{helperText}</FormHelperText>}
     </>
   );
 });
