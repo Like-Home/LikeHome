@@ -17,6 +17,10 @@ export function getBookingsByStatus(status: string | string[]) {
   return fetch.get<PaginationResponse<Booking>>(`/booking/?${searchParams}`);
 }
 
+export function getBookingsRewards() {
+  return fetch.get<PaginationResponse<Booking>>(`/booking/rewards/`);
+}
+
 export function getBooking(id: string) {
   return fetch.get<Booking>(`/booking/${id}/`);
 }

@@ -4,6 +4,7 @@ from api.pagination import BasePagination
 from api.serializers import BookingSerializer
 from api.utils import format_currency
 from app import config
+from django.db.models import Q
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import status, viewsets
 from rest_framework.decorators import action
@@ -283,6 +284,11 @@ class BookingView(viewsets.ReadOnlyModelViewSet, viewsets.mixins.UpdateModelMixi
         """
 
         # filter the bookings by the request.user and order them by check_in date descending
+        if self.action == 'rewards':
+            return Booking.objects.filter(
+                Q(points_earned__gt=0) | Q(points_spent__gt=0),
+                user=self.request.user,
+            ).order_by('check_in', '-pk')
         return Booking.objects.filter(user=self.request.user).order_by('check_in', '-pk')
 
     def get_object(self):
@@ -297,6 +303,10 @@ class BookingView(viewsets.ReadOnlyModelViewSet, viewsets.mixins.UpdateModelMixi
             return Booking.objects.get(id=pk, user=self.request.user)
 
         return super().get_object()
+
+    @action(detail=False, methods=['get'])
+    def rewards(self, request):
+        return self.list(request, queryset=self.get_queryset())
 
     @action(detail=True, methods=['get'])
     def cancel(self, request, pk=None):

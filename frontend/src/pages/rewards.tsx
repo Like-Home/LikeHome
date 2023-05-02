@@ -12,7 +12,7 @@ import {
 } from '@mui/material';
 import moment from 'moment';
 import { Link } from 'react-router-dom';
-import { bookingsByStatusSelector } from '../recoil/bookings/atom';
+import { bookingRewardsSelector } from '../recoil/bookings/atom';
 import { createHotelbedsSrcSetFromPath } from '../utils';
 import userAtom from '../recoil/user/atom';
 import { PointOverview } from '../components/Navbar';
@@ -47,20 +47,6 @@ const RewardPageItem = ({ item: booking }: { item: Booking }) => (
           </ListItemAvatar>
           <Stack>
             <ListItemText primary={booking.hotel.name} secondary={moment(booking.created_at).format('ll')} />
-            <ListItemText
-              primary={booking.points_earned > 0 ? `+${booking.points_earned} points` : undefined}
-              primaryTypographyProps={{
-                sx: {
-                  color: 'success.main',
-                },
-              }}
-              secondaryTypographyProps={{
-                sx: {
-                  color: 'error.main',
-                },
-              }}
-              secondary={booking.points_spent > 0 ? `-${booking.points_spent} points` : undefined}
-            />
           </Stack>
         </Stack>
         <Stack
@@ -74,16 +60,23 @@ const RewardPageItem = ({ item: booking }: { item: Booking }) => (
           }}
           spacing={1}
         >
-          <ListItemText>
-            <Stack direction="row" justifyContent={'end'} spacing={1}>
-              {booking.status === 'CO' && <Chip label="Confirmed" color="success" size="small" />}
-              {(booking.status === 'CA' || booking.status === 'RE') && (
-                <Chip label="Canceled" color="warning" size="small" />
-              )}
-              {booking.status === 'RE' && <Chip label="Rebooked" color="info" size="small" />}
-              {booking.status === 'PE' && <Chip label="Pending" color="info" size="small" />}
-            </Stack>
-          </ListItemText>
+          <ListItemText
+            sx={{
+              marginLeft: 5,
+            }}
+            primary={booking.points_earned > 0 ? `+${booking.points_earned} points` : undefined}
+            primaryTypographyProps={{
+              sx: {
+                color: 'success.main',
+              },
+            }}
+            secondaryTypographyProps={{
+              sx: {
+                color: 'error.main',
+              },
+            }}
+            secondary={booking.points_spent > 0 ? `-${booking.points_spent} points` : undefined}
+          />
         </Stack>
       </Stack>
     </ListItemButton>
@@ -91,7 +84,7 @@ const RewardPageItem = ({ item: booking }: { item: Booking }) => (
 );
 
 export default function RewardsPage() {
-  const response = useRecoilValue(bookingsByStatusSelector(['CO', 'CA', 'RE', 'PA', 'IP']));
+  const response = useRecoilValue(bookingRewardsSelector);
   const user = useRecoilValue(userAtom) as User;
 
   return (
