@@ -21,7 +21,7 @@ import {
   ListItemButton,
 } from '@mui/material';
 import { useRecoilValue } from 'recoil';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import Info from '@mui/icons-material/Info';
 import { Box } from '@mui/system';
 import InputCSRF from '../api/csrf';
@@ -185,6 +185,7 @@ function AccountMenu({ navbarEl, user }: { navbarEl: React.RefObject<HTMLElement
 export default function Navbar() {
   const user = useRecoilValue(userAtom);
   const navbarEl = createRef<HTMLElement>();
+  const location = useLocation();
 
   return (
     <nav
@@ -211,7 +212,12 @@ export default function Navbar() {
         {user ? (
           <AccountMenu user={user} navbarEl={navbarEl} />
         ) : (
-          <form action="/accounts/google/login/?process=login" method="post">
+          <form
+            action={`/accounts/google/login/?process=login&next=${encodeURIComponent(
+              location.pathname + location.search,
+            )}`}
+            method="post"
+          >
             <InputCSRF />
             <Button variant="contained" type="submit">
               Log in

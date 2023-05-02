@@ -1,6 +1,8 @@
 import { createBrowserRouter, Outlet, Navigate } from 'react-router-dom';
 
 import { useRecoilValue } from 'recoil';
+import { useSnackbar } from 'notistack';
+import { useEffect } from 'react';
 import HomePage from './pages/home';
 import AuthPage from './pages/auth';
 import HotelPage from './pages/hotel';
@@ -23,8 +25,23 @@ import userAtom from './recoil/user';
 
 const AuthGuard = () => {
   const user = useRecoilValue(userAtom);
-  // TODO: notify user that they need to login
-  return user === null ? <Navigate to="/auth" /> : <Outlet />;
+  const { enqueueSnackbar } = useSnackbar();
+
+  const isAuthenticated = user !== null;
+
+  useEffect(() => {
+    if (!isAuthenticated) {
+      enqueueSnackbar('You must be logged in to view this page', {
+        variant: 'error',
+      });
+    }
+  }, [user]);
+
+  return isAuthenticated ? (
+    <Outlet />
+  ) : (
+    <Navigate to={`/auth?redirect=${encodeURIComponent(window.location.pathname + window.location.search)}`} />
+  );
 };
 
 const router = createBrowserRouter([
