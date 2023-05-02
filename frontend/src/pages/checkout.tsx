@@ -261,7 +261,7 @@ export default function CheckoutPage() {
               </Grid>
               <Grid xs={12} md={9}>
                 <Stack direction="row" justifyContent="space-between">
-                  {checkoutDetailsState.rewards ? (
+                  {checkoutDetailsState.rewards && !rebooking ? (
                     <Stack>
                       {checkoutDetailsState.rewards.free ? (
                         <Stack direction="row" alignItems="center">
