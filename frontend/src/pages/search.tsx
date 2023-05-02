@@ -123,12 +123,6 @@ export default function SearchPage() {
       };
     }
 
-    // const searchParams = new URLSearchParams();
-    // searchParams.set('location', kwargs.location?.code);
-    // searchParams.set('checkin', kwargs.checkin);
-    // searchParams.set('checkout', kwargs.checkout);
-    // searchParams.set('guests', kwargs.guests);
-    // searchParams.set('rooms', kwargs.rooms);
     setParams({
       location: kwargs.location?.code,
       checkin: kwargs.checkin,
@@ -160,24 +154,30 @@ export default function SearchPage() {
 
     let cancel = false;
 
-    // Do an immediate request
-    getOffersByLocation({ ...args, size: 5 }).then((response) => {
+    (async () => {
+      // Do an immediate request
+      const response = await getOffersByLocation({ ...args, size: 5 });
+
+      if (cancel) return;
+
       // Update location display name
-      if (response.name) setLocation({ ...location, name: response.name });
-      if (!cancel) {
-        setResults(response.results);
-        setResultsMessage(`Found ${response.total} hotel${response.total !== 1 ? 's' : ''}`);
-        setLoading(false);
-        if (response.links.next) {
-          // Do a delayed request
-          getOffersByLocation({ ...args, size: 100 }).then((res) => {
-            if (cancel) return;
-            setFilterLoading(false);
-            setResults(res.results);
-          });
-        }
+      if (response.name) {
+        setLocation({ ...location, name: response.name });
       }
-    });
+
+      setResults(response.results);
+      setResultsMessage(`Found ${response.total} hotel${response.total !== 1 ? 's' : ''}`);
+      setLoading(false);
+
+      if (response.links.next) {
+        // Do a delayed request
+        const res = await getOffersByLocation({ ...args, size: 100 });
+        if (cancel) return;
+        setResults(res.results);
+      }
+
+      setFilterLoading(false);
+    })();
 
     return () => {
       cancel = true;
