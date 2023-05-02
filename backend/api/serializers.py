@@ -159,6 +159,12 @@ class BookingSerializer(serializers.ModelSerializer):
             'check_out',
             'created_at',
             'canceled_at',
+            "amount_before_fees_tax_and_discount",
+            "amount_discount",
+            "amount_before_fees_tax",
+            "amount_fees_taxes",
+            "card_last_four",
+            "card_network",
         )
         model = Booking
 
