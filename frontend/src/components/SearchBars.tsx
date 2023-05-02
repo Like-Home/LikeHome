@@ -2,6 +2,7 @@ import { ChangeEvent, useEffect, useState } from 'react';
 import { Stack, Button, Alert } from '@mui/material';
 import Grid from '@mui/material/Unstable_Grid2';
 import { useNavigate } from 'react-router-dom';
+import moment from 'moment';
 import TextInput from './controls/TextInput';
 import GuestsInput from './controls/GuestsInput';
 import LocationAutocomplete from './LocationAutocomplete';
@@ -140,21 +141,26 @@ export default function SearchBars(props: SearchBarProps) {
                 setAlert('Please enter check-in and checkout dates.');
                 return;
               }
+
               const now = new Date();
-              const checkinDate = new Date(checkin);
-              const checkoutDate = new Date(checkout);
-              if (checkinDate < now) {
+
+              if (moment(checkin).isBefore(moment(now))) {
                 setAlert('Check-in date must be in the future.');
                 return;
               }
-              if (checkinDate > checkoutDate) {
+              if (moment(checkout).isSameOrBefore(checkin)) {
                 setAlert('Check-in date must be before checkout date.');
+                return;
+              }
+              if (moment(checkout).isAfter(moment(checkin).add(30, 'days'))) {
+                setAlert('The number of nights must be less than or equal to 30.');
                 return;
               }
               if (!props.noLocation && !location) {
                 setAlert('Please select a location.');
                 return;
               }
+              setAlert('');
               if (props.onSearch) {
                 props.onSearch({
                   location,
