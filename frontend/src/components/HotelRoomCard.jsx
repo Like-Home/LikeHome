@@ -2,17 +2,10 @@
 /* eslint-disable react/prop-types */
 
 import { Stack, List, ListItem, ListItemText, Typography, Card, CardContent, CardActions, Button } from '@mui/material';
-import { useNavigate } from 'react-router-dom';
 import Grid from '@mui/material/Unstable_Grid2/Grid2';
 import { createHotelbedsSrcSetFromPath, formatCurrency } from '../utils';
 
-export default function HotelRoomCard({ room }) {
-  const navigate = useNavigate();
-
-  function onReserve() {
-    navigate(`/checkout/${btoa(room.rates[0].rateKey)}`);
-  }
-
+export default function HotelRoomCard({ room, reserveText, onClick }) {
   return (
     <Grid item sm={12} md={6} lg={4} key={room.code}>
       <Card sx={{ height: '100%', width: '100%' }}>
@@ -41,8 +34,8 @@ export default function HotelRoomCard({ room }) {
           </Stack>
         </CardContent>
         <CardActions>
-          <Button size="small" onClick={onReserve}>
-            Reserve
+          <Button size="small" onClick={onClick}>
+            {reserveText || 'Reserve'}
           </Button>
         </CardActions>
       </Card>

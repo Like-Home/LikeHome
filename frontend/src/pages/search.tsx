@@ -1,5 +1,7 @@
 import {
   Stack,
+  useTheme,
+  useMediaQuery,
   Typography,
   RadioGroup,
   FormControlLabel,
@@ -12,17 +14,21 @@ import {
   Button,
   Skeleton,
 } from '@mui/material';
-import { Link, useSearchParams } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import slugify from 'slugify';
 import CloseIcon from '@mui/icons-material/Close';
 import { Box } from '@mui/system';
+import Accordion from '@mui/material/Accordion';
+import AccordionSummary from '@mui/material/AccordionSummary';
+import AccordionDetails from '@mui/material/AccordionDetails';
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import HotelCard, { HotelCardSkeleton, onBookNowCallback } from '../components/HotelCard';
 import SearchBars, { SearchPageParams, onSearchProps } from '../components/SearchBars';
 import { getOffersByLocation, OfferHotel } from '../api/search';
 import Spinner from '../components/Spinner';
 import PriceSlider from '../components/controls/PriceSlider';
-import { nightsFromDates } from '../api/hotel';
+import { nightsFromDates, priceBreakdown } from '../api/hotel';
 import { usePageParamsObject } from '../hooks';
 
 type ZoneInfo = {
@@ -86,9 +92,15 @@ export default function SearchPage() {
   // update price range based on minRate and maxRate
   useEffect(() => {
     if (!results.length) return;
-    const minRates = results.map((h) => h.minRate);
-    const minRate = Math.min(...minRates);
-    const maxRate = Math.max(...minRates);
+
+    const minRates = results.map((h) => priceBreakdown(h.minRate, nights, adults).perNightPerAdult);
+
+    let minRate = Math.min(...minRates);
+    // round to nearest 10
+    minRate = Math.floor(minRate / 10) * 10;
+    let maxRate = Math.max(...minRates);
+    // round to nearest 10
+    maxRate = Math.ceil(maxRate / 10) * 10;
 
     setPriceRangeMin(minRate);
     setPriceRangeMax(maxRate);
@@ -228,9 +240,10 @@ export default function SearchPage() {
     let filteredList = sorted;
 
     // Filter by price
-    filteredList = filteredList.filter(
-      (hotel) => Number(hotel.minRate) >= priceRange[0] && Number(hotel.minRate) <= priceRange[1],
-    );
+    filteredList = filteredList.filter((hotel) => {
+      const { perNightPerAdult } = priceBreakdown(hotel.minRate, nights, adults);
+      return perNightPerAdult >= priceRange[0] && perNightPerAdult <= priceRange[1];
+    });
 
     // Filter by zone
     if (zone) filteredList = filteredList.filter((hotel) => hotel.zoneName === zone);
@@ -244,8 +257,70 @@ export default function SearchPage() {
     if (!loading) setResultsMessage(`Found ${filtered.length} hotel${filtered.length !== 1 ? 's' : ''}`);
   }, [filtered, filterLoading]);
 
+  const theme = useTheme();
+  const onlyMediumScreens = useMediaQuery(theme.breakpoints.down('md'));
+
+  const filteringOptionsRootEl = (
+    <Stack
+      alignItems="start"
+      direction={{
+        xs: 'column',
+        sm: 'row',
+        md: 'column',
+      }}
+    >
+      <Box width={'100%'}>
+        <PriceSlider
+          loading={filterLoading}
+          priceRange={priceRange}
+          setPriceRange={setPriceRange}
+          min={priceRangeMin}
+          max={priceRangeMax}
+        />
+      </Box>
+      {(zones.length > 0 || filterLoading) && (
+        <Box width={'100%'}>
+          <Stack direction="row" justifyContent="space-between" alignItems="end" width="100%" height={40}>
+            <Typography gutterBottom>Neighborhood</Typography>
+            {zone && (
+              <IconButton onClick={() => setZone(null)}>
+                <CloseIcon />
+              </IconButton>
+            )}
+          </Stack>
+          <RadioGroup name="zones" value={zone} onChange={(e, v) => setZone(v)}>
+            {filterLoading ? (
+              <>
+                <Skeleton variant="rectangular" height={42} sx={{ borderRadius: 1, mb: 1 }} />
+                <Skeleton variant="rectangular" height={42} sx={{ borderRadius: 1, mb: 1 }} />
+                <Skeleton variant="rectangular" height={42} sx={{ borderRadius: 1, mb: 1 }} />
+              </>
+            ) : (
+              zones.map(({ code, name, count }) => (
+                <FormControlLabel
+                  value={code}
+                  key={code}
+                  label={
+                    <Typography style={{ fontSize: 14 }}>
+                      {name} <small>({count})</small>
+                    </Typography>
+                  }
+                  control={<Radio />}
+                />
+              ))
+            )}
+          </RadioGroup>
+        </Box>
+      )}
+    </Stack>
+  );
+
+  const sizing = {
+    xs: 2,
+    sm: 3,
+  };
   return (
-    <main className="card push-center" style={{ marginTop: 50, maxWidth: 1200 }}>
+    <Stack className="card push-center" spacing={sizing}>
       <SearchBars
         location={location}
         guests={params.guests}
@@ -254,52 +329,27 @@ export default function SearchPage() {
         checkout={params.checkout}
         onSearch={onSearch}
       />
-      <Stack direction="row" spacing={4} sx={{ pt: 4 }}>
-        <Stack sx={{ width: 275, p: 2, pl: 1 }} alignItems="start">
-          <PriceSlider
-            loading={filterLoading}
-            priceRange={priceRange}
-            setPriceRange={setPriceRange}
-            min={priceRangeMin}
-            max={priceRangeMax}
-          />
-          {(zones.length > 0 || filterLoading) && (
-            <>
-              <Stack direction="row" justifyContent="space-between" alignItems="end" width="100%" height={40}>
-                <Typography gutterBottom>Neighborhood</Typography>
-                {zone && (
-                  <IconButton onClick={() => setZone(null)}>
-                    <CloseIcon />
-                  </IconButton>
-                )}
-              </Stack>
-              <RadioGroup name="zones" value={zone} onChange={(e, v) => setZone(v)}>
-                {filterLoading ? (
-                  <>
-                    <Skeleton variant="rectangular" height={42} width={250} sx={{ borderRadius: 1, mb: 1 }} />
-                    <Skeleton variant="rectangular" height={42} width={250} sx={{ borderRadius: 1, mb: 1 }} />
-                    <Skeleton variant="rectangular" height={42} width={250} sx={{ borderRadius: 1, mb: 1 }} />
-                  </>
-                ) : (
-                  zones.map(({ code, name, count }) => (
-                    <FormControlLabel
-                      value={code}
-                      key={code}
-                      label={
-                        <Typography style={{ fontSize: 14 }}>
-                          {name} <small>({count})</small>
-                        </Typography>
-                      }
-                      control={<Radio />}
-                    />
-                  ))
-                )}
-              </RadioGroup>
-            </>
+      <Stack
+        direction={{
+          sm: 'column',
+          md: 'row',
+        }}
+        spacing={sizing}
+      >
+        <Box flex={1}>
+          {onlyMediumScreens ? (
+            <Accordion sx={{ flex: 1 }}>
+              <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+                <Typography>Filters</Typography>
+              </AccordionSummary>
+              <AccordionDetails>{filteringOptionsRootEl}</AccordionDetails>
+            </Accordion>
+          ) : (
+            filteringOptionsRootEl
           )}
-        </Stack>
-        <Stack sx={{ flex: 1, mx: 'auto' }}>
-          <Stack direction="row" justifyContent="space-between" alignItems="end" width="100%">
+        </Box>
+        <Stack sx={{ flex: 2 }} spacing={sizing}>
+          <Stack direction="row" justifyContent="space-between" alignItems="center" width="100%">
             <Typography sx={{ flex: 2 }} color="#999">
               {resultsMessage}
             </Typography>
@@ -326,7 +376,7 @@ export default function SearchPage() {
             )}
           </Stack>
           {loading && results.length === 0 && <Spinner />}
-          <Stack spacing={3} mt={2} mb={3}>
+          <Stack spacing={sizing}>
             {filtered.length > 0 &&
               filtered.map((hotel) => (
                 <HotelCard
@@ -349,6 +399,6 @@ export default function SearchPage() {
           </Stack>
         </Stack>
       </Stack>
-    </main>
+    </Stack>
   );
 }

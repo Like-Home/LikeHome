@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, Link } from 'react-router-dom';
 // eslint-disable-next-line camelcase
 import { useRecoilValue, useRecoilRefresher_UNSTABLE } from 'recoil';
 import {
@@ -16,27 +16,17 @@ import {
   ListItem,
   ListItemText,
   List,
+  Alert,
 } from '@mui/material';
 import moment from 'moment';
+import slugify from 'slugify';
 import { bookingById } from '../recoil/bookings/atom';
 import { createHotelbedsSrcSetFromPath, formatAddressFromHotel, formatCurrency } from '../utils';
 import { nightsFromDates } from '../api/hotel';
 import { Booking } from '../api/types';
 import { cancelBooking, editBooking } from '../api/bookings';
 import CardModal from '../components/CardModal';
-
-const statusToText = {
-  PE: 'Pending',
-  CO: 'Confirmed',
-  CA: 'Canceled',
-  PA: 'Past',
-};
-
-const phoneTypeToText = {
-  PHONEBOOKING: 'Booking',
-  PHONEHOTEL: 'Hotel Lobby',
-  FAXNUMBER: 'Fax',
-};
+import { statusToText, phoneTypeToText, cancelationStatusToText } from '../enums';
 
 function EditBookingModal({
   booking,
@@ -109,9 +99,10 @@ export default function BookingPage() {
   if (!bookingId) {
     return <div>Booking not found!</div>;
   }
+
   const bookingSelector = bookingById(bookingId);
   const refreshBookingAtom = useRecoilRefresher_UNSTABLE(bookingSelector);
-  const booking = useRecoilValue(bookingSelector);
+  const booking = useRecoilValue(bookingSelector) as unknown as Booking;
 
   const [editBookingOpen, setEditBookingOpen] = useState(false);
   const handleEditBookingOpen = () => setEditBookingOpen(true);
@@ -132,11 +123,9 @@ export default function BookingPage() {
     handleCancelBookingClose();
   };
 
-  const onRebooking = () => {
-    console.log('lol');
-  };
-
-  const hasBeenCanceled = booking.status === 'CA';
+  const isConfirmed = booking.status === 'CO';
+  const wasRebooked = booking.status === 'RE';
+  const wasCanceled = !!booking.cancelation_status;
   const isWithin24Hours = moment(booking.check_in).isBefore(moment().add(1, 'day'));
 
   // eslint-disable-next-line no-nested-ternary
@@ -161,6 +150,19 @@ export default function BookingPage() {
           spacing={2}
         >
           <Stack direction="column" spacing={2} flex={2}>
+            {wasCanceled && <Alert severity="warning">This booking has been canceled.</Alert>}
+            {wasRebooked && (
+              <Alert severity="success">
+                This booking has been rebooked. <Link to={`/booking/${booking.rebooked_to}`}>Click here</Link> to view
+                the new booking.
+              </Alert>
+            )}
+            {booking.rebooked_from && (
+              <Alert severity="info">
+                This booking was rebooked. <Link to={`/booking/${booking.rebooked_from}`}>Click here</Link> to view the
+                original booking.
+              </Alert>
+            )}
             <Stack className="card" spacing={1}>
               <Typography variant="h4">Hotel Information</Typography>
               <Typography variant="body1">{booking.hotel.description}</Typography>
@@ -176,7 +178,7 @@ export default function BookingPage() {
                 ))}
               </List>
             </Stack>
-            <Stack className="card" spacing={1}>
+            <Stack className="card" spacing={1} flexGrow={1}>
               <Typography variant="h4">Your details</Typography>
               <Stack direction="row" spacing={1}>
                 <Typography sx={{ fontWeight: 'bold' }}>First Name:</Typography>
@@ -194,10 +196,10 @@ export default function BookingPage() {
                 <Typography sx={{ fontWeight: 'bold' }}>Phone:</Typography>
                 <Typography>{booking.phone}</Typography>
               </Stack>
-              {!hasBeenCanceled && <Button onClick={handleEditBookingOpen}>Update Information</Button>}
+              {isConfirmed && <Button onClick={handleEditBookingOpen}>Update Information</Button>}
             </Stack>
           </Stack>
-          <Stack className="card" direction="column" spacing={2} flex={1}>
+          <Stack className="card" direction="column" spacing={2} flex={1} flexGrow={1}>
             <img
               alt=""
               {...createHotelbedsSrcSetFromPath(booking.image)}
@@ -214,12 +216,20 @@ export default function BookingPage() {
             <Typography variant="subtitle1" sx={{ marginTop: 0 }}>
               {formatAddressFromHotel(booking.hotel)}
             </Typography>
+            <Divider />
+            <Typography variant="h6">Details</Typography>
             <Card>
               <CardContent>
                 <Stack spacing={1}>
                   <Stack direction="row" justifyContent="space-between" sx={{ width: '100%' }}>
                     <Typography variant="body1">Check-in</Typography>
-                    <Stack spacing={1} direction="row">
+                    <Stack
+                      spacing={1}
+                      direction="row"
+                      sx={{
+                        textDecoration: wasCanceled ? 'line-through' : undefined,
+                      }}
+                    >
                       <Typography variant="body1" component="span">
                         {moment(booking.check_in).format('MMMM Do, YYYY')}
                       </Typography>
@@ -230,7 +240,13 @@ export default function BookingPage() {
                   </Stack>
                   <Stack direction="row" justifyContent="space-between" sx={{ width: '100%' }}>
                     <Typography variant="body1">Check-out</Typography>
-                    <Stack spacing={1} direction="row">
+                    <Stack
+                      spacing={1}
+                      direction="row"
+                      sx={{
+                        textDecoration: wasCanceled ? 'line-through' : undefined,
+                      }}
+                    >
                       <Typography variant="body1" component="span">
                         {moment(booking.check_out).format('MMMM Do, YYYY')}
                       </Typography>
@@ -251,10 +267,12 @@ export default function BookingPage() {
                     <Typography variant="body1">Total</Typography>
                     <Typography variant="body1">{formatCurrency(booking.amount_paid)}</Typography>
                   </Stack>
-                  <Stack direction="row" justifyContent="space-between" sx={{ width: '100%' }}>
-                    <Typography variant="body1">Points Earned</Typography>
-                    <Typography variant="body1">{booking.points_earned}</Typography>
-                  </Stack>
+                  {!wasCanceled && (
+                    <Stack direction="row" justifyContent="space-between" sx={{ width: '100%' }}>
+                      <Typography variant="body1">Points Earned</Typography>
+                      <Typography variant="body1">{booking.points_earned}</Typography>
+                    </Stack>
+                  )}
                   <Stack direction="row" justifyContent="space-between" sx={{ width: '100%' }}>
                     <Typography variant="body1">Points Spent</Typography>
                     <Typography variant="body1">{booking.points_spent}</Typography>
@@ -262,10 +280,55 @@ export default function BookingPage() {
                 </Stack>
               </CardContent>
             </Card>
-            {!hasBeenCanceled && (
+            {wasCanceled && (
               <>
                 <Divider />
-                <Button onClick={onRebooking}>Re-book</Button>
+                <Typography variant="h6">Cancelation</Typography>
+                <Card>
+                  <CardContent>
+                    <Stack spacing={1}>
+                      <Stack direction="row" justifyContent="space-between" sx={{ width: '100%' }}>
+                        <Typography variant="body1">Date</Typography>
+                        <Typography variant="body1" component="span">
+                          {moment(booking.canceled_at).format('MMMM Do, YYYY HH:mm A')}
+                        </Typography>
+                      </Stack>
+                      <Stack direction="row" justifyContent="space-between" sx={{ width: '100%' }}>
+                        <Typography variant="body1">Refund</Typography>
+                        <Typography variant="body1" component="span">
+                          {cancelationStatusToText[booking.cancelation_status]}
+                        </Typography>
+                      </Stack>
+                      <Stack direction="row" justifyContent="space-between" sx={{ width: '100%' }}>
+                        <Stack>
+                          <Typography variant="body1">Amount</Typography>
+                        </Stack>
+                        <Typography variant="body1">{formatCurrency(booking.refund_amount)}</Typography>
+                      </Stack>
+                      <Stack direction="row" justifyContent="space-between" sx={{ width: '100%' }}>
+                        <Stack>
+                          <Typography variant="body1">Card</Typography>
+                        </Stack>
+                        <Typography variant="body1">xxxx xxxx xxxx 4242</Typography>
+                      </Stack>
+                    </Stack>
+                  </CardContent>
+                </Card>
+              </>
+            )}
+            {isConfirmed && (
+              <>
+                <Divider />
+                <Button
+                  component={Link}
+                  to={`/hotel/${booking.hotel.code}/${slugify(booking.hotel.name).toLowerCase()}/?checkin=${
+                    booking.check_in
+                  }&checkout=${booking.check_out}&guests=${booking.adults}&rooms=${booking.rooms}&rebooking=${
+                    booking.id
+                  }`}
+                >
+                  Re-book
+                </Button>
                 <Button color="error" onClick={handleCancelBookingOpen}>
                   Cancel
                 </Button>

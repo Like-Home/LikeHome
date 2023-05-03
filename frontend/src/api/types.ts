@@ -1,3 +1,4 @@
+export type HotelPhoneType = 'PHONEMANAGEMENT' | 'PHONEBOOKING' | 'PHONEHOTEL' | 'FAXNUMBER';
 export interface HotelbedsHotel {
   code: number;
   accommodationType: {
@@ -58,7 +59,7 @@ export interface HotelbedsHotel {
   phones: {
     id: number;
     phoneNumber: string;
-    phoneType: 'PHONEBOOKING' | 'PHONEHOTEL' | 'FAXNUMBER';
+    phoneType: HotelPhoneType;
     hotel: number;
     // ...
   }[];
@@ -107,37 +108,52 @@ export type BookingPutArgs = {
   phone: string;
 };
 
+export type BookingCancelationStatusEnum = 'N' | 'F' | 'P';
+export type BookingStatusEnum = 'PE' | 'CO' | 'CA' | 'RE' | 'IP' | 'PA';
 export type Booking = BookingPutArgs & {
   id: number;
-  stripe_id: string;
+  stripe_payment_intent_id: string;
   amount_paid: number;
   points_earned: number;
   points_spent: number;
-  status: 'PE' | 'CO' | 'CA' | 'PA';
+  status: BookingStatusEnum;
   user: number;
   created_at: string;
   hotel: HotelbedsHotel;
   overlapping: boolean;
   room_code: string;
   adults: string;
+  rooms: number;
+  room_name: string;
   image: string;
   children: string;
   check_in: string;
   check_out: string;
+  refund_amount: number;
+  cancelation_status: BookingCancelationStatusEnum;
+  rebooked_to?: number; // Booking;
+  rebooked_from?: number; // Booking;
+  canceled_at?: string; // Booking;
+};
+
+export type UserPutArgs = {
+  first_name: string;
+  email: string;
+  last_name: string;
+  phone_number: string;
+  autofill_booking_info: boolean;
 };
 
 export type User = {
   username: string;
-  email: string;
+  image: string;
   date_joined: string;
-  first_name: string;
   groups: string[];
   id: number;
   is_active: boolean;
   is_staff: boolean;
   is_superuser: boolean;
   last_login: string;
-  last_name: string;
   travel_points: number;
   user_permissions: string[];
-};
+} & UserPutArgs;

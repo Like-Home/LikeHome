@@ -43,10 +43,19 @@ type SearchBarProps = SearchPageParams & {
 export default function SearchBars(props: SearchPageParams & SearchBarProps) {
   const navigate = useNavigate();
 
+  // default to setting the checkin/checkout date to the next weekend
+  const today = new Date();
+  const nextWeekend = new Date();
+  nextWeekend.setDate(today.getDate() + ((6 - today.getDay() + 7) % 7) + 1);
+  const nextWeekendStr = nextWeekend.toISOString().split('T')[0];
+  const nextWeekendPlusOne = new Date(nextWeekend);
+  nextWeekendPlusOne.setDate(nextWeekendPlusOne.getDate() + 2);
+  const nextWeekendPlusOneStr = nextWeekendPlusOne.toISOString().split('T')[0];
+
   const [location, setLocation] = useState(props.location);
-  const [checkin, setCheckin] = useState(props.checkin);
-  const [checkout, setCheckout] = useState(props.checkout);
-  const [guests, setGuests] = useState(props.guests || '1');
+  const [checkin, setCheckin] = useState(props.checkin || nextWeekendStr);
+  const [checkout, setCheckout] = useState(props.checkout || nextWeekendPlusOneStr);
+  const [guests, setGuests] = useState(props.guests || '2');
   const [rooms, setRooms] = useState(props.rooms || '1');
 
   const gridLayouts = {
