@@ -50,39 +50,6 @@ class KeyPool:
     def reset(self):
         self.cur_key = 0
 
-# [{
-#     "name": "Nha",
-#     "key": "ac00df36f6a3bffadb3ba384582aaf9e",
-#     "secret": "1c211bc731"
-# },
-#     {
-#     "name": "Josh",
-#     "key": "d41651a67b68b36d5f2dbfd28145f87d",
-#     "secret": "e6062af3bf"
-# },
-#     {
-#     "name": "Jeff Throwaway",
-#     "key": "37f60277ee67df99d23144b542260e78",
-#     "secret": "eda7e0129a"
-# },
-#     {
-#     "name": "Micheal",
-#     "key": "fbd965f9ca40a9d3a9b9152d5da4fcfe",
-#     "secret": "a31b78b04e"
-# },
-#     {
-#     "name": "Rishi",
-#     "key": "ad2698d1ff021fb1c81a93f1d7d44d7b",
-#     "secret": "3e598c20c3"
-# },
-#     {
-#     "name": "Noah",
-#     "key": "319ad69c0ecef4c79861bb616a3c30ea",
-#     "secret": "a8f2bfb4b9"
-# }
-# ]
-
-
 def generate_signature(api_key: str, secret: str) -> str:
     """Generates a signature for the Hotelbeds API.
 
